@@ -35,7 +35,7 @@ class Device(object):
       parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
       timeout=1, xonxoff=False, rtscts=False, dsrdtr=False, writeTimeout=None)
 
-  def _SendCommand(self, cmd):
+  def _send_command(self, cmd):
     """Send command interface.
 
     Args:
@@ -50,7 +50,7 @@ class Device(object):
 
   _RESPONSE_MATCH = re.compile(r'^(.+) ([0-9A-F]{4})\r$')
 
-  def _ValidateAndStripChecksum(self, line):
+  def _validate_and_strip_checksum(self, line):
     """Verify the CRC16 checksum and remove it from the line.
 
     Args:
@@ -69,7 +69,7 @@ class Device(object):
     # TODO(flameeyes) check that the checksum is actually valid
     return response
 
-  def _SendOnelinerCommand(self, cmd):
+  def _send_oneliner_command(self, cmd):
     """Send command and read a one-line response.
 
     Args:
@@ -78,19 +78,19 @@ class Device(object):
     Returns:
       A single line of text that the glucometer responds, without the checksum.
     """
-    self._SendCommand(cmd)
+    self._send_command(cmd)
 
     line = self.serial_.readline().decode('ascii')
-    return self._ValidateAndStripChecksum(line)
+    return self._validate_and_strip_checksum(line)
 
-  def GetVersion(self):
+  def get_version(self):
     """Returns an identifier of the firmware version of the glucometer.
 
     Returns:
       The software version returned by the glucometer, such as
         "P02.00.00 30/08/06".
     """
-    response = self._SendOnelinerCommand('DM?')
+    response = self._send_oneliner_command('DM?')
 
     if response[0] != '?':
       raise InvalidResponse(response)
@@ -99,7 +99,7 @@ class Device(object):
 
   _SERIAL_NUMBER_RE = re.compile('^@ "([A-Z0-9]{9})"$')
 
-  def GetSerialNumber(self):
+  def get_serial_number(self):
     """Retrieve the serial number of the device.
 
     Returns:
@@ -111,7 +111,7 @@ class Device(object):
       InvalidSerialNumber: if the returned serial number does not match
         the OneTouch2 device as per specs.
     """
-    response = self._SendOnelinerCommand('DM@')
+    response = self._send_oneliner_command('DM@')
 
     match = self._SERIAL_NUMBER_RE.match(response)
     if not match:
@@ -130,7 +130,7 @@ class Device(object):
   _DATETIME_RE = re.compile(
     r'^"[A-Z]{3}","([0-9]{2}/[0-9]{2}/[0-9]{2})","([0-9]{2}:[0-9]{2}:[0-9]{2})   "$')
 
-  def _ParseDateTime(self, response):
+  def _parse_datetime(self, response):
     """Convert a response with date and time from the meter into a datetime.
 
     Args:
@@ -153,16 +153,16 @@ class Device(object):
     # Yes, OneTouch2's firmware is not Y2K safe.
     return datetime.datetime(2000 + year, month, day, hour, minute, second)
 
-  def GetDateTime(self):
+  def get_datetime(self):
     """Returns the current date and time for the glucometer.
 
     Returns:
       A datetime object built according to the returned response.
     """
-    response = self._SendOnelinerCommand('DMF')
-    return self._ParseDateTime(response[2:])
+    response = self._send_oneliner_command('DMF')
+    return self._parse_datetime(response[2:])
 
-  def SetDateTime(self, date=datetime.datetime.now()):
+  def set_datetime(self, date=datetime.datetime.now()):
     """Sets the date and time of the glucometer.
 
     Args:
@@ -172,12 +172,12 @@ class Device(object):
     Returns:
       A datetime object built according to the returned response.
     """
-    response = self._SendOnelinerCommand(
+    response = self._send_oneliner_command(
       'DMT' + date.strftime('%m/%d/%y %H:%M:%S'))
 
-    return self._ParseDateTime(response[2:])
+    return self._parse_datetime(response[2:])
 
-  def _ParseGlucoseUnit(self, unit):
+  def _parse_glucose_unit(self, unit):
     """Parses the value of a OneTouch Ultra Glucose unit definition.
 
     Args:
@@ -199,22 +199,22 @@ class Device(object):
 
   _GLUCOSE_UNIT_RE = re.compile(r'^SU\?,"(MG/DL |MMOL/L)"')
 
-  def GetGlucoseUnit(self):
+  def get_glucose_unit(self):
     """Returns a constant representing the unit for the dumped readings.
 
     Returns:
       common.UNIT_MGDL: if the glucometer reads in mg/dL
       common.UNIT_MMOLL: if the glucometer reads in mmol/L
     """
-    response = self._SendOnelinerCommand('DMSU?')
+    response = self._send_oneliner_command('DMSU?')
 
     match = self._GLUCOSE_UNIT_RE.match(response)
-    return self._ParseGlucoseUnit(match.group(1))
+    return self._parse_glucose_unit(match.group(1))
 
   _DUMP_HEADER_RE = re.compile(r'P ([0-9]{3}),"[0-9A-Z]{9}","(MG/DL |MMOL/L)"')
   _DUMP_LINE_RE = re.compile(r'P ("[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),"([ 0-9.]{6})",')
 
-  def GetReadings(self, unit=None):
+  def get_readings(self, unit=None):
     """Iterates over the reading values stored in the glucometer.
 
     Args:
@@ -228,7 +228,7 @@ class Device(object):
     Raises:
       exceptions.InvalidResponse: if the response does not match what expected.
     """
-    self._SendCommand('DMP')
+    self._send_command('DMP')
     data = self.serial_.readlines()
 
     header = data.pop(0).decode('ascii')
@@ -237,23 +237,23 @@ class Device(object):
       raise exceptions.InvalidResponse(header)
 
     if not unit:
-      unit = self._ParseGlucoseUnit(match.group(2))
+      unit = self._parse_glucose_unit(match.group(2))
     count = int(match.group(1))
     assert count == len(data)
 
     for line in data:
-      line = self._ValidateAndStripChecksum(line.decode('ascii'))
+      line = self._validate_and_strip_checksum(line.decode('ascii'))
 
       match = self._DUMP_LINE_RE.match(line)
       if not match:
         raise exceptions.InvalidResponse(line)
 
-      date = self._ParseDateTime(match.group(1))
+      date = self._parse_datetime(match.group(1))
 
       # OneTouch2 always returns the data in mg/dL even if the
       # glucometer is set to mmol/L. We need to convert it to the
       # requested unit here.
-      value = common.ConvertGlucoseUnit(int(match.group(2)),
-                                        common.UNIT_MGDL, unit)
+      value = common.convert_glucose_unit(int(match.group(2)),
+                                          common.UNIT_MGDL, unit)
 
       yield (date, value)

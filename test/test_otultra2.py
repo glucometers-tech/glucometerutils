@@ -31,26 +31,26 @@ class TestOTUltra2(unittest.TestCase):
     self.mock_readline.return_value = bytes('INVALID', 'ascii')
 
     self.assertRaises(otultra2.MissingChecksum,
-                      self.device.GetSerialNumber)
+                      self.device.get_serial_number)
 
   def testShortResponse(self):
     self.mock_readline.return_value = bytes('.\r', 'ascii')
 
     self.assertRaises(exceptions.InvalidResponse,
-                      self.device.GetSerialNumber)
+                      self.device.get_serial_number)
 
   def testInvalidResponse(self):
     self.mock_readline.return_value = bytes('% 1337\r', 'ascii')
 
     self.assertRaises(exceptions.InvalidResponse,
-                      self.device.GetSerialNumber)
+                      self.device.get_serial_number)
 
   def testInvalidSerialNumber(self):
     self.mock_readline.return_value = bytes(
       '@ "12345678O" 1337\r', 'ascii')
 
     self.assertRaises(otultra2.InvalidSerialNumber,
-                      self.device.GetSerialNumber)
+                      self.device.get_serial_number)
 
 if __name__ == '__main__':
     unittest.main()

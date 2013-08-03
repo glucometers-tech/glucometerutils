@@ -43,13 +43,13 @@ def main(argv=sys.argv):
   device = driver.Device(args.device)
 
   if args.action == 'dump':
-    for reading in device.GetReadings(args.unit):
+    for reading in device.get_readings(args.unit):
       print('%s,%f' % reading)
   elif args.action == 'datetime':
     if args.set:
-      print(device.SetDateTime())
+      print(device.set_datetime())
     else:
-      print(device.GetDateTime())
+      print(device.get_datetime())
   else:
     return 1
 

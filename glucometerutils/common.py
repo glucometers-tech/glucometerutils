@@ -19,7 +19,7 @@ DATETIME_24HR = '24 hours'
 from glucometerutils import exceptions
 
 
-def ConvertGlucoseUnit(value, from_unit, to_unit=None):
+def convert_glucose_unit(value, from_unit, to_unit=None):
   """Convert the given value of glucose level between units.
 
   Args:
