@@ -235,7 +235,8 @@ class Device(object):
     if not match:
       raise exceptions.InvalidResponse(header)
 
-    final_unit = unit or self._ParseGlucoseUnit(match.group(2))
+    if not unit:
+      unit = self._ParseGlucoseUnit(match.group(2))
     count = int(match.group(1))
     assert count == len(data)
 
