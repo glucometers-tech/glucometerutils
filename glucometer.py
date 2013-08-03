@@ -9,12 +9,11 @@ __license__ = 'GPL v3 or later'
 
 import argparse
 import importlib
-import sys
 
 from glucometerutils import common
 from glucometerutils.drivers import otultra2
 
-def main(argv=sys.argv):
+def main():
   parser = argparse.ArgumentParser()
   subparsers = parser.add_subparsers(dest="action")
 
