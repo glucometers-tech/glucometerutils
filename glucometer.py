@@ -10,12 +10,12 @@ import argparse
 import importlib
 import sys
 
-from glucometerutils import constants
+from glucometerutils import common
 from glucometerutils.drivers import otultra2
 
 def main(argv=sys.argv):
   parser = argparse.ArgumentParser()
-  subparsers = parser.add_subparsers()
+  subparsers = parser.add_subparsers(dest="action")
 
   parser.add_argument(
     '--driver', action='store', required=True,
@@ -37,6 +37,17 @@ def main(argv=sys.argv):
 
   driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
   device = driver.Device(args.device)
+
+  if args.action == 'dump':
+    for reading in device.GetReadings():
+      print('%s,%f' % reading)
+  elif args.action == 'datetime':
+    if args.set:
+      print(device.SetDateTime())
+    else:
+      print(device.GetDateTime())
+  else:
+    return 1
 
 if __name__ == "__main__":
     main()
