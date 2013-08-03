@@ -9,6 +9,9 @@ __license__ = 'MIT'
 
 import argparse
 import importlib
+import sys
+
+from dateutil import parser as date_parser
 
 from glucometerutils import common
 from glucometerutils.drivers import otultra2
@@ -33,7 +36,7 @@ def main():
   parser_date = subparsers.add_parser(
     'datetime', help='Reads or sets the date and time of the glucometer.')
   parser_date.add_argument(
-    '--set', action='store_true',
+    '--set', action='store', nargs='?', const='now', default=None,
     help='Set the date rather than just reading it from the device.')
 
   args = parser.parse_args()
@@ -45,8 +48,13 @@ def main():
     for reading in device.get_readings(args.unit):
       print('%s,%f' % reading)
   elif args.action == 'datetime':
-    if args.set:
+    if args.set == 'now':
       print(device.set_datetime())
+    elif args.set:
+      try:
+        print(device.set_datetime(date_parser.parse(args.set)))
+      except ValueError:
+        print('%s: not a valid date' % args.set, file=sys.stderr)
     else:
       print(device.get_datetime())
   else:
