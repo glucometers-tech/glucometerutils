@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Utility to manage glucometers' data."""
 
 __author__ = 'Diego Elio Pettenò'

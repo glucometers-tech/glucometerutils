@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Common exceptions for glucometerutils."""
 
 __author__ = 'Diego Elio Pettenò'

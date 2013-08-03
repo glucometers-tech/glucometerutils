@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Common routines for data in glucometers."""
 
 __author__ = 'Diego Elio Pettenò'

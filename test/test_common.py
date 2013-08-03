@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for the common routines."""
 
 __author__ = 'Diego Elio Pettenò'

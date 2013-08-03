@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for the LifeScan OneTouch Ultra 2 driver."""
 
 __author__ = 'Diego Elio Pettenò'
