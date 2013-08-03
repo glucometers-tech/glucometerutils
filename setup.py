@@ -19,7 +19,7 @@ setup(
     'Development Status :: 4 - Beta',
     'Environment :: Console',
     'Operating System :: OS Independent',
-    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+    'License :: OSI Approved :: MIT License',
     'Intended Audience :: End Users/Desktop',
     'Topic :: Scientific/Engineering :: Medical Science Apps.',
   ],
