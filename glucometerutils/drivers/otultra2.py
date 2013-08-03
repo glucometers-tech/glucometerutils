@@ -13,19 +13,7 @@ import serial
 
 from glucometerutils import common
 from glucometerutils import exceptions
-
-
-class MissingChecksum(exceptions.InvalidResponse):
-  """The response misses the expected 4-digits checksum."""
-  def __init__(self, response):
-    self.response = response
-
-  def __str__(self):
-    return 'Response is missing the OT2 checksum: %s' % self.response
-
-
-class InvalidSerialNumber(exceptions.Error):
-  """The serial number is not ending with Y as expected."""
+from glucometerutils.drivers import lifescan_common
 
 
 class Device(object):
@@ -62,11 +50,22 @@ class Device(object):
     match = self._RESPONSE_MATCH.match(line)
 
     if not match:
-      raise MissingChecksum(line)
+      raise lifescan_common.MissingChecksum(line)
 
-    response, checksum = match.groups()
+    response, checksum_string = match.groups()
 
-    # TODO(flameeyes) check that the checksum is actually valid
+    try:
+      checksum_given = int(checksum_string, 16)
+      checksum_calculated = lifescan_common.calculate_checksum(
+        bytes(response, 'ascii'))
+
+      if checksum_given != checksum_calculated:
+        raise lifescan_common.InvalidChecksum(checksum_given,
+                                              checksum_calculated)
+    except ValueError:
+      raise lifescan_common.InvalidChecksum(checksum_given,
+                                            None)
+
     return response
 
   def _send_oneliner_command(self, cmd):
@@ -122,7 +121,7 @@ class Device(object):
     # 'Y' at the far right of the serial number is the indication of a OneTouch
     # Ultra2 device, as per specs.
     if serial_number[-1] != 'Y':
-      raise InvalidSerialNumber('Serial number %s is invalid.' % serial_number)
+      raise lifescan_common.InvalidSerialNumber(serial_number)
 
     return serial_number
 

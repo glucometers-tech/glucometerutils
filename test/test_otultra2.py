@@ -15,6 +15,7 @@ import mock
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from glucometerutils import common
+from glucometerutils.drivers import lifescan_common
 from glucometerutils.drivers import otultra2
 from glucometerutils import exceptions
 
@@ -30,7 +31,7 @@ class TestOTUltra2(unittest.TestCase):
   def testMissingChecksum(self):
     self.mock_readline.return_value = bytes('INVALID', 'ascii')
 
-    self.assertRaises(otultra2.MissingChecksum,
+    self.assertRaises(lifescan_common.MissingChecksum,
                       self.device.get_serial_number)
 
   def testShortResponse(self):
@@ -40,16 +41,30 @@ class TestOTUltra2(unittest.TestCase):
                       self.device.get_serial_number)
 
   def testInvalidResponse(self):
-    self.mock_readline.return_value = bytes('% 1337\r', 'ascii')
+    self.mock_readline.return_value = bytes('% 2500\r', 'ascii')
 
     self.assertRaises(exceptions.InvalidResponse,
                       self.device.get_serial_number)
 
   def testInvalidSerialNumber(self):
     self.mock_readline.return_value = bytes(
-      '@ "12345678O" 1337\r', 'ascii')
+      '@ "12345678O" E105\r', 'ascii')
 
-    self.assertRaises(otultra2.InvalidSerialNumber,
+    self.assertRaises(lifescan_common.InvalidSerialNumber,
+                      self.device.get_serial_number)
+
+  def testInvalidChecksum(self):
+    self.mock_readline.return_value = bytes(
+      '% 1337\r', 'ascii')
+
+    self.assertRaises(lifescan_common.InvalidChecksum,
+                      self.device.get_serial_number)
+
+  def testBrokenChecksum(self):
+    self.mock_readline.return_value = bytes(
+      '% 13AZ\r', 'ascii')
+
+    self.assertRaises(lifescan_common.MissingChecksum,
                       self.device.get_serial_number)
 
 if __name__ == '__main__':
