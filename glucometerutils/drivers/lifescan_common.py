@@ -6,8 +6,6 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
 __license__ = 'GPL v3 or later'
 
-import ctypes
-
 from glucometerutils import exceptions
 
 
@@ -31,40 +29,20 @@ class InvalidSerialNumber(exceptions.Error):
 
 
 def calculate_checksum(bytestring):
-  """Calculate the "CRC16 Sick" style checksum for LifeScan protocols.
+  """Calculate the checksum used by OneTouch Ultra and Ultra2 devices
 
   Args:
     bytestring: the string of which the checksum has to be calculated.
 
   Returns:
-    A 16-bit integer that is the checksum for the input.
+    A string with the hexdecimal representation of the checksum for the input.
 
-  Credits for this code go to Christian Navalici, who implemented it in his
-  library at https://github.com/cristianav/PyCRC/ .
+  The checksum is a very stupid one: it just sums all the bytes,
+  modulo 16-bit, without any parity.
   """
-  crcValue = 0x0000
-  prev_c = 0x0000
+  checksum = 0
 
-  for idx, c in enumerate(bytestring):
-    short_c  =  0x00ff & c
+  for byte in bytestring:
+    checksum = (checksum + byte) & 0xffff
 
-    idx_previous = idx - 1
-    short_p  = ( 0x00ff & prev_c) << 8;
-
-    if ( crcValue & 0x8000 ):
-      crcValue = ctypes.c_ushort(crcValue << 1).value ^ 0x8005
-    else:
-      crcValue = ctypes.c_ushort(crcValue << 1).value
-
-    crcValue &= 0xffff
-    crcValue ^= ( short_c | short_p )
-
-    prev_c = short_c
-
-  # After processing, the one's complement of the CRC is calcluated and the
-  # two bytes of the CRC are swapped.
-  low_byte   = (crcValue & 0xff00) >> 8
-  high_byte  = (crcValue & 0x00ff) << 8
-  crcValue   = low_byte | high_byte;
-
-  return crcValue
+  return checksum

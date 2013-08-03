@@ -20,10 +20,11 @@ from glucometerutils import exceptions
 class TestOTUltra2(unittest.TestCase):
   def testChecksum(self):
     checksum = lifescan_common.calculate_checksum(bytes('T', 'ascii'))
-    self.assertEqual(0x5400, checksum)
+    self.assertEqual(0x0054, checksum)
 
-    checksum = lifescan_common.calculate_checksum(bytes('TestString', 'ascii'))
-    self.assertEqual(0x0643, checksum)
+    checksum = lifescan_common.calculate_checksum(
+      bytes('T "SAT","08/03/13","22:12:00   "', 'ascii'))
+    self.assertEqual(0x0608, checksum)
 
 if __name__ == '__main__':
     unittest.main()

@@ -48,7 +48,7 @@ class TestOTUltra2(unittest.TestCase):
 
   def testInvalidSerialNumber(self):
     self.mock_readline.return_value = bytes(
-      '@ "12345678O" E105\r', 'ascii')
+      '@ "12345678O" 0297\r', 'ascii')
 
     self.assertRaises(lifescan_common.InvalidSerialNumber,
                       self.device.get_serial_number)
