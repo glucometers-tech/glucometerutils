@@ -4,7 +4,7 @@
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
-__license__ = 'GPL v3 or later'
+__license__ = 'MIT'
 
 import datetime
 import re
