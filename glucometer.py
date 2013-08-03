@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+"""Utility to manage glucometers' data."""
+
+__author__ = 'Diego Elio Pettenò'
+__email__ = 'flameeyes@flameeyes.eu'
+__copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
+__license__ = 'GPL v3 or later'
+
+import argparse
+import importlib
+import sys
+
+from glucometerutils import constants
+from glucometerutils.drivers import otultra2
+
+def main(argv=sys.argv):
+  parser = argparse.ArgumentParser()
+  subparsers = parser.add_subparsers()
+
+  parser.add_argument(
+    '--driver', action='store', required=True,
+    help='Select the driver to use for connecting to the glucometer.')
+  parser.add_argument(
+    '--device', action='store', required=True,
+    help='Select the path to the glucometer device.')
+
+  parser_dump = subparsers.add_parser(
+    'dump', help='Dump the readings stored in the device.')
+
+  parser_date = subparsers.add_parser(
+    'datetime', help='Reads or sets the date and time of the glucometer.')
+  parser_date.add_argument(
+    '--set', action='store_true',
+    help='Set the date rather than just reading it from the device.')
+
+  args = parser.parse_args()
+
+  driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
+  device = driver.Device(args.device)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,15 @@
+Glucometer Utilities
+====================
+
+This utility I created for personal needs, as my glucometer's software
+can only print the software (to XPS) without a file export option.
+
+While right now only supports my glucometer (LifeScan OneTouch Ultra
+2), I've tried designing it so that it can be extended and used for
+other models as well.
+
+License
+-------
+
+Due to one of the dependencies being licensed under GPL v3, the
+utility is also released under GPLv3 or later.
