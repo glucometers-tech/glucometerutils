@@ -26,6 +26,9 @@ def main(argv=sys.argv):
 
   parser_dump = subparsers.add_parser(
     'dump', help='Dump the readings stored in the device.')
+  parser_dump.add_argument(
+    '--unit', action='store', choices=common.VALID_UNITS,
+    help='Select the unit to use for the dumped data.')
 
   parser_date = subparsers.add_parser(
     'datetime', help='Reads or sets the date and time of the glucometer.')
@@ -39,7 +42,7 @@ def main(argv=sys.argv):
   device = driver.Device(args.device)
 
   if args.action == 'dump':
-    for reading in device.GetReadings():
+    for reading in device.GetReadings(args.unit):
       print('%s,%f' % reading)
   elif args.action == 'datetime':
     if args.set:
