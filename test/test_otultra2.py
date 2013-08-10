@@ -28,41 +28,41 @@ class TestOTUltra2(unittest.TestCase):
 
     self.device = otultra2.Device('mockdevice')
 
+  def _set_return_string(self, string):
+    self.mock_readline.return_value = bytes(string, 'ascii')
+
   def testMissingChecksum(self):
-    self.mock_readline.return_value = bytes('INVALID', 'ascii')
+    self._set_return_string('INVALID')
 
     self.assertRaises(lifescan_common.MissingChecksum,
                       self.device.get_serial_number)
 
   def testShortResponse(self):
-    self.mock_readline.return_value = bytes('.\r', 'ascii')
+    self._set_return_string('.\r')
 
     self.assertRaises(exceptions.InvalidResponse,
                       self.device.get_serial_number)
 
   def testInvalidResponse(self):
-    self.mock_readline.return_value = bytes('% 2500\r', 'ascii')
+    self._set_return_string('% 2500\r')
 
     self.assertRaises(exceptions.InvalidResponse,
                       self.device.get_serial_number)
 
   def testInvalidSerialNumber(self):
-    self.mock_readline.return_value = bytes(
-      '@ "12345678O" 0297\r', 'ascii')
+    self._set_return_string('@ "12345678O" 0297\r')
 
     self.assertRaises(lifescan_common.InvalidSerialNumber,
                       self.device.get_serial_number)
 
   def testInvalidChecksum(self):
-    self.mock_readline.return_value = bytes(
-      '% 1337\r', 'ascii')
+    self._set_return_string('% 1337\r')
 
     self.assertRaises(lifescan_common.InvalidChecksum,
                       self.device.get_serial_number)
 
   def testBrokenChecksum(self):
-    self.mock_readline.return_value = bytes(
-      '% 13AZ\r', 'ascii')
+    self._set_return_string('% 13AZ\r')
 
     self.assertRaises(lifescan_common.MissingChecksum,
                       self.device.get_serial_number)
