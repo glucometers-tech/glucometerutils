@@ -45,8 +45,8 @@ def main():
   device = driver.Device(args.device)
 
   if args.action == 'dump':
-    for reading in device.get_readings(args.unit):
-      print('%s,%f' % reading)
+    for reading in device.get_readings():
+      print('%s,%f' % (reading.timestamp, reading.get_value_as(args.unit)))
   elif args.action == 'datetime':
     if args.set == 'now':
       print(device.set_datetime())

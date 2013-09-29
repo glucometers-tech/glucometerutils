@@ -47,3 +47,22 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
     return round(value / 18.0, 2)
   else:
     return round(value * 18.0, 0)
+
+
+class Reading(object):
+  def __init__(self, timestamp, value, unit):
+    self.timestamp = timestamp
+    self.value = value
+    self.unit = unit
+
+  def get_value_as(self, to_unit):
+    """Returns the reading value as the given unit.
+
+    Args:
+      to_unit: either UNIT_MGDL or UNIT_MMOLL as wanted; if None, the
+      value as recorded will be returned.
+    """
+    if to_unit is None:
+      return self.value
+
+    return convert_glucose_unit(self.value, self.unit, to_unit)

@@ -210,10 +210,13 @@ class Device(object):
     match = self._GLUCOSE_UNIT_RE.match(response)
     return self._parse_glucose_unit(match.group(1))
 
-  _DUMP_HEADER_RE = re.compile(r'P ([0-9]{3}),"[0-9A-Z]{9}","(MG/DL |MMOL/L)"')
-  _DUMP_LINE_RE = re.compile(r'P ("[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),"([ 0-9.]{6})",')
+  _DUMP_HEADER_RE = re.compile(r'P ([0-9]{3}),"[0-9A-Z]{9}","(?:MG/DL |MMOL/L)"')
+  _DUMP_LINE_RE = re.compile(
+    r'P (?P<datetime>"[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),'
+    r'"(?P<control>[C ]) (?P<value>[0-9]{3})(?P<parityerror>[\? ])",'
+    r'"(?P<meal>[NBA])","(?P<comment>0[0-9]|1[01])", 00')
 
-  def get_readings(self, unit=None):
+  def get_readings(self):
     """Iterates over the reading values stored in the glucometer.
 
     Args:
@@ -235,8 +238,6 @@ class Device(object):
     if not match:
       raise exceptions.InvalidResponse(header)
 
-    if not unit:
-      unit = self._parse_glucose_unit(match.group(2))
     count = int(match.group(1))
     assert count == len(data)
 
@@ -247,12 +248,12 @@ class Device(object):
       if not match:
         raise exceptions.InvalidResponse(line)
 
-      date = self._parse_datetime(match.group(1))
+      line_data = match.groupdict()
+
+      date = self._parse_datetime(line_data['datetime'])
 
       # OneTouch2 always returns the data in mg/dL even if the
       # glucometer is set to mmol/L. We need to convert it to the
       # requested unit here.
-      value = common.convert_glucose_unit(int(match.group(2)),
-                                          common.UNIT_MGDL, unit)
-
-      yield (date, value)
+      yield common.Reading(date, int(line_data['value']),
+                           common.UNIT_MGDL)
