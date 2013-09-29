@@ -10,45 +10,40 @@ import os
 import sys
 import unittest
 
-import mock
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from glucometerutils import common
 from glucometerutils import exceptions
 
 class TestCommon(unittest.TestCase):
-  def setUp(self):
-    pass
+    def test_glucose_conversion(self):
+        self.assertEqual(
+            5.56, common.convert_glucose_unit(
+                100, common.UNIT_MGDL, common.UNIT_MMOLL))
 
-  def test_glucose_conversion(self):
-    self.assertEqual(
-      5.56, common.convert_glucose_unit(
-        100, common.UNIT_MGDL, common.UNIT_MMOLL))
+        self.assertEqual(
+            5.56, common.convert_glucose_unit(
+                100, common.UNIT_MGDL))
 
-    self.assertEqual(
-      5.56, common.convert_glucose_unit(
-        100, common.UNIT_MGDL))
+        self.assertEqual(
+            180, common.convert_glucose_unit(
+                10, common.UNIT_MMOLL, common.UNIT_MGDL))
 
-    self.assertEqual(
-      180, common.convert_glucose_unit(
-        10, common.UNIT_MMOLL, common.UNIT_MGDL))
+        self.assertEqual(
+            180, common.convert_glucose_unit(
+                10, common.UNIT_MMOLL))
 
-    self.assertEqual(
-      180, common.convert_glucose_unit(
-        10, common.UNIT_MMOLL))
+        self.assertEqual(
+            100, common.convert_glucose_unit(
+                100, common.UNIT_MGDL, common.UNIT_MGDL))
 
-    self.assertEqual(
-      100, common.convert_glucose_unit(
-        100, common.UNIT_MGDL, common.UNIT_MGDL))
+        self.assertEqual(
+            10, common.convert_glucose_unit(
+                10, common.UNIT_MMOLL, common.UNIT_MMOLL))
 
-    self.assertEqual(
-      10, common.convert_glucose_unit(
-        10, common.UNIT_MMOLL, common.UNIT_MMOLL))
-
-    self.assertRaises(
-      exceptions.InvalidGlucoseUnit,
-      common.convert_glucose_unit, common.UNIT_MMOLL, 'foo')
+        self.assertRaises(
+            exceptions.InvalidGlucoseUnit,
+            common.convert_glucose_unit, common.UNIT_MMOLL, 'foo')
 
 if __name__ == '__main__':
-    unittest.main()
+        unittest.main()
