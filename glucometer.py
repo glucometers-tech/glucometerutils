@@ -46,7 +46,8 @@ def main():
 
   if args.action == 'dump':
     for reading in device.get_readings():
-      print('%s,%f' % (reading.timestamp, reading.get_value_as(args.unit)))
+      print('%s,%.2f,%s' % (reading.timestamp, reading.get_value_as(args.unit),
+                            reading.comment))
   elif args.action == 'datetime':
     if args.set == 'now':
       print(device.set_datetime())

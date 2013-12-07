@@ -50,10 +50,11 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
 
 
 class Reading(object):
-  def __init__(self, timestamp, value, unit):
+  def __init__(self, timestamp, value, unit, comment=None):
     self.timestamp = timestamp
     self.value = value
     self.unit = unit
+    self.comment = comment or ''
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
