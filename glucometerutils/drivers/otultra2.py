@@ -110,7 +110,7 @@ class Device(object):
     response = self._send_oneliner_command('DM?')
 
     if response[0] != '?':
-      raise InvalidResponse(response)
+      raise exceptions.InvalidResponse(response)
 
     return response[1:]
 

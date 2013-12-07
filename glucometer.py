@@ -14,6 +14,7 @@ import sys
 from dateutil import parser as date_parser
 
 from glucometerutils import common
+from glucometerutils import exceptions
 from glucometerutils.drivers import otultra2
 
 def main():
@@ -49,29 +50,30 @@ def main():
   driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
   device = driver.Device(args.device)
 
-  if args.action == 'info':
-    print(device.get_information_string())
-  elif args.action == 'dump':
-    for reading in device.get_readings():
-      print('%s,%.2f,%s' % (reading.timestamp, reading.get_value_as(args.unit),
-                            reading.comment))
-  elif args.action == 'datetime':
-    if args.set == 'now':
-      print(device.set_datetime())
-    elif args.set:
-      try:
-        print(device.set_datetime(date_parser.parse(args.set)))
-      except ValueError:
-        print('%s: not a valid date' % args.set, file=sys.stderr)
-    else:
-      print(device.get_datetime())
-  elif args.action == 'zero':
-    try:
+  try:
+    if args.action == 'info':
+      print(device.get_information_string())
+    elif args.action == 'dump':
+      for reading in device.get_readings():
+        print('%s,%.2f,%s' % (reading.timestamp, reading.get_value_as(args.unit),
+                              reading.comment))
+    elif args.action == 'datetime':
+      if args.set == 'now':
+        print(device.set_datetime())
+      elif args.set:
+        try:
+          print(device.set_datetime(date_parser.parse(args.set)))
+        except ValueError:
+          print('%s: not a valid date' % args.set, file=sys.stderr)
+      else:
+        print(device.get_datetime())
+    elif args.action == 'zero':
       device.zero_log()
       print('Device data log zeroed.')
-    except Exception as e:
-      print('Error while zeroing device log: %s' % e)
-  else:
+    else:
+      return 1
+  except exceptions.Error as err:
+    print('Error while executing \'%s\': %s' % (args.action, str(err)))
     return 1
 
 if __name__ == "__main__":
