@@ -176,7 +176,18 @@ class Device(object):
 
     return self._parse_datetime(response[2:])
 
+  def zero_log(self):
+    """Zeros out the data log of the device.
+
+    This function will clear the memory of the device deleting all the readings
+    in an irrecoverable way.
+    """
+    response = self._send_oneliner_command('DMZ')
+    if response != 'Z':
+      raise exceptions.InvalidResponse(response)
+
   def _parse_glucose_unit(self, unit):
+
     """Parses the value of a OneTouch Ultra Glucose unit definition.
 
     Args:
@@ -264,7 +275,6 @@ class Device(object):
       # requested unit here.
       yield common.Reading(date, int(line_data['value']),
                            common.UNIT_MGDL, comment=comment)
-
 
   # The following two hashes are taken directly from LifeScan's documentation
   _MEAL_CODES = {

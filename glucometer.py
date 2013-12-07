@@ -39,6 +39,9 @@ def main():
     '--set', action='store', nargs='?', const='now', default=None,
     help='Set the date rather than just reading it from the device.')
 
+  reset = subparsers.add_parser(
+    'zero', help='Zero out the data log of the meter.')
+
   args = parser.parse_args()
 
   driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
@@ -58,6 +61,12 @@ def main():
         print('%s: not a valid date' % args.set, file=sys.stderr)
     else:
       print(device.get_datetime())
+  elif args.action == 'zero':
+    try:
+      device.zero_log()
+      print('Device data log zeroed.')
+    except Exception as e:
+      print('Error while zeroing device log: %s' % e)
   else:
     return 1
 
