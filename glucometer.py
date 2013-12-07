@@ -27,6 +27,11 @@ def main():
     '--device', action='store', required=True,
     help='Select the path to the glucometer device.')
 
+  subparsers.add_parser(
+    'info', help='Display information about the meter.')
+  subparsers.add_parser(
+    'zero', help='Zero out the data log of the meter.')
+
   parser_dump = subparsers.add_parser(
     'dump', help='Dump the readings stored in the device.')
   parser_dump.add_argument(
@@ -39,15 +44,14 @@ def main():
     '--set', action='store', nargs='?', const='now', default=None,
     help='Set the date rather than just reading it from the device.')
 
-  reset = subparsers.add_parser(
-    'zero', help='Zero out the data log of the meter.')
-
   args = parser.parse_args()
 
   driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
   device = driver.Device(args.device)
 
-  if args.action == 'dump':
+  if args.action == 'info':
+    print(device.get_information_string())
+  elif args.action == 'dump':
     for reading in device.get_readings():
       print('%s,%.2f,%s' % (reading.timestamp, reading.get_value_as(args.unit),
                             reading.comment))

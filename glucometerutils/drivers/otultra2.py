@@ -82,7 +82,25 @@ class Device(object):
     line = self.serial_.readline().decode('ascii')
     return self._validate_and_strip_checksum(line)
 
+  def get_information_string(self):
+    """Returns a single string with all the identification information.
+
+    Returns:
+      A string including the serial number, software version, date and time and
+      default unit.
+    """
+    return ('OneTouch Ultra 2 glucometer\n'
+            'Serial number: %s\n'
+            'Software version: %s\n'
+            'Time: %s\n'
+            'Default unit: %s' % (
+              self.get_serial_number(),
+              self.get_version(),
+              self.get_datetime(),
+              self.get_glucose_unit()))
+
   def get_version(self):
+
     """Returns an identifier of the firmware version of the glucometer.
 
     Returns:
