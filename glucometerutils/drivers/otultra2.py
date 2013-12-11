@@ -282,11 +282,7 @@ class Device(object):
       date = self._parse_datetime(line_data['datetime'])
       meal_str = self._MEAL_CODES[line_data['meal']]
       comment_str = self._COMMENT_CODES[line_data['comment']]
-
-      if meal_str and comment_str:
-        comment = '%s & %s' % (meal_str, comment_str)
-      else:
-        comment = meal_str or comment_str
+      comment = '"%s","%s"' % (meal_str, comment_str)
 
       # OneTouch2 always returns the data in mg/dL even if the
       # glucometer is set to mmol/L. We need to convert it to the
