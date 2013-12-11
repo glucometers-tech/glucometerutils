@@ -6,6 +6,8 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
 __license__ = 'MIT'
 
+import collections
+
 # Constants for units
 UNIT_MGDL = 'mg/dL'
 UNIT_MMOLL = 'mmol/L'
@@ -48,8 +50,10 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
   else:
     return round(value * 18.0, 0)
 
+_ReadingBase = collections.namedtuple(
+  '_ReadingBase', ['timestamp', 'value', 'meal', 'comment'])
 
-class Reading(object):
+class Reading(_ReadingBase):
   def __init__(self, timestamp, value, meal='', comment=''):
     """Constructor for the reading object.
 
@@ -63,10 +67,8 @@ class Reading(object):
     because at least most of the LifeScan devices report the raw data in this
     format.
     """
-    self.timestamp = timestamp
-    self.value = value
-    self.meal = meal
-    self.comment = comment
+    super(Reading, self).__init__(
+      timestamp=timestamp, value=value, meal=meal, comment=comment)
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.

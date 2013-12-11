@@ -38,6 +38,10 @@ def main():
   parser_dump.add_argument(
     '--unit', action='store', choices=common.VALID_UNITS,
     help='Select the unit to use for the dumped data.')
+  parser_dump.add_argument(
+    '--sort-by', action='store', default='timestamp',
+    choices=common.Reading._fields,
+    help='Field to order the dumped data by.')
 
   parser_date = subparsers.add_parser(
     'datetime', help='Reads or sets the date and time of the glucometer.')
@@ -58,7 +62,13 @@ def main():
       if unit is None:
         unit = device.get_glucose_unit()
 
-      for reading in device.get_readings():
+      readings = device.get_readings()
+
+      if args.sort_by is not None:
+        readings = sorted(
+          readings, key=lambda reading: getattr(reading, args.sort_by))
+
+      for reading in readings:
         print('"%s","%.2f","%s","%s"' % (
           reading.timestamp, reading.get_value_as(unit),
           reading.meal, reading.comment))
