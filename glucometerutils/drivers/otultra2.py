@@ -280,15 +280,14 @@ class Device(object):
       line_data = match.groupdict()
 
       date = self._parse_datetime(line_data['datetime'])
-      meal_str = self._MEAL_CODES[line_data['meal']]
-      comment_str = self._COMMENT_CODES[line_data['comment']]
-      comment = '"%s","%s"' % (meal_str, comment_str)
+      meal = self._MEAL_CODES[line_data['meal']]
+      comment = self._COMMENT_CODES[line_data['comment']]
 
       # OneTouch2 always returns the data in mg/dL even if the
       # glucometer is set to mmol/L. We need to convert it to the
       # requested unit here.
       yield common.Reading(date, int(line_data['value']),
-                           common.UNIT_MGDL, comment=comment)
+                           common.UNIT_MGDL, meal=meal, comment=comment)
 
   # The following two hashes are taken directly from LifeScan's documentation
   _MEAL_CODES = {

@@ -50,11 +50,21 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
 
 
 class Reading(object):
-  def __init__(self, timestamp, value, unit, comment=None):
+  def __init__(self, timestamp, value, unit, meal='', comment=''):
+    """Constructor for the reading object.
+
+    Args:
+      timestamp: (datetime) Timestamp of the reading as reported by the meter.
+      value: (float) Value of the reading in the selected unit.
+      unit: (UNIT_MGDL|UNIT_MMOLL) The unit for the reported reading.
+      meal: (string) Meal-relativeness as reported by the reader, if any.
+      comment: (string) Comment reported by the reader, if any.
+    """
     self.timestamp = timestamp
     self.value = value
     self.unit = unit
-    self.comment = comment or ''
+    self.meal = meal
+    self.comment = comment
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
