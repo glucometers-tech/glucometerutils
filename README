@@ -8,6 +8,26 @@ While right now only supports my glucometer (LifeScan OneTouch Ultra
 2), I've tried designing it so that it can be extended and used for
 other models as well.
 
+Dump format
+-----------
+
+The `dump` action by default will output CSV-compatible format, with the
+following fields:
+
+ * date and time;
+ * meter reading value;
+ * before/after meal information, if known;
+ * comment provided with the reading, if any.
+
+Meal and comment information is provided by the meters supporting the
+information. In the future, meal information could be guessed based on the time
+of the reading.
+
+The unit format used by the dump by default matches what the meter reports as
+its display unit, which might differ from the one used by the meter for internal
+representation and wire protocol. You can override the display unit with
+`--unit`.
+
 Development
 -----------
 
