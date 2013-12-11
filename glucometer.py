@@ -15,7 +15,6 @@ from dateutil import parser as date_parser
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.drivers import otultra2
 
 def main():
   parser = argparse.ArgumentParser()

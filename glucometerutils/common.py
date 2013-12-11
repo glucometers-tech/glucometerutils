@@ -8,6 +8,8 @@ __license__ = 'MIT'
 
 import collections
 
+from glucometerutils import exceptions
+
 # Constants for units
 UNIT_MGDL = 'mg/dL'
 UNIT_MMOLL = 'mmol/L'
@@ -17,8 +19,6 @@ VALID_UNITS = [UNIT_MGDL, UNIT_MMOLL]
 # Constants for date format
 DATETIME_12HR = '12 hours'
 DATETIME_24HR = '24 hours'
-
-from glucometerutils import exceptions
 
 
 def convert_glucose_unit(value, from_unit, to_unit=None):

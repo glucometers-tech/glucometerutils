@@ -15,6 +15,93 @@ from glucometerutils import common
 from glucometerutils import exceptions
 from glucometerutils.drivers import lifescan_common
 
+# The following two hashes are taken directly from LifeScan's documentation
+_MEAL_CODES = {
+  'N': '',
+  'B': 'Before Meal',
+  'A': 'After Meal',
+}
+
+_COMMENT_CODES = {
+  '00': '',  # would be 'No Comment'
+  '01': 'Not Enough Food',
+  '02': 'Too Much Food',
+  '03': 'Mild Exercise',
+  '04': 'Hard Exercise',
+  '05': 'Medication',
+  '06': 'Stress',
+  '07': 'Illness',
+  '08': 'Feel Hypo',
+  '09': 'Menses',
+  '10': 'Vacation',
+  '11': 'Other',
+}
+
+_DUMP_HEADER_RE = re.compile(
+  r'P ([0-9]{3}),"[0-9A-Z]{9}","(?:MG/DL |MMOL/L)"')
+_DUMP_LINE_RE = re.compile(
+  r'P (?P<datetime>"[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),'
+  r'"(?P<control>[C ]) (?P<value>[0-9]{3})(?P<parityerror>[\? ])",'
+  r'"(?P<meal>[NBA])","(?P<comment>0[0-9]|1[01])", 00')
+
+_RESPONSE_MATCH = re.compile(r'^(.+) ([0-9A-F]{4})\r$')
+
+def _validate_and_strip_checksum(line):
+  """Verify the simple 16-bit checksum and remove it from the line.
+
+  Args:
+    line: the line to check the checksum of.
+
+  Returns:
+    A copy of the line with the checksum stripped out.
+  """
+  match = _RESPONSE_MATCH.match(line)
+
+  if not match:
+    raise lifescan_common.MissingChecksum(line)
+
+  response, checksum_string = match.groups()
+
+  try:
+    checksum_given = int(checksum_string, 16)
+    checksum_calculated = lifescan_common.calculate_checksum(
+      bytes(response, 'ascii'))
+
+    if checksum_given != checksum_calculated:
+      raise lifescan_common.InvalidChecksum(checksum_given,
+                                            checksum_calculated)
+  except ValueError:
+    raise lifescan_common.InvalidChecksum(checksum_given, None)
+
+  return response
+
+_DATETIME_RE = re.compile(
+  r'^"[A-Z]{3}","([0-9]{2}/[0-9]{2}/[0-9]{2})","([0-9]{2}:[0-9]{2}:[0-9]{2})   "$')
+
+
+def _parse_datetime(response):
+  """Convert a response with date and time from the meter into a datetime.
+
+  Args:
+    response: the response coming from a DMF or DMT command
+
+  Returns:
+    A datetime object built according to the returned response.
+
+  Raises:
+    InvalidResponse if the string cannot be matched by _DATETIME_RE.
+  """
+  match = _DATETIME_RE.match(response)
+  if not match:
+    raise exceptions.InvalidResponse(response)
+
+  date, time = match.groups()
+  month, day, year = [int(part) for part in date.split('/')]
+  hour, minute, second = [int(part) for part in time.split(':')]
+
+  # Yes, OneTouch2's firmware is not Y2K safe.
+  return datetime.datetime(2000 + year, month, day, hour, minute, second)
+
 
 class Device(object):
   def __init__(self, device):
@@ -33,40 +120,8 @@ class Device(object):
     each command that wakes this model up.
     """
     cmdstring = bytes('\x11\r' + cmd + '\r', 'ascii')
-    self.serial_.write(cmdstring);
+    self.serial_.write(cmdstring)
     self.serial_.flush()
-
-  _RESPONSE_MATCH = re.compile(r'^(.+) ([0-9A-F]{4})\r$')
-
-  def _validate_and_strip_checksum(self, line):
-    """Verify the CRC16 checksum and remove it from the line.
-
-    Args:
-      line: the line to check the CRC16 of.
-
-    Returns:
-      A copy of the line with the CRC16 stripped out.
-    """
-    match = self._RESPONSE_MATCH.match(line)
-
-    if not match:
-      raise lifescan_common.MissingChecksum(line)
-
-    response, checksum_string = match.groups()
-
-    try:
-      checksum_given = int(checksum_string, 16)
-      checksum_calculated = lifescan_common.calculate_checksum(
-        bytes(response, 'ascii'))
-
-      if checksum_given != checksum_calculated:
-        raise lifescan_common.InvalidChecksum(checksum_given,
-                                              checksum_calculated)
-    except ValueError:
-      raise lifescan_common.InvalidChecksum(checksum_given,
-                                            None)
-
-    return response
 
   def _send_oneliner_command(self, cmd):
     """Send command and read a one-line response.
@@ -80,7 +135,7 @@ class Device(object):
     self._send_command(cmd)
 
     line = self.serial_.readline().decode('ascii')
-    return self._validate_and_strip_checksum(line)
+    return _validate_and_strip_checksum(line)
 
   def get_information_string(self):
     """Returns a single string with all the identification information.
@@ -143,33 +198,6 @@ class Device(object):
 
     return serial_number
 
-  # The [TF] at the start is to accept both Get (F) and Set (T) commands.
-  _DATETIME_RE = re.compile(
-    r'^"[A-Z]{3}","([0-9]{2}/[0-9]{2}/[0-9]{2})","([0-9]{2}:[0-9]{2}:[0-9]{2})   "$')
-
-  def _parse_datetime(self, response):
-    """Convert a response with date and time from the meter into a datetime.
-
-    Args:
-      response: the response coming from a DMF or DMT command
-
-    Returns:
-      A datetime object built according to the returned response.
-
-    Raises:
-      InvalidResponse if the string cannot be matched by _DATETIME_RE.
-    """
-    match = self._DATETIME_RE.match(response)
-    if not match:
-      raise exceptions.InvalidResponse(response)
-
-    date, time = match.groups()
-    month, day, year = [int(part) for part in date.split('/')]
-    hour, minute, second = [int(part) for part in time.split(':')]
-
-    # Yes, OneTouch2's firmware is not Y2K safe.
-    return datetime.datetime(2000 + year, month, day, hour, minute, second)
-
   def get_datetime(self):
     """Returns the current date and time for the glucometer.
 
@@ -177,7 +205,7 @@ class Device(object):
       A datetime object built according to the returned response.
     """
     response = self._send_oneliner_command('DMF')
-    return self._parse_datetime(response[2:])
+    return _parse_datetime(response[2:])
 
   def set_datetime(self, date=datetime.datetime.now()):
     """Sets the date and time of the glucometer.
@@ -192,7 +220,7 @@ class Device(object):
     response = self._send_oneliner_command(
       'DMT' + date.strftime('%m/%d/%y %H:%M:%S'))
 
-    return self._parse_datetime(response[2:])
+    return _parse_datetime(response[2:])
 
   def zero_log(self):
     """Zeros out the data log of the device.
@@ -204,46 +232,34 @@ class Device(object):
     if response != 'Z':
       raise exceptions.InvalidResponse(response)
 
-  def _parse_glucose_unit(self, unit):
+  _GLUCOSE_UNIT_RE = re.compile(r'^SU\?,"(MG/DL |MMOL/L)"')
 
-    """Parses the value of a OneTouch Ultra Glucose unit definition.
+  def get_glucose_unit(self):
+    """Returns a constant representing the unit displayed by the meter.
 
-    Args:
-      unit: the string reported by the glucometer as glucose unit.
-
-    Return:
-      common.UNIT_MGDL: if the glucometer reads in mg/dL
-      common.UNIT_MMOLL: if the glucometer reads in mmol/L
+    Returns:
+      common.UNIT_MGDL: if the glucometer displays in mg/dL
+      common.UNIT_MMOLL: if the glucometer displays in mmol/L
 
     Raises:
       exceptions.InvalidGlucoseUnit: if the unit is not recognized
+
+    OneTouch meters will always dump data in mg/dL because that's their internal
+    storage. They will then provide a separate method to read the unit used for
+    display. This is not settable by the user in all modern meters.
+
     """
+    response = self._send_oneliner_command('DMSU?')
+
+    match = self._GLUCOSE_UNIT_RE.match(response)
+    unit = match.group(1)
+
     if unit == 'MG/DL ':
       return common.UNIT_MGDL
     elif unit == 'MMOL/L':
       return common.UNIT_MMOLL
     else:
       raise exceptions.InvalidGlucoseUnit(string)
-
-  _GLUCOSE_UNIT_RE = re.compile(r'^SU\?,"(MG/DL |MMOL/L)"')
-
-  def get_glucose_unit(self):
-    """Returns a constant representing the unit for the dumped readings.
-
-    Returns:
-      common.UNIT_MGDL: if the glucometer reads in mg/dL
-      common.UNIT_MMOLL: if the glucometer reads in mmol/L
-    """
-    response = self._send_oneliner_command('DMSU?')
-
-    match = self._GLUCOSE_UNIT_RE.match(response)
-    return self._parse_glucose_unit(match.group(1))
-
-  _DUMP_HEADER_RE = re.compile(r'P ([0-9]{3}),"[0-9A-Z]{9}","(?:MG/DL |MMOL/L)"')
-  _DUMP_LINE_RE = re.compile(
-    r'P (?P<datetime>"[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),'
-    r'"(?P<control>[C ]) (?P<value>[0-9]{3})(?P<parityerror>[\? ])",'
-    r'"(?P<meal>[NBA])","(?P<comment>0[0-9]|1[01])", 00')
 
   def get_readings(self):
     """Iterates over the reading values stored in the glucometer.
@@ -263,7 +279,7 @@ class Device(object):
     data = self.serial_.readlines()
 
     header = data.pop(0).decode('ascii')
-    match = self._DUMP_HEADER_RE.match(header)
+    match = _DUMP_HEADER_RE.match(header)
     if not match:
       raise exceptions.InvalidResponse(header)
 
@@ -271,41 +287,19 @@ class Device(object):
     assert count == len(data)
 
     for line in data:
-      line = self._validate_and_strip_checksum(line.decode('ascii'))
+      line = _validate_and_strip_checksum(line.decode('ascii'))
 
-      match = self._DUMP_LINE_RE.match(line)
+      match = _DUMP_LINE_RE.match(line)
       if not match:
         raise exceptions.InvalidResponse(line)
 
       line_data = match.groupdict()
 
-      date = self._parse_datetime(line_data['datetime'])
-      meal = self._MEAL_CODES[line_data['meal']]
-      comment = self._COMMENT_CODES[line_data['comment']]
+      date = _parse_datetime(line_data['datetime'])
+      meal = _MEAL_CODES[line_data['meal']]
+      comment = _COMMENT_CODES[line_data['comment']]
 
       # OneTouch2 always returns the data in mg/dL even if the glucometer is set
       # to mmol/L, so there is no conversion required.
       yield common.Reading(
         date, float(line_data['value']), meal=meal, comment=comment)
-
-  # The following two hashes are taken directly from LifeScan's documentation
-  _MEAL_CODES = {
-    'N': '',
-    'B': 'Before Meal',
-    'A': 'After Meal',
-  }
-
-  _COMMENT_CODES = {
-    '00': '',  # would be 'No Comment'
-    '01': 'Not Enough Food',
-    '02': 'Too Much Food',
-    '03': 'Mild Exercise',
-    '04': 'Hard Exercise',
-    '05': 'Medication',
-    '06': 'Stress',
-    '07': 'Illness',
-    '08': 'Feel Hypo',
-    '09': 'Menses',
-    '10': 'Vacation',
-    '11': 'Other',
-  }
