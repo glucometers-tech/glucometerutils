@@ -50,19 +50,21 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
 
 
 class Reading(object):
-  def __init__(self, timestamp, value, unit, meal='', comment=''):
+  def __init__(self, timestamp, value, meal='', comment=''):
     """Constructor for the reading object.
 
     Args:
       timestamp: (datetime) Timestamp of the reading as reported by the meter.
-      value: (float) Value of the reading in the selected unit.
-      unit: (UNIT_MGDL|UNIT_MMOLL) The unit for the reported reading.
+      value: (float) Value of the reading, in mg/dL.
       meal: (string) Meal-relativeness as reported by the reader, if any.
       comment: (string) Comment reported by the reader, if any.
+
+    The value is stored in mg/dL, even though this is not the standard value,
+    because at least most of the LifeScan devices report the raw data in this
+    format.
     """
     self.timestamp = timestamp
     self.value = value
-    self.unit = unit
     self.meal = meal
     self.comment = comment
 
@@ -70,10 +72,6 @@ class Reading(object):
     """Returns the reading value as the given unit.
 
     Args:
-      to_unit: either UNIT_MGDL or UNIT_MMOLL as wanted; if None, the
-      value as recorded will be returned.
+      to_unit: (UNIT_MGDL|UNIT_MMOLL) The unit to return the value to.
     """
-    if to_unit is None:
-      return self.value
-
-    return convert_glucose_unit(self.value, self.unit, to_unit)
+    return convert_glucose_unit(self.value, UNIT_MGDL, to_unit)
