@@ -54,9 +54,13 @@ def main():
     if args.action == 'info':
       print(device.get_information_string())
     elif args.action == 'dump':
+      unit = args.unit
+      if unit is None:
+        unit = device.get_glucose_unit()
+
       for reading in device.get_readings():
         print('"%s","%.2f","%s","%s"' % (
-          reading.timestamp, reading.get_value_as(args.unit),
+          reading.timestamp, reading.get_value_as(unit),
           reading.meal, reading.comment))
     elif args.action == 'datetime':
       if args.set == 'now':
