@@ -82,8 +82,13 @@ def main():
       else:
         print(device.get_datetime())
     elif args.action == 'zero':
-      device.zero_log()
-      print('Device data log zeroed.')
+      confirm = input('Delete the device data log? (y/N) ')
+      if confirm.lower() in ['y', 'ye', 'yes']:
+        device.zero_log()
+        print('\nDevice data log zeroed.')
+      else:
+        print('\nDevice data log not zeroed.')
+        return 1
     else:
       return 1
   except exceptions.Error as err:
