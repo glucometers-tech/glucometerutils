@@ -4,9 +4,18 @@ Glucometer Utilities
 This utility I created for personal needs, as my glucometer's software
 can only print the software (to XPS) without a file export option.
 
-While right now only supports my glucometer (LifeScan OneTouch Ultra
-2), I've tried designing it so that it can be extended and used for
-other models as well.
+While right now only supports the glucometers I own and for which I have
+the specification of the protocol,I've tried designing it so that it can
+be extended and used for other models and other brands as well.
+
+Supported devices
+-----------------
+
+ * **LifeScan OneTouch Ultra 2**: get information, get and set time,
+   dump of readings (including comments and meal specification) in
+   native units, memory reset.
+ * **LifeScan OneTouch Ultra Easy**: get information, get and set time,
+   dump of readings in native units, memory reset.
 
 Dump format
 -----------
