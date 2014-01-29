@@ -14,8 +14,9 @@ Supported devices
  * **LifeScan OneTouch Ultra 2**: get information, get and set time,
    dump of readings (including comments and meal specification) in
    native units, memory reset.
- * **LifeScan OneTouch Ultra Easy**: get information, get and set time,
-   dump of readings in native units, memory reset.
+ * **LifeScan OneTouch Ultra Easy** (also known as **Ultra Mini**):
+   get information, get and set time, dump of readings in native
+   units, memory reset.
 
 Dump format
 -----------
