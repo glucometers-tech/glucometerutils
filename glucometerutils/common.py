@@ -54,7 +54,7 @@ _ReadingBase = collections.namedtuple(
   '_ReadingBase', ['timestamp', 'value', 'meal', 'comment'])
 
 class Reading(_ReadingBase):
-  def __init__(self, timestamp, value, meal='', comment=''):
+  def __new__(cls, timestamp, value, meal='', comment=''):
     """Constructor for the reading object.
 
     Args:
@@ -67,8 +67,8 @@ class Reading(_ReadingBase):
     because at least most of the LifeScan devices report the raw data in this
     format.
     """
-    super(Reading, self).__init__(
-      timestamp=timestamp, value=value, meal=meal, comment=comment)
+    return super(Reading, cls).__new__(
+      cls, timestamp=timestamp, value=value, meal=meal, comment=comment)
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
