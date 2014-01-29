@@ -53,6 +53,8 @@ def main():
   driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
   device = driver.Device(args.device)
 
+  device.connect()
+
   try:
     if args.action == 'info':
       print(device.get_information_string())
@@ -94,6 +96,8 @@ def main():
   except exceptions.Error as err:
     print('Error while executing \'%s\': %s' % (args.action, str(err)))
     return 1
+
+  device.disconnect()
 
 if __name__ == "__main__":
     main()

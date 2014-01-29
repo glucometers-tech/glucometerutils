@@ -110,16 +110,20 @@ class Device(object):
       parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
       timeout=1, xonxoff=False, rtscts=False, dsrdtr=False, writeTimeout=None)
 
+  def connect(self):
+    self.serial_.write(b'\x11\r')
+    self.serial_.flush()
+
+  def disconnect(self):
+    return
+
   def _send_command(self, cmd):
     """Send command interface.
 
     Args:
       cmd: command and parameters to send (without newline)
-
-    This function exists to wrap the need to send the 0x11 0x0d prefix with
-    each command that wakes this model up.
     """
-    cmdstring = bytes('\x11\r' + cmd + '\r', 'ascii')
+    cmdstring = bytes(cmd + '\r', 'ascii')
     self.serial_.write(cmdstring)
     self.serial_.flush()
 
@@ -155,7 +159,6 @@ class Device(object):
               self.get_glucose_unit()))
 
   def get_version(self):
-
     """Returns an identifier of the firmware version of the glucometer.
 
     Returns:
