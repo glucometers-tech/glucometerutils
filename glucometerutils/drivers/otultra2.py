@@ -46,6 +46,25 @@ _DUMP_LINE_RE = re.compile(
 
 _RESPONSE_MATCH = re.compile(r'^(.+) ([0-9A-F]{4})\r$')
 
+def _calculate_checksum(bytestring):
+  """Calculate the checksum used by OneTouch Ultra and Ultra2 devices
+
+  Args:
+    bytestring: the string of which the checksum has to be calculated.
+
+  Returns:
+    A string with the hexdecimal representation of the checksum for the input.
+
+  The checksum is a very stupid one: it just sums all the bytes,
+  modulo 16-bit, without any parity.
+  """
+  checksum = 0
+
+  for byte in bytestring:
+    checksum = (checksum + byte) & 0xffff
+
+  return checksum
+
 def _validate_and_strip_checksum(line):
   """Verify the simple 16-bit checksum and remove it from the line.
 
@@ -64,7 +83,7 @@ def _validate_and_strip_checksum(line):
 
   try:
     checksum_given = int(checksum_string, 16)
-    checksum_calculated = lifescan_common.calculate_checksum(
+    checksum_calculated = _calculate_checksum(
       bytes(response, 'ascii'))
 
     if checksum_given != checksum_calculated:

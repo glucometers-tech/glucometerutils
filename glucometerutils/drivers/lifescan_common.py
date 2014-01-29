@@ -26,23 +26,3 @@ class InvalidSerialNumber(exceptions.Error):
   """The serial number is not as expected."""
   def __init__(self, serial_number):
     self.message = 'Serial number %s is invalid.' % serial_number
-
-
-def calculate_checksum(bytestring):
-  """Calculate the checksum used by OneTouch Ultra and Ultra2 devices
-
-  Args:
-    bytestring: the string of which the checksum has to be calculated.
-
-  Returns:
-    A string with the hexdecimal representation of the checksum for the input.
-
-  The checksum is a very stupid one: it just sums all the bytes,
-  modulo 16-bit, without any parity.
-  """
-  checksum = 0
-
-  for byte in bytestring:
-    checksum = (checksum + byte) & 0xffff
-
-  return checksum

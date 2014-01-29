@@ -30,6 +30,14 @@ class TestOTUltra2(unittest.TestCase):
     def _set_return_string(self, string):
         self.mock_readline.return_value = bytes(string, 'ascii')
 
+    def test_checksum(self):
+        checksum = otultra2._calculate_checksum(bytes('T', 'ascii'))
+        self.assertEqual(0x0054, checksum)
+
+        checksum = otultra2._calculate_checksum(
+            bytes('T "SAT","08/03/13","22:12:00   "', 'ascii'))
+        self.assertEqual(0x0608, checksum)
+
     def test_missing_checksum(self):
         self._set_return_string('INVALID')
 
