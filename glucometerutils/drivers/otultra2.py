@@ -130,8 +130,7 @@ class Device(object):
       timeout=1, xonxoff=False, rtscts=False, dsrdtr=False, writeTimeout=None)
 
   def connect(self):
-    self.serial_.write(b'\x11\r')
-    self.serial_.flush()
+    return
 
   def disconnect(self):
     return
@@ -142,7 +141,7 @@ class Device(object):
     Args:
       cmd: command and parameters to send (without newline)
     """
-    cmdstring = bytes(cmd + '\r', 'ascii')
+    cmdstring = bytes('\x11\r' + cmd + '\r', 'ascii')
     self.serial_.write(cmdstring)
     self.serial_.flush()
 
