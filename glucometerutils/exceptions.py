@@ -13,6 +13,13 @@ class Error(Exception):
     return self.message
 
 
+class ConnectionFailed(Error):
+  """It was not possible to connect to the meter."""
+
+  def __init__(self):
+    self.message = 'Unable to connect to the meter.'
+
+
 class InvalidResponse(Error):
   """The response received from the meter was not understood"""
 
