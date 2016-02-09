@@ -15,6 +15,14 @@ import serial
 from glucometerutils import common
 from glucometerutils import exceptions
 
+
+class InvalidChecksum(exceptions.InvalidResponse):
+  def __init__(self, expected, gotten):
+    self.message = (
+      'Response checksum not matching: %04x expected, %04x gotten' %
+      (expected, gotten))
+
+
 _CLOCK_RE = re.compile(
   r'^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t'
   r'(?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})$')
@@ -28,7 +36,10 @@ _CLOCK_RE = re.compile(
 # I don't have β-ketone strips to test.
 _READING_RE = re.compile(
   r'^(?P<reading>HI |[0-9]{3})  (?P<month>[A-Z][a-z]{2})[ ey] (?P<day>[0-9]{2}) '
-  r'(?P<year>[0-9]{4}) (?P<time>[0-9]{2}:[0-9]{2}) G 0x00')
+  r'(?P<year>[0-9]{4}) (?P<time>[0-9]{2}:[0-9]{2}) G 0x00$')
+
+_CHECKSUM_RE = re.compile(
+  r'^(?P<checksum>0x[0-9A-F]{4})  END$')
 
 # There are two date format used by the device. One uses three-letters month
 # names, and that's easy enough. The other uses three-letters month names,
@@ -68,7 +79,7 @@ def _parse_clock(datestr):
   hour, minute, second = (int(part) for part in match.group('time').split(':'))
 
   return datetime.datetime(year, month, day, hour, minute, second)
-  
+
 
 class Device(object):
   def __init__(self, device):
@@ -225,6 +236,19 @@ class Device(object):
     count = int(data[4])
     if count != (len(data) - 6):
       raise exceptions.InvalidResponse('\n'.join(data))
+
+    # Extract the checksum from the last line.
+    checksum_match = _CHECKSUM_RE.match(data[-1])
+    if not checksum_match:
+      raise exceptions.InvalidResponse('\n'.join(data))
+
+    expected_checksum = int(checksum_match.group('checksum'), 16)
+    # exclude the last line in the checksum calculation, as that's the checksum
+    # itself. The final \r\n is added separately.
+    calculated_checksum = sum(ord(c) for c in '\r\n'.join(data[:-1])) + 0xd + 0xa
+
+    if expected_checksum != calculated_checksum:
+      raise InvalidChecksum(expected_checksum, calculated_checksum)
 
     for line in data[5:-1]:
       match = _READING_RE.match(line)
