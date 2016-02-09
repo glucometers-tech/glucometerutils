@@ -4,9 +4,15 @@ Glucometer Utilities
 This utility I created for personal needs, as my glucometer's software
 can only print the software (to XPS) without a file export option.
 
-While right now only supports the glucometers I own and for which I have
-the specification of the protocol,I've tried designing it so that it can
-be extended and used for other models and other brands as well.
+While right now only supports the glucometers I own and for which I
+have the specification of the protocol, I've tried designing it so
+that it can be extended and used for other models and other brands as
+well.
+
+If you have knowledge of a protocol of a glucometer you would have
+supported, please provide a reference, possibly by writing a
+specification and contribute it to
+https://github.com/Flameeyes/glucometer-protocols/.
 
 Supported devices
 -----------------
@@ -17,6 +23,8 @@ Supported devices
  * **LifeScan OneTouch Ultra Easy** (also known as **Ultra Mini**):
    get information, get and set time, dump of readings in native
    units, memory reset.
+ * **Abbott FreeStyle Optium**: get information, get and set time,
+   dump of readings in native units.
 
 Dump format
 -----------
@@ -51,7 +59,7 @@ compatible.
 
 License
 -------
-Copyright © 2013 Diego Elio Pettenò <flameeyes@flameeyes.eu>
+Copyright © 2013-2016 Diego Elio Pettenò <flameeyes@flameeyes.eu>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

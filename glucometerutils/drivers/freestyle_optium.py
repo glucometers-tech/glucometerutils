@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Driver for FreeStyle Optium devices"""
+"""Driver for FreeStyle Optium devices.
+
+Further information on the device protocol can be found at
+
+https://github.com/Flameeyes/glucometer-protocols/blob/master/abbott/freestyle-optium.md
+"""
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
@@ -94,6 +99,8 @@ class Device(object):
     self.serial_.flush()
 
     response = self.serial_.readlines()
+    print("%r" % response)
+
     # We always want to decode the output, and remove stray \r\n. Any failure in
     # decoding means the output is invalid anyway.
     decoded_response = [line.decode('ascii').rstrip('\r\n')
