@@ -16,8 +16,8 @@ class Error(Exception):
 class ConnectionFailed(Error):
   """It was not possible to connect to the meter."""
 
-  def __init__(self):
-    self.message = 'Unable to connect to the meter.'
+  def __init__(self, message='Unable to connect to the meter.'):
+    self.message = message
 
 
 class InvalidResponse(Error):
