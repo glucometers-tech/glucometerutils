@@ -31,12 +31,12 @@ class TestOTUltraMini(unittest.TestCase):
     def testCrc(self):
         self.assertEqual(
             0x41cd,
-            otultraeasy._Packet._crc(b'\x02\x06\x06\x03'))
+            lifescan_common.crc_ccitt(b'\x02\x06\x06\x03'))
 
         cmd_array = array.array('B', b'\x02\x06\x08\x03')
         self.assertEqual(
             0x62C2,
-            otultraeasy._Packet._crc(cmd_array))
+            lifescan_common.crc_ccitt(cmd_array))
 
     def testPacketUpdateChecksum(self):
         packet = otultraeasy._Packet()

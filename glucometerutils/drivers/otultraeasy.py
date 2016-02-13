@@ -68,19 +68,6 @@ def _convert_timestamp(timestamp_bytes):
 class _Packet(object):
   _STRUCT = struct.Struct('<H')
 
-  @staticmethod
-  def _crc(cmd):
-    crc = 0xffff
-
-    for byte in cmd:
-      crc = (crc >> 8) & 0xffff | (crc << 8) & 0xffff
-      crc ^= byte
-      crc ^= (crc & 0xff) >> 4
-      crc ^= (((crc << 8) & 0xffff) << 4) & 0xffff
-      crc ^= (crc & 0xff) << 5
-
-    return (crc & 0xffff)
-
   def __init__(self):
     self.cmd = array.array('B')
 
@@ -148,7 +135,7 @@ class _Packet(object):
 
   @property
   def checksum(self):
-    return self._crc(self.cmd[:_IDX_CHECKSUM].tobytes())
+    return lifescan_common.crc_ccitt(self.cmd[:_IDX_CHECKSUM].tobytes())
 
   @property
   def acknowledge(self):
