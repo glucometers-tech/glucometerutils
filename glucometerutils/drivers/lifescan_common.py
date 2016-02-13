@@ -28,6 +28,12 @@ class InvalidSerialNumber(exceptions.Error):
     self.message = 'Serial number %s is invalid.' % serial_number
 
 
+class MalformedCommand(exceptions.InvalidResponse):
+  def __init__(self, message):
+    exceptions.InvalidResponse.__init__(
+      self, 'Malformed command: %s' % message)
+
+
 def crc_ccitt(data):
   """Calculate the CRC-16-CCITT with LifeScan's common seed.
 

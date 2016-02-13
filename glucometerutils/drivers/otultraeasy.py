@@ -52,13 +52,6 @@ class UnsetPacketError(LookupError):
   pass
 
 
-class MalformedCommand(exceptions.InvalidResponse):
-  def __init__(self, position, expected, received):
-    exceptions.InvalidResponse.__init__(
-      self, 'Malformed command at position %s: expected %02x, received %02x' % (
-        position, expected, received))
-
-
 def _convert_timestamp(timestamp_bytes):
   timestamp, = _STRUCT_TIMESTAMP.unpack(timestamp_bytes)
 
@@ -75,7 +68,9 @@ class _Packet(object):
     self.cmd.extend(serial.read(3))
 
     if self.cmd[_IDX_STX] != _STX:
-      raise MalformedCommand(_IDX_STX, _STX, self.cmd[_IDX_STX])
+      raise lifescan_command.MalformedCommand(
+        'at position %s expected %02x, received %02x' % (
+          _IDX_STX, _STX, self.cmd[_IDX_STX]))
 
     # the length includes prelude and appendix, which are six bytes total.
     if self.length > 6:
@@ -84,7 +79,9 @@ class _Packet(object):
     self.cmd.extend(serial.read(3))
 
     if self.cmd[_IDX_ETX] != _ETX:
-      raise MalformedCommand(_IDX_ETX, _ETX, self.cmd[_IDX_ETX])
+      raise lifescan_command.MalformedCommand(
+        'at position %s expected %02x, received %02x' % (
+          _IDX_ETX, _ETX, self.cmd[_IDX_ETX]))
 
   def build_command(self, cmd_bytes):
     self.cmd.append(_STX)
@@ -200,7 +197,9 @@ class Device(object):
     response.read_from(self.serial_)
 
     if not response.disconnect and response.sent_counter != self.expect_receive_:
-      raise MalformedCommand('2[0b]', self.expect_receive_, response.expect_receive)
+      raise lifescan_command.MalformedCommand(
+        'at position 2[0b] expected %02x, received %02x' % (
+          self.expect_receive_, response.expect_receive))
 
     if not response.acknowledge:
       self.expect_receive_ = not self.expect_receive_
@@ -291,7 +290,8 @@ class Device(object):
     elif response.data[2] == 1:
       return common.UNIT_MMOLL
     else:
-      raise MalformedCommand('PM1', response.data[2], 0)
+      raise lifescan_command.MalformedCommand(
+        'at position PM1 invalid value %02x for unit' % response.data[2])
 
   def _get_reading(self, record_id):
     id_bytes = _STRUCT_RECORDID.pack(record_id)
