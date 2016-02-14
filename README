@@ -23,8 +23,13 @@ Supported devices
  * **LifeScan OneTouch Ultra Easy** (also known as **Ultra Mini**):
    get information, get and set time, dump of readings in native
    units, memory reset.
+ * **LifeScan OneTouch Verio** (USB version), **LifeScan OneTouch
+   Select Plus**: get information, get and set time, dump of
+   readings. Requires [python-scsi][1].
  * **Abbott FreeStyle Optium**: get information, get and set time,
    dump of readings in native units.
+
+[1] https://github.com/rosjat/python-scsi
 
 Dump format
 -----------
