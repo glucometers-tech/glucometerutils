@@ -17,19 +17,39 @@ https://github.com/Flameeyes/glucometer-protocols/.
 Supported devices
 -----------------
 
- * **LifeScan OneTouch Ultra 2**: get information, get and set time,
-   dump of readings (including comments and meal specification) in
-   native units, memory reset.
- * **LifeScan OneTouch Ultra Easy** (also known as **Ultra Mini**):
-   get information, get and set time, dump of readings in native
-   units, memory reset.
- * **LifeScan OneTouch Verio** (USB version), **LifeScan OneTouch
-   Select Plus**: get information, get and set time, dump of
-   readings. Requires [python-scsi][1].
- * **Abbott FreeStyle Optium**: get information, get and set time,
-   dump of readings in native units.
+Please see the following table for the driver for each device that is
+known and supported; the following table will provide further
+information on each of the devices.
 
-[1] https://github.com/rosjat/python-scsi
+| Manufacturer | Model Name           | Driver             |
+| ---          | ---                  | ---                |
+| LifeScan     | OneTouch Ultra 2     | `otultra2`         |
+| LifeScan     | OneTouch Ultra Easy  | `otultraeasy`      |
+| LifeScan     | OneTouch Ultra Mini  | `otultraeasy`      |
+| LifeScan     | OneTouch Verio (USB) | `otverio2015`      |
+| LifeScan     | OneTouch Select Plus | `otverio2015`      |
+| Abbott       | FreeStyle Optium     | `freestyle_optium` |
+
+### Driver features
+
+| Driver             | Information           | Time        | Record comments         | Memory Reset            |
+| ---                | ---                   | ---         | ---                     | ---                     |
+| `otultra2`         | serialno, swver, unit | get and set | yes                     | yes                     |
+| `otultraeasy`      | serialno, swver, unit | get and set | not supported by device | yes                     |
+| `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
+| `freestyle_optium` | serialno, swver, unit | get and set | not supported by device | not supported by device |
+
+### Driver dependencies
+
+| Driver             | Dependencies  |
+| ---                | ---           |
+| `otultra2`         | [pyserial]    |
+| `otultraeasy`      | [pyserial]    |
+| `otverio2015`      | [python-scsi] |
+| `freestyle_optium` | [pyserial]    |
+
+[pyserial]: https://pythonhosted.org/pyserial/
+[python-scsi]: https://github.com/rosjat/python-scsi
 
 Dump format
 -----------
