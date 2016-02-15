@@ -16,6 +16,11 @@ UNIT_MMOLL = 'mmol/L'
 
 VALID_UNITS = [UNIT_MGDL, UNIT_MMOLL]
 
+# Constants for meal information
+NO_MEAL = ''
+BEFORE_MEAL = 'Before Meal'
+AFTER_MEAL = 'After Meal'
+
 # Constants for date format
 DATETIME_12HR = '12 hours'
 DATETIME_24HR = '24 hours'
@@ -54,7 +59,7 @@ _ReadingBase = collections.namedtuple(
   '_ReadingBase', ['timestamp', 'value', 'meal', 'comment'])
 
 class Reading(_ReadingBase):
-  def __new__(cls, timestamp, value, meal='', comment=''):
+  def __new__(cls, timestamp, value, meal=NO_MEAL, comment=''):
     """Constructor for the reading object.
 
     Args:

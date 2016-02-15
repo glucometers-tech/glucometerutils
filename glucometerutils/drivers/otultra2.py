@@ -17,9 +17,9 @@ from glucometerutils.drivers import lifescan_common
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
-  'N': '',
-  'B': 'Before Meal',
-  'A': 'After Meal',
+  'N': common.NO_MEAL,
+  'B': common.BEFORE_MEAL,
+  'A': common.AFTER_MEAL,
 }
 
 _COMMENT_CODES = {
