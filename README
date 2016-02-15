@@ -29,6 +29,7 @@ information on each of the devices.
 | LifeScan     | OneTouch Verio (USB) | `otverio2015`      |
 | LifeScan     | OneTouch Select Plus | `otverio2015`      |
 | Abbott       | FreeStyle Optium     | `freestyle_optium` |
+| Roche        | Accu-Chek Mobile     | `accuchek_reports` |
 
 ### Driver features
 
@@ -38,6 +39,7 @@ information on each of the devices.
 | `otultraeasy`      | serialno, swver, unit | get and set | not supported by device | yes                     |
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
 | `freestyle_optium` | serialno, swver, unit | get and set | not supported by device | not supported by device |
+| `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
 
 ### Driver dependencies
 
