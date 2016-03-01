@@ -74,7 +74,7 @@ def _parse_clock(datestr):
   month = _MONTH_MATCHES[match.group('month')]
   year = int(match.group('year'))
 
-  hour, minute, second = (int(part) for part in match.group('time').split(':'))
+  hour, minute, second = map(match.group('time').split(':'), int)
 
   return datetime.datetime(year, month, day, hour, minute, second)
 
@@ -264,7 +264,7 @@ class Device(object):
       month = _MONTH_MATCHES[match.group('month')]
       year = int(match.group('year'))
 
-      hour, minute = (int(part) for part in match.group('time').split(':'))
+      hour, minute = map(match.group('time').split(':'), int)
 
       timestamp = datetime.datetime(year, month, day, hour, minute)
 

@@ -115,8 +115,8 @@ def _parse_datetime(response):
     raise exceptions.InvalidResponse(response)
 
   date, time = match.groups()
-  month, day, year = [int(part) for part in date.split('/')]
-  hour, minute, second = [int(part) for part in time.split(':')]
+  month, day, year = map(date.split('/'), int)
+  hour, minute, second = map(time.split(':'), int)
 
   # Yes, OneTouch2's firmware is not Y2K safe.
   return datetime.datetime(2000 + year, month, day, hour, minute, second)
