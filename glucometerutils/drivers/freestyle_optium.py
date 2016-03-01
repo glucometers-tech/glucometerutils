@@ -21,13 +21,6 @@ from glucometerutils import common
 from glucometerutils import exceptions
 
 
-class InvalidChecksum(exceptions.InvalidResponse):
-  def __init__(self, expected, gotten):
-    self.message = (
-      'Response checksum not matching: %04x expected, %04x gotten' %
-      (expected, gotten))
-
-
 _CLOCK_RE = re.compile(
   r'^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t'
   r'(?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})$')
@@ -255,7 +248,7 @@ class Device(object):
     calculated_checksum = sum(ord(c) for c in '\r\n'.join(data[:-1])) + 0xd + 0xa
 
     if expected_checksum != calculated_checksum:
-      raise InvalidChecksum(expected_checksum, calculated_checksum)
+      raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
 
     for line in data[5:-1]:
       match = _READING_RE.match(line)

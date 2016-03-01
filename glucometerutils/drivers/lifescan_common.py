@@ -15,13 +15,6 @@ class MissingChecksum(exceptions.InvalidResponse):
     self.message = 'Response is missing checksum: %s' % response
 
 
-class InvalidChecksum(exceptions.InvalidResponse):
-  def __init__(self, expected, gotten):
-    self.message = (
-      'Response checksum not matching: %04x expected, %04x gotten' %
-      (expected, gotten))
-
-
 class InvalidSerialNumber(exceptions.Error):
   """The serial number is not as expected."""
   def __init__(self, serial_number):

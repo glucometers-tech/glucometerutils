@@ -52,7 +52,7 @@ class TestOTUltraMini(unittest.TestCase):
         packet.validate_checksum()
         packet.disconnect = False
 
-        with self.assertRaises(lifescan_common.InvalidChecksum):
+        with self.assertRaises(exceptions.InvalidChecksum):
             packet.validate_checksum()
 
 

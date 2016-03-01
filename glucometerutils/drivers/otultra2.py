@@ -87,10 +87,10 @@ def _validate_and_strip_checksum(line):
       bytes(response, 'ascii'))
 
     if checksum_given != checksum_calculated:
-      raise lifescan_common.InvalidChecksum(checksum_given,
-                                            checksum_calculated)
+      raise exceptions.InvalidChecksum(checksum_given,
+                                       checksum_calculated)
   except ValueError:
-    raise lifescan_common.InvalidChecksum(checksum_given, None)
+    raise exceptions.InvalidChecksum(checksum_given, None)
 
   return response
 

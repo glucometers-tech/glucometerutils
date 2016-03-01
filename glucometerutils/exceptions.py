@@ -27,6 +27,13 @@ class InvalidResponse(Error):
     self.message = 'Invalid response received:\n%s' % response
 
 
+class InvalidChecksum(InvalidResponse):
+  def __init__(self, expected, gotten):
+    self.message = (
+      'Response checksum not matching: %08x expected, %08x gotten' %
+      (expected, gotten))
+
+
 class InvalidGlucoseUnit(Error):
   """Unable to parse the given glucose unit"""
 

@@ -75,8 +75,7 @@ def _extract_message(register):
     raise lifescan_common.MalformedCommand(
       'invalid ETX byte: %02x' % etx)
   if encoded_checksum != calculated_checksum:
-    raise lifescan_common.InvalidChecksum(
-      encoded_checksum, calculated_checksum)
+    raise exceptions.InvalidChecksum(encoded_checksum, calculated_checksum)
 
   response = register[_STRUCT_PREAMBLE.size:coda_offset]
   return response

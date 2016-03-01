@@ -162,7 +162,7 @@ class _Packet(object):
     expected_checksum = self.checksum
     received_checksum = self._STRUCT.unpack(self.cmd[_IDX_CHECKSUM:])[0]
     if received_checksum != expected_checksum:
-      raise lifescan_common.InvalidChecksum(expected_checksum, received_checksum)
+      raise exceptions.InvalidChecksum(expected_checksum, received_checksum)
 
   def update_checksum(self):
     self._STRUCT.pack_into(self.cmd, _IDX_CHECKSUM, self.checksum)

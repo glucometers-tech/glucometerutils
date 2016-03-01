@@ -65,7 +65,7 @@ class TestOTUltra2(unittest.TestCase):
     def test_invalid_checksum(self):
         self._set_return_string('% 1337\r')
 
-        self.assertRaises(lifescan_common.InvalidChecksum,
+        self.assertRaises(exceptions.InvalidChecksum,
                           self.device.get_serial_number)
 
     def test_broken_checksum(self):
