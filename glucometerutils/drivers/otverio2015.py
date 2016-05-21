@@ -45,6 +45,9 @@ _QUERY_KEY_SERIAL = b'\x00'
 _QUERY_KEY_MODEL = b'\x01'
 _QUERY_KEY_SOFTWARE = b'\x02'
 
+_READ_PARAMETER_REQUEST = b'\x04'
+_PARAMETER_KEY_UNIT = b'\x04'
+
 _READ_RTC_REQUEST = b'\x04\x20\x02'
 _WRITE_RTC_REQUEST = b'\x04\x20\x01'
 # All timestamp reported by this device are seconds since this date.
@@ -134,11 +137,12 @@ class Device(object):
             'Serial number: %s\n'
             'Software version: %s\n'
             'Time: %s\n'
-            'Default unit: unknown\n' % (
+            'Default unit: %s\n' % (
               self._query_string(_QUERY_KEY_MODEL),
               self.get_serial_number(),
               self.get_version(),
-              self.get_datetime()))
+              self.get_datetime(),
+              self.get_glucose_unit()))
 
   def _query_string(self, query_key):
     response = self._send_message(_QUERY_REQUEST + query_key, 3)
@@ -150,6 +154,15 @@ class Device(object):
     # only contain ASCII characters. Note that the string is
     # null-terminated, so the last character should be dropped.
     return response[2:].decode('utf-16-le')[:-1]
+
+  def _read_parameter(self, parameter_key):
+    response = self._send_message(
+      _READ_PARAMETER_REQUEST + parameter_key, 4)
+    if response[0:2] != b'\x03\x06':
+      raise lifescan_common.MalformedCommand(
+        'invalid response, expected 03 06, received %02x %02x' % (
+          response[0], response[1]))
+    return response[2:]
 
   def get_serial_number(self):
     return self._query_string(_QUERY_KEY_SERIAL)
@@ -201,7 +214,13 @@ class Device(object):
     return record_count
 
   def get_glucose_unit(self):
-    return common.UNIT_MGDL
+    unit_value = self._read_parameter(_PARAMETER_KEY_UNIT)
+    if unit_value == b'\x00\x00\x00\x00':
+      return common.UNIT_MGDL
+    elif unit_value == b'\x01\x00\x00\x00':
+      return common.UNIT_MMOLL
+    else:
+      raise exceptions.InvalidGlucoseUnit('%r' % unit_value)
 
   def _get_reading(self, record_number):
     request = (_READ_RECORD_REQUEST_PREFIX +
