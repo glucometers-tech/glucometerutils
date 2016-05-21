@@ -95,7 +95,7 @@ def _encode_message(cmd):
     _REGISTER_SIZE - 2 - len(message))
 
 def _convert_timestamp(timestamp):
-  return datetime.datetime.fromtimestamp(timestamp + _EPOCH_BASE)
+  return datetime.datetime.utcfromtimestamp(timestamp + _EPOCH_BASE)
 
 class Device(object):
   def __init__(self, device):
