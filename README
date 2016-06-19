@@ -41,7 +41,7 @@ information on each of the devices.
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
 | `freestyle_optium` | serialno, swver, unit | get and set | not supported by device | not supported by device |
 | `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
-| `sdcodefree`       | none                  | get         | pre-/post-meal notes    | not supported by device |
+| `sdcodefree`       | none                  | set only    | pre-/post-meal notes    | not supported by device |
 
 ### Driver dependencies
 
