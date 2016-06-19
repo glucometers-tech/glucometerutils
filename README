@@ -30,6 +30,7 @@ information on each of the devices.
 | LifeScan     | OneTouch Select Plus | `otverio2015`      |
 | Abbott       | FreeStyle Optium     | `freestyle_optium` |
 | Roche        | Accu-Chek Mobile     | `accuchek_reports` |
+| SD Biosensor | SD CodeFree          | `sdcodefree`       |
 
 ### Driver features
 
@@ -40,6 +41,7 @@ information on each of the devices.
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
 | `freestyle_optium` | serialno, swver, unit | get and set | not supported by device | not supported by device |
 | `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
+| `sdcodefree`       | none                  | get         | pre-/post-meal notes    | not supported by device |
 
 ### Driver dependencies
 
@@ -49,6 +51,7 @@ information on each of the devices.
 | `otultraeasy`      | [pyserial]    |
 | `otverio2015`      | [python-scsi] |
 | `freestyle_optium` | [pyserial]    |
+| `sdcodefree`       | [pyserial]    |
 
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://github.com/rosjat/python-scsi
