@@ -263,7 +263,7 @@ class Device(object):
       month = _MONTH_MATCHES[match.group('month')]
       year = int(match.group('year'))
 
-      hour, minute = map(match.group('time').split(':'), int)
+      hour, minute = map(int, match.group('time').split(':'))
 
       timestamp = datetime.datetime(year, month, day, hour, minute)
 
