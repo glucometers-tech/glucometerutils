@@ -29,12 +29,10 @@ _CLOCK_RE = re.compile(
 # over what the meter was supposed to read. Unlike the "Clock:" line, the months
 # of June and July are written in full, everything else is truncated to three
 # characters, so accept a space or 'e'/'y' at the end of the month name. Also,
-# the time does *not* include seconds. Note that the G is likely going to
-# indicate a blood-glucose reading rather than a blood-β-ketones. Unfortunately
-# I don't have β-ketone strips to test.
+# the time does *not* include seconds.
 _READING_RE = re.compile(
   r'^(?P<reading>HI |[0-9]{3})  (?P<month>[A-Z][a-z]{2})[ ey] (?P<day>[0-9]{2}) '
-  r'(?P<year>[0-9]{4}) (?P<time>[0-9]{2}:[0-9]{2}) G 0x00$')
+  r'(?P<year>[0-9]{4}) (?P<time>[0-9]{2}:[0-9]{2}) (?P<type>[GK]) 0x00$')
 
 _CHECKSUM_RE = re.compile(
   r'^(?P<checksum>0x[0-9A-F]{4})  END$')
@@ -253,6 +251,11 @@ class Device(object):
       match = _READING_RE.match(line)
       if not match:
         raise exceptions.InvalidResponse(line)
+
+      if match.group('type') != 'G':
+        print('Non-glucose readings are not supported, ignoring.',
+              file=sys.stderr)
+        continue
 
       if match.group('reading') == 'HI ':
         value = float("inf")
