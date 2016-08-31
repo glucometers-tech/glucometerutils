@@ -92,7 +92,6 @@ class Device(object):
     self.serial_.flush()
 
     response = self.serial_.readlines()
-    print("%r" % response)
 
     # We always want to decode the output, and remove stray \r\n. Any failure in
     # decoding means the output is invalid anyway.
