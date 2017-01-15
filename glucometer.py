@@ -54,18 +54,20 @@ def main():
   device = driver.Device(args.device)
 
   device.connect()
+  device_info = device.get_meter_info()
 
   try:
     if args.action == 'info':
-      print(str(device.get_meter_info()).strip())
       try:
-        print('Time: %s' % device.get_datetime())
+        time_str = device.get_datetime()
       except NotImplementedError:
-        print('Time: N/A')
+        time_str = 'N/A'
+      print("{device_info}Time: {time}".format(
+        device_info=str(device_info), time=time_str))
     elif args.action == 'dump':
       unit = args.unit
       if unit is None:
-        unit = device.get_glucose_unit()
+        unit = device_info.native_unit
 
       readings = device.get_readings()
 
