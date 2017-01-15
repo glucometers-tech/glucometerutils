@@ -1,0 +1,3 @@
+[submodule "gdef"]
+	path = gdef
+	url = https://github.com/Flameeyes/gdef
