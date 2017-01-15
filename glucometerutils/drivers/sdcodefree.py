@@ -141,8 +141,8 @@ class Device(object):
     if response != _DISCONNECTED_PACKET:
       raise exceptions.InvalidResponse(response=response)
 
-  def get_information_string(self):
-    return ('SD CodeFree glucometer\n')
+  def get_meter_info(self):
+    return common.MeterInfo('SD CodeFree glucometer')
 
   def get_version(self):
     raise NotImplementedError

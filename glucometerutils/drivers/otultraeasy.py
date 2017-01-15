@@ -231,16 +231,13 @@ class Device(object):
       result = self._read_response()
       return result
 
-  def get_information_string(self):
-    return ('OneTouch Ultra Easy glucometer\n'
-            'Serial number: %s\n' 
-            'Software version: %s\n'
-            'Time: %s\n'
-            'Default unit: %s' % (
-              self.get_serial_number(),
-              self.get_version(),
-              self.get_datetime(),
-              self.get_glucose_unit()))
+  def get_meter_info(self):
+    return common.MeterInfo(
+      'OneTouch Ultra Easy glucometer',
+      serial_number=self.get_serial_number(),
+      version_info=(
+        'Software version: ' + self.get_version(),),
+      native_unit=self.get_glucose_unit())
 
   def get_version(self):
     result = self._send_command(_READ_VERSION)

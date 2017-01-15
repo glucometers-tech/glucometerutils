@@ -132,17 +132,13 @@ class Device(object):
   def disconnect(self):
     return
 
-  def get_information_string(self):
-    return ('OneTouch %s glucometer\n'
-            'Serial number: %s\n'
-            'Software version: %s\n'
-            'Time: %s\n'
-            'Default unit: %s\n' % (
-              self._query_string(_QUERY_KEY_MODEL),
-              self.get_serial_number(),
-              self.get_version(),
-              self.get_datetime(),
-              self.get_glucose_unit()))
+  def get_meter_info(self):
+    return common.MeterInfo(
+      'OneTouch %s glucometer' % self._query_string(_QUERY_KEY_MODEL),
+      serial_number=self.get_serial_number(),
+      version_info=(
+        'Software version: ' + self.get_version(),),
+      native_unit=self.get_glucose_unit())
 
   def _query_string(self, query_key):
     response = self._send_message(_QUERY_REQUEST + query_key, 3)

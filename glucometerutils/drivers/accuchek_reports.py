@@ -68,13 +68,11 @@ class Device(object):
   def disconnect(self):
     self.report.close()
 
-  def get_information_string(self):
-    return ('%s glucometer\n'
-            'Serial number: %s\n'
-            'Default unit: %s' % (
-              self.get_model(),
-              self.get_serial_number(),
-              self.get_glucose_unit()))
+  def get_meter_info(self):
+    return common.MeterInfo(
+      '%s glucometer' % self.get_model(),
+      serial_number=self.get_serial_number(),
+      native_unit=self.get_glucose_unit())
 
   def get_model(self):
     # $device/MODEL/Reports/*.csv

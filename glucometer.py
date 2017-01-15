@@ -57,7 +57,11 @@ def main():
 
   try:
     if args.action == 'info':
-      print(device.get_information_string())
+      print(str(device.get_meter_info()).strip())
+      try:
+        print('Time: %s' % device.get_datetime())
+      except NotImplementedError:
+        print('Time: N/A')
     elif args.action == 'dump':
       unit = args.unit
       if unit is None:

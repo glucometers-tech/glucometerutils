@@ -7,6 +7,7 @@ __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import collections
+import textwrap
 
 from glucometerutils import exceptions
 
@@ -82,3 +83,36 @@ class Reading(_ReadingBase):
       to_unit: (UNIT_MGDL|UNIT_MMOLL) The unit to return the value to.
     """
     return convert_glucose_unit(self.value, UNIT_MGDL, to_unit)
+
+_MeterInfoBase = collections.namedtuple(
+  '_MeterInfoBase', ['model', 'serial_number', 'version_info', 'native_unit'])
+
+class MeterInfo(_MeterInfoBase):
+  def __new__(cls, model, serial_number='N/A', version_info=(),
+              native_unit=UNIT_MGDL):
+    """Construct a meter information object.
+
+    Args:
+      model: (string) Human-readable model name, depending on driver.
+      serial_number: (string) Optional serial number to identify the device.
+      version_info: (list(string)) Optional hardware/software version information.
+      native_unit: (UNIT_MGDL|UNIT_MMOLL) Native unit of the device for display.
+    """
+    return super(MeterInfo, cls).__new__(
+      cls, model=model, serial_number=serial_number, version_info=version_info,
+      native_unit=native_unit)
+
+  def __str__(self):
+    version_information_string = 'N/A'
+    if self.version_info:
+      version_information_string = '\n    '.join(self.version_info).strip()
+
+    return textwrap.dedent("""\
+      {model}
+      Serial Number: {serial_number}
+      Version Information:
+          {version_information_string}
+      Native Unit: {native_unit}
+      """).format(model=self.model, serial_number=self.serial_number,
+                  version_information_string=version_information_string,
+                  native_unit=self.native_unit)
