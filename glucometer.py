@@ -76,9 +76,7 @@ def main():
           readings, key=lambda reading: getattr(reading, args.sort_by))
 
       for reading in readings:
-        print('"%s","%.2f","%s","%s"' % (
-          reading.timestamp, reading.get_value_as(unit),
-          reading.meal, reading.comment))
+        print(reading.as_csv(unit))
     elif args.action == 'datetime':
       if args.set == 'now':
         print(device.set_datetime())

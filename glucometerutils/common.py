@@ -84,6 +84,12 @@ class Reading(_ReadingBase):
     """
     return convert_glucose_unit(self.value, UNIT_MGDL, to_unit)
 
+  def as_csv(self, unit):
+    """Returns the reading as a formatted comma-separated value string."""
+    return '"%s","%.2f","%s","%s"' % (
+      self.timestamp, self.get_value_as(unit), self.meal, self.comment)
+
+
 _MeterInfoBase = collections.namedtuple(
   '_MeterInfoBase', ['model', 'serial_number', 'version_info', 'native_unit'])
 
