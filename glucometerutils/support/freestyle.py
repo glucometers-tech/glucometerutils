@@ -183,6 +183,10 @@ class FreeStyleHidDevice(object):
 
         return self.get_datetime()
 
+    def zero_log(self):
+        """Not implemented, Abbott devices don't allow resetting memory."""
+        raise NotImplementedError
+
     def _get_multirecord(self, command):
         """Queries for, and returns, "multirecords" results.
 
