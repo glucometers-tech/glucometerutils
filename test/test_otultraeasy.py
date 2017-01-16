@@ -15,8 +15,8 @@ import mock
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from glucometerutils.drivers import lifescan_common
 from glucometerutils.drivers import otultraeasy
+from glucometerutils.support import lifescan
 from glucometerutils import exceptions
 
 class TestOTUltraMini(unittest.TestCase):
@@ -31,12 +31,12 @@ class TestOTUltraMini(unittest.TestCase):
     def testCrc(self):
         self.assertEqual(
             0x41cd,
-            lifescan_common.crc_ccitt(b'\x02\x06\x06\x03'))
+            lifescan.crc_ccitt(b'\x02\x06\x06\x03'))
 
         cmd_array = array.array('B', b'\x02\x06\x08\x03')
         self.assertEqual(
             0x62C2,
-            lifescan_common.crc_ccitt(cmd_array))
+            lifescan.crc_ccitt(cmd_array))
 
     def testPacketUpdateChecksum(self):
         packet = otultraeasy._Packet()

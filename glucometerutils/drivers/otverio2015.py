@@ -19,7 +19,7 @@ from pyscsi.pyscsi.scsi_device import SCSIDevice
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.drivers import lifescan_common
+from glucometerutils.support import lifescan
 
 # Match the same values in the otultraeasy driver.
 _STX = 0x02
@@ -63,19 +63,19 @@ def _extract_message(register):
   """Parse the message preamble and verify checksums."""
   stx, length = _STRUCT_PREAMBLE.unpack_from(register)
   if stx != _STX:
-    raise lifescan_common.MalformedCommand(
+    raise lifescan.MalformedCommand(
       'invalid STX byte: %02x' % stx)
   if length > _REGISTER_SIZE:
-    raise lifescan_common.MalformedCommand(
+    raise lifescan.MalformedCommand(
       'invalid length: %d > REGISTER_SIZE' % length)
 
   # 2 is the length of the checksum, so it should be ignored.
-  calculated_checksum = lifescan_common.crc_ccitt(register[:(length-2)])
+  calculated_checksum = lifescan.crc_ccitt(register[:(length-2)])
 
   coda_offset = length - _STRUCT_CODA.size
   etx, encoded_checksum = _STRUCT_CODA.unpack_from(register[coda_offset:])
   if etx != _ETX:
-    raise lifescan_common.MalformedCommand(
+    raise lifescan.MalformedCommand(
       'invalid ETX byte: %02x' % etx)
   if encoded_checksum != calculated_checksum:
     raise exceptions.InvalidChecksum(encoded_checksum, calculated_checksum)
@@ -88,7 +88,7 @@ def _encode_message(cmd):
   length = len(cmd) + _STRUCT_PREAMBLE.size + _STRUCT_CODA.size
   preamble = _STRUCT_PREAMBLE.pack(_STX, length)
   message = preamble + cmd + bytes((_ETX,))
-  checksum = _STRUCT_CHECKSUM.pack(lifescan_common.crc_ccitt(message))
+  checksum = _STRUCT_CHECKSUM.pack(lifescan.crc_ccitt(message))
 
   # Pad the message to match the size of the register.
   return message + checksum + bytes(
@@ -143,7 +143,7 @@ class Device(object):
   def _query_string(self, query_key):
     response = self._send_message(_QUERY_REQUEST + query_key, 3)
     if response[0:2] != b'\x04\06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
           response[0], response[1]))
     # Strings are encoded in wide characters (LE), but they should
@@ -155,7 +155,7 @@ class Device(object):
     response = self._send_message(
       _READ_PARAMETER_REQUEST + parameter_key, 4)
     if response[0:2] != b'\x03\x06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 03 06, received %02x %02x' % (
           response[0], response[1]))
     return response[2:]
@@ -169,7 +169,7 @@ class Device(object):
   def get_datetime(self):
     response = self._send_message(_READ_RTC_REQUEST, 3)
     if response[0:2] != b'\x04\06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
           response[0], response[1]))
     (timestamp,) = _STRUCT_TIMESTAMP.unpack(response[2:])
@@ -184,7 +184,7 @@ class Device(object):
     response = self._send_message(_WRITE_RTC_REQUEST + timestamp_bytes, 3)
 
     if response[0:2] != b'\x04\06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
           response[0], response[1]))
 
@@ -195,14 +195,14 @@ class Device(object):
   def zero_log(self):
     response = self._send_message(_MEMORY_ERASE_REQUEST, 3)
     if response[0:2] != b'\x04\06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
           response[0], response[1]))    
 
   def _get_reading_count(self):
     response = self._send_message(_READ_RECORD_COUNT_REQUEST, 3)
     if response[0:2] != b'\x04\06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
           response[0], response[1]))
 
@@ -224,7 +224,7 @@ class Device(object):
                _READ_RECORD_REQUEST_SUFFIX)
     response = self._send_message(request, 3)
     if response[0:2] != b'\x04\06':
-      raise lifescan_common.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
           response[0], response[1]))
 

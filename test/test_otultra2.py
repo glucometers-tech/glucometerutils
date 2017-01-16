@@ -14,8 +14,8 @@ import mock
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from glucometerutils.drivers import lifescan_common
 from glucometerutils.drivers import otultra2
+from glucometerutils.support import lifescan
 from glucometerutils import exceptions
 
 class TestOTUltra2(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestOTUltra2(unittest.TestCase):
     def test_missing_checksum(self):
         self._set_return_string('INVALID')
 
-        self.assertRaises(lifescan_common.MissingChecksum,
+        self.assertRaises(lifescan.MissingChecksum,
                           self.device.get_serial_number)
 
     def test_short_response(self):
@@ -59,7 +59,7 @@ class TestOTUltra2(unittest.TestCase):
     def test_invalid_serial_number(self):
         self._set_return_string('@ "12345678O" 0297\r')
 
-        self.assertRaises(lifescan_common.InvalidSerialNumber,
+        self.assertRaises(lifescan.InvalidSerialNumber,
                           self.device.get_serial_number)
 
     def test_invalid_checksum(self):
@@ -71,7 +71,7 @@ class TestOTUltra2(unittest.TestCase):
     def test_broken_checksum(self):
         self._set_return_string('% 13AZ\r')
 
-        self.assertRaises(lifescan_common.MissingChecksum,
+        self.assertRaises(lifescan.MissingChecksum,
                           self.device.get_serial_number)
 
 if __name__ == '__main__':

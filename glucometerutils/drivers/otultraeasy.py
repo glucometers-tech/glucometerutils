@@ -16,7 +16,7 @@ import serial
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.drivers import lifescan_common
+from glucometerutils.support import lifescan
 
 _STX = 0x02
 _ETX = 0x03
@@ -132,7 +132,7 @@ class _Packet(object):
 
   @property
   def checksum(self):
-    return lifescan_common.crc_ccitt(self.cmd[:_IDX_CHECKSUM].tobytes())
+    return lifescan.crc_ccitt(self.cmd[:_IDX_CHECKSUM].tobytes())
 
   @property
   def acknowledge(self):

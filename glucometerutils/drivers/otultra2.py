@@ -13,7 +13,7 @@ import serial
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.drivers import lifescan_common
+from glucometerutils.support import lifescan
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
@@ -77,7 +77,7 @@ def _validate_and_strip_checksum(line):
   match = _RESPONSE_MATCH.match(line)
 
   if not match:
-    raise lifescan_common.MissingChecksum(line)
+    raise lifescan.MissingChecksum(line)
 
   response, checksum_string = match.groups()
 
@@ -211,7 +211,7 @@ class Device(object):
     # 'Y' at the far right of the serial number is the indication of a OneTouch
     # Ultra2 device, as per specs.
     if serial_number[-1] != 'Y':
-      raise lifescan_common.InvalidSerialNumber(serial_number)
+      raise lifescan.InvalidSerialNumber(serial_number)
 
     return serial_number
 
