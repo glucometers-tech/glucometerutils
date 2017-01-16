@@ -3,7 +3,7 @@
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2014, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2014-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import array

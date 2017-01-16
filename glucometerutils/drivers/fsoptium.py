@@ -3,12 +3,12 @@
 
 Further information on the device protocol can be found at
 
-https://github.com/Flameeyes/glucometer-protocols/blob/master/abbott/freestyle-optium.md
+https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-optium
 """
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2016, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2016-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import datetime

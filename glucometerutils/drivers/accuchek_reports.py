@@ -114,12 +114,12 @@ class Device(object):
       return common.BEFORE_MEAL
     else:
       return common.NO_MEAL
-  
+
   def get_readings(self):
     for record in self._get_records_reader():
       if record[_RESULT_CSV_KEY] is None:
         continue
-      
+
       yield common.Reading(
         self._extract_datetime(record),
         common.convert_glucose_unit(float(record[_RESULT_CSV_KEY]),

@@ -3,12 +3,12 @@
 
 Further information on the device protocol can be found at
 
-https://github.com/Flameeyes/glucometer-protocols/blob/master/lifescan/onetouch-verio-2015.md
+https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
 """
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2016, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2016-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import datetime
@@ -197,7 +197,7 @@ class Device(object):
     if response[0:2] != b'\x04\06':
       raise lifescan.MalformedCommand(
         'invalid response, expected 04 06, received %02x %02x' % (
-          response[0], response[1]))    
+          response[0], response[1]))
 
   def _get_reading_count(self):
     response = self._send_message(_READ_RECORD_COUNT_REQUEST, 3)
