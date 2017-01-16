@@ -23,11 +23,10 @@ _INIT_SEQUENCE = (0x04, 0x05, 0x15, 0x01)
 
 _STRUCT_PREAMBLE = struct.Struct('<BB')
 
-_TEXT_REPLY_COMPLETED = b'CMD OK'
-_TEXT_REPLY_FAILURE = b'CMD Fail!'
+_TEXT_COMPLETION_RE = re.compile('CMD (?:OK|Fail!)')
 _TEXT_REPLY_FORMAT = re.compile(
-    '^(?P<message>.+\r\n)CKSM:(?P<checksum>[0-9A-F]{8})\r\n'
-    'CMD OK\r\n$', re.DOTALL)
+    '^(?P<message>.*)CKSM:(?P<checksum>[0-9A-F]{8})\r\n'
+    'CMD (?P<status>OK|Fail!)\r\n$', re.DOTALL)
 
 _MULTIRECORDS_FORMAT = re.compile(
     '^(?P<message>.+\r\n)(?P<count>[0-9]+),(?P<checksum>[0-9A-F]{8})\r\n$',
@@ -124,30 +123,29 @@ class FreeStyleHidDevice(object):
         self._send_command(self.TEXT_CMD, command)
 
         # Reply can stretch multiple buffers
-        full_content = b''
-        while _TEXT_REPLY_COMPLETED not in full_content:
+        full_content = ''
+        while True:
             message_type, content = self._read_response()
-
-            # Check for message failure in all the message types.
-            if _TEXT_REPLY_FAILURE in content:
-                raise exceptions.InvalidResponse(
-                    'Command failure: %s' % content.decode('ascii'))
 
             if message_type != self.TEXT_REPLY_CMD:
                 raise exceptions.InvalidResponse(
                     'Message type %02x does not match expectations: %s' %
                     (message_type, content.decode('ascii')))
 
-            full_content += content
+            full_content += content.decode('ascii')
 
-        decoded_message = full_content.decode('ascii')
+            if _TEXT_COMPLETION_RE.search(full_content):
+                break
 
-        match = _TEXT_REPLY_FORMAT.search(decoded_message)
+        match = _TEXT_REPLY_FORMAT.search(full_content)
         if not match:
-            raise exceptions.InvalidResponse(decoded_message)
+            raise exceptions.InvalidResponse(full_content)
 
         message = match.group('message')
         _verify_checksum(message, match.group('checksum'))
+
+        if match.group('status') != 'OK':
+            raise exceptions.InvalidResponse(message)
 
         return message
 
@@ -168,6 +166,22 @@ class FreeStyleHidDevice(object):
         hour, minute = (int(x) for x in time.split(','))
 
         return datetime.datetime(year + 2000, month, day, hour, minute)
+
+    def set_datetime(self, date=datetime.datetime.now()):
+        """Sets the date and time of the device."""
+
+        # The format used by the FreeStyle devices is not composable based on
+        # standard strftime() (namely it includes no leading zeros), so we need
+        # to build it manually.
+        date_cmd = '$date,{month},{day},{year}'.format(
+            month=date.month, day=date.day, year=(date.year-2000))
+        time_cmd = '$time,{hour},{minute}'.format(
+            hour=date.hour, minute=date.minute)
+
+        self._send_text_command(bytes(date_cmd, "ascii"))
+        self._send_text_command(bytes(time_cmd, "ascii"))
+
+        return self.get_datetime()
 
     def _get_multirecord(self, command):
         """Queries for, and returns, "multirecords" results.

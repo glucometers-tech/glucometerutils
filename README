@@ -39,7 +39,7 @@ information on each of the devices.
 | `otultraeasy`      | serialno, swver, unit | get and set | not supported by device | yes                     |
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
 | `fsoptium`         | serialno, swver, unit | get and set | not supported by device | not supported by device |
-| `fsprecisionneo`   | serialno, swver       | get         | not supported by device | not supported by device |
+| `fsprecisionneo`   | serialno, swver       | get and set | not supported by device | not supported by device |
 | `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
 | `sdcodefree`       | none                  | set only    | pre-/post-meal notes    | not supported by device |
 
