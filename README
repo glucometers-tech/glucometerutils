@@ -1,5 +1,4 @@
-Glucometer Utilities
-====================
+# Glucometer Utilities
 
 This utility I created for personal needs, as my glucometer's software
 can only print the software (to XPS) without a file export option.
@@ -14,8 +13,7 @@ supported, please provide a reference, possibly by writing a
 specification and contribute it to
 https://github.com/Flameeyes/glucometer-protocols/.
 
-Supported devices
------------------
+## Supported devices
 
 Please see the following table for the driver for each device that is
 known and supported; the following table will provide further
@@ -59,8 +57,7 @@ information on each of the devices.
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://github.com/rosjat/python-scsi
 
-Dump format
------------
+## Dump format
 
 The `dump` action by default will output CSV-compatible format, with the
 following fields:
@@ -79,8 +76,7 @@ its display unit, which might differ from the one used by the meter for internal
 representation and wire protocol. You can override the display unit with
 `--unit`.
 
-Development
------------
+## Development
 
 The tool is being written keeping in mind that different glucometers,
 even if they are all from the same manufacturer, will use different
@@ -90,8 +86,8 @@ If you want to contribute code, please note that the target language
 is Python 3.2, and that the style to follow is for the most part PEP8
 compatible.
 
-License
--------
+## License
+
 Copyright © 2013-2017 Diego Elio Pettenò <flameeyes@flameeyes.eu>
 
 Permission is hereby granted, free of charge, to any person obtaining
