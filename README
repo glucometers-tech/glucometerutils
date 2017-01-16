@@ -21,16 +21,17 @@ Please see the following table for the driver for each device that is
 known and supported; the following table will provide further
 information on each of the devices.
 
-| Manufacturer | Model Name           | Driver             |
-| ---          | ---                  | ---                |
-| LifeScan     | OneTouch Ultra 2     | `otultra2`         |
-| LifeScan     | OneTouch Ultra Easy  | `otultraeasy`      |
-| LifeScan     | OneTouch Ultra Mini  | `otultraeasy`      |
-| LifeScan     | OneTouch Verio (USB) | `otverio2015`      |
-| LifeScan     | OneTouch Select Plus | `otverio2015`      |
-| Abbott       | FreeStyle Optium     | `fsoptium`         |
-| Roche        | Accu-Chek Mobile     | `accuchek_reports` |
-| SD Biosensor | SD CodeFree          | `sdcodefree`       |
+| Manufacturer | Model Name              | Driver             |
+| ---          | ---                     | ---                |
+| LifeScan     | OneTouch Ultra 2        | `otultra2`         |
+| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      |
+| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      |
+| LifeScan     | OneTouch Verio (USB)    | `otverio2015`      |
+| LifeScan     | OneTouch Select Plus    | `otverio2015`      |
+| Abbott       | FreeStyle Optium        | `fsoptium`         |
+| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   |
+| Roche        | Accu-Chek Mobile        | `accuchek_reports` |
+| SD Biosensor | SD CodeFree             | `sdcodefree`       |
 
 ### Driver features
 
@@ -40,6 +41,7 @@ information on each of the devices.
 | `otultraeasy`      | serialno, swver, unit | get and set | not supported by device | yes                     |
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
 | `fsoptium`         | serialno, swver, unit | get and set | not supported by device | not supported by device |
+| `fsprecisionneo`   | serialno, swver       | get         | not supported by device | not supported by device |
 | `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
 | `sdcodefree`       | none                  | set only    | pre-/post-meal notes    | not supported by device |
 
@@ -51,6 +53,7 @@ information on each of the devices.
 | `otultraeasy`      | [pyserial]    |
 | `otverio2015`      | [python-scsi] |
 | `fsoptium`         | [pyserial]    |
+| `fsprecisionneo`   |               |
 | `sdcodefree`       | [pyserial]    |
 
 [pyserial]: https://pythonhosted.org/pyserial/
@@ -89,7 +92,7 @@ compatible.
 
 License
 -------
-Copyright © 2013-2016 Diego Elio Pettenò <flameeyes@flameeyes.eu>
+Copyright © 2013-2017 Diego Elio Pettenò <flameeyes@flameeyes.eu>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
