@@ -28,7 +28,7 @@ information on each of the devices.
 | LifeScan     | OneTouch Ultra Mini  | `otultraeasy`      |
 | LifeScan     | OneTouch Verio (USB) | `otverio2015`      |
 | LifeScan     | OneTouch Select Plus | `otverio2015`      |
-| Abbott       | FreeStyle Optium     | `freestyle_optium` |
+| Abbott       | FreeStyle Optium     | `fsoptium`         |
 | Roche        | Accu-Chek Mobile     | `accuchek_reports` |
 | SD Biosensor | SD CodeFree          | `sdcodefree`       |
 
@@ -39,7 +39,7 @@ information on each of the devices.
 | `otultra2`         | serialno, swver, unit | get and set | yes                     | yes                     |
 | `otultraeasy`      | serialno, swver, unit | get and set | not supported by device | yes                     |
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
-| `freestyle_optium` | serialno, swver, unit | get and set | not supported by device | not supported by device |
+| `fsoptium`         | serialno, swver, unit | get and set | not supported by device | not supported by device |
 | `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
 | `sdcodefree`       | none                  | set only    | pre-/post-meal notes    | not supported by device |
 
@@ -50,7 +50,7 @@ information on each of the devices.
 | `otultra2`         | [pyserial]    |
 | `otultraeasy`      | [pyserial]    |
 | `otverio2015`      | [python-scsi] |
-| `freestyle_optium` | [pyserial]    |
+| `fsoptium`         | [pyserial]    |
 | `sdcodefree`       | [pyserial]    |
 
 [pyserial]: https://pythonhosted.org/pyserial/
