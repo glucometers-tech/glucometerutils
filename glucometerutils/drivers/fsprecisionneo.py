@@ -54,7 +54,7 @@ class Device(freestyle.FreeStyleHidDevice):
 
     def get_readings(self):
         """Iterate through the reading records in the device."""
-        for record in self._get_multirecord(b'$record?'):
+        for record in self._get_multirecord(b'$result?'):
             if not record or record[0] != _TYPE_GLUCOSE_READING:
                 continue
 
