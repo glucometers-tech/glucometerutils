@@ -12,6 +12,7 @@ __license__ = 'MIT'
 
 import csv
 import datetime
+import os.path
 import re
 import struct
 
@@ -68,6 +69,9 @@ class FreeStyleHidDevice(object):
     TEXT_REPLY_CMD = 0x60
 
     def __init__(self, device):
+        if not os.path.exists(device):
+            raise exceptions.ConnectionFailed(
+                message='Path %s does not exist.' % device)
         self.handle_ = open(device, 'w+b')
 
     def connect(self):
