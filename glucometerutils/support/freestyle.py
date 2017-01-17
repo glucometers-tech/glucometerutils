@@ -110,7 +110,7 @@ class FreeStyleHidDevice(object):
         message_length = usb_packet[1]
         message_content = usb_packet[2:2+message_length]
 
-        # There appears to be a stray number of 22 01 03 messages being returned
+        # There appears to be a stray number of 22 01 xx messages being returned
         # by some devices after commands are sent. These do not appear to have
         # meaning, so ignore them and proceed to the next.
         if message_type == 0x22 and message_length == 1:
@@ -145,7 +145,7 @@ class FreeStyleHidDevice(object):
         _verify_checksum(message, match.group('checksum'))
 
         if match.group('status') != 'OK':
-            raise exceptions.InvalidResponse(message)
+            raise exceptions.InvalidResponse(message or "Command failed")
 
         return message
 
