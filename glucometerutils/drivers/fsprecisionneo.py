@@ -40,14 +40,6 @@ class Device(freestyle.FreeStyleHidDevice):
                 'Software version: ' + self._get_version(),),
             native_unit=self.get_glucose_unit())
 
-    def _get_version(self):
-        """Return the software version of the device."""
-        return self._send_text_command(b'$swver?').rstrip('\r\n')
-
-    def get_serial_number(self):
-        """Returns the serial number of the device."""
-        return self._send_text_command(b'$serlnum?').rstrip('\r\n')
-
     def get_glucose_unit(self):
         """Returns the glucose unit of the device."""
         return common.UNIT_MGDL
@@ -58,8 +50,8 @@ class Device(freestyle.FreeStyleHidDevice):
             if not record or record[0] != _TYPE_GLUCOSE_READING:
                 continue
 
-            # Build a _NeoReading object by parsing each of the entries in the
-            # CSV as integers.
+            # Build a _reading object by parsing each of the entries in the CSV
+            # as integers.
             raw_reading = _NeoReading._make([int(v) for v in record])
 
             timestamp = datetime.datetime(

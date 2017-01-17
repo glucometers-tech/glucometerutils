@@ -152,6 +152,14 @@ class FreeStyleHidDevice(object):
     # Some of the commands are also shared across devices that use this HID
     # protocol, but not many. Only provide here those that do seep to change
     # between them.
+    def _get_version(self):
+        """Return the software version of the device."""
+        return self._send_text_command(b'$swver?').rstrip('\r\n')
+
+    def get_serial_number(self):
+        """Returns the serial number of the device."""
+        return self._send_text_command(b'$serlnum?').rstrip('\r\n')
+
     def get_datetime(self):
         """Gets the date and time as reported by the device.
 
