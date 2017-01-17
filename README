@@ -26,6 +26,7 @@ information on each of the devices.
 | LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      |
 | LifeScan     | OneTouch Verio (USB)    | `otverio2015`      |
 | LifeScan     | OneTouch Select Plus    | `otverio2015`      |
+| Abbott       | FreeStyle InsuLinx      | `fsinsulinx`       |
 | Abbott       | FreeStyle Optium        | `fsoptium`         |
 | Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   |
 | Roche        | Accu-Chek Mobile        | `accuchek_reports` |
@@ -38,6 +39,7 @@ information on each of the devices.
 | `otultra2`         | serialno, swver, unit | get and set | yes                     | yes                     |
 | `otultraeasy`      | serialno, swver, unit | get and set | not supported by device | yes                     |
 | `otverio2015`      | serialno, swver       | get and set | no                      | yes                     |
+| `fsinsulinx`       | serialno, swver       | get and set | no                      | not supported by device |
 | `fsoptium`         | serialno, swver, unit | get and set | not supported by device | not supported by device |
 | `fsprecisionneo`   | serialno, swver       | get and set | not supported by device | not supported by device |
 | `accuchek_reports` | serialno, unit        | no          | yes                     | not supported by device |
@@ -51,7 +53,6 @@ information on each of the devices.
 | `otultraeasy`      | [pyserial]    |
 | `otverio2015`      | [python-scsi] |
 | `fsoptium`         | [pyserial]    |
-| `fsprecisionneo`   |               |
 | `sdcodefree`       | [pyserial]    |
 
 [pyserial]: https://pythonhosted.org/pyserial/
