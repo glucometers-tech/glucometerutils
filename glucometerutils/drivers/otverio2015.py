@@ -100,7 +100,7 @@ def _convert_timestamp(timestamp):
 class Device(object):
   def __init__(self, device):
     self.device_name_ = device
-    self.scsi_device_ = SCSIDevice(device)
+    self.scsi_device_ = SCSIDevice(device, readwrite=True)
     self.scsi_ = SCSI(self.scsi_device_)
     self.scsi_.blocksize = _REGISTER_SIZE
 
