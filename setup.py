@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
   name = 'glucometerutils',
-  packages = ['glucometerutils', 'glucometerutils.drivers'],
+  packages = ['glucometerutils', 'glucometerutils.drivers', 'glucometerutils.support'],
   scripts = ['glucometer.py'],
   version = '1',
   description = 'Glucometer access utilities',
