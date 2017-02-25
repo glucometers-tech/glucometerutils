@@ -9,6 +9,7 @@ __license__ = 'MIT'
 
 import argparse
 import importlib
+import logging
 import sys
 
 from dateutil import parser as date_parser
@@ -26,6 +27,11 @@ def main():
   parser.add_argument(
     '--device', action='store', required=True,
     help='Select the path to the glucometer device.')
+
+  parser.add_argument(
+    '--vlog', action='store', required=False, type=int,
+    help=('Python logging level. See the levels at '
+          'https://docs.python.org/3/library/logging.html#logging-levels'))
 
   subparsers.add_parser(
     'info', help='Display information about the meter.')
@@ -49,6 +55,8 @@ def main():
     help='Set the date rather than just reading it from the device.')
 
   args = parser.parse_args()
+
+  logging.basicConfig(level=args.vlog)
 
   driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
   device = driver.Device(args.device)
