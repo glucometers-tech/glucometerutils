@@ -59,7 +59,14 @@ def main():
 
   logging.basicConfig(level=args.vlog)
 
-  driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
+  try:
+    driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
+  except ImportError:
+    logging.error(
+      'No driver "%s" found, please check your --driver parameter.',
+      args.driver)
+    return 1
+
   device = driver.Device(args.device)
 
   device.connect()
