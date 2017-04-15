@@ -10,6 +10,7 @@ import array
 import collections
 import datetime
 import functools
+import logging
 import operator
 import struct
 import time
@@ -66,12 +67,12 @@ def xor_checksum(msg):
 class Device(object):
     def __init__(self, device):
         if not device:
-            raise exceptions.CommandLineError(
-                '--device parameter is required, should point to the serial '
-                'device connected to the meter.')
+            logging.info(
+                'No --device parameter provided, looking for default cable.')
+            device = 'hwgrep://10c4:ea60'
 
-        self.serial_ = serial.Serial(
-            port=device, baudrate=38400, bytesize=serial.EIGHTBITS,
+        self.serial_ = serial.serial_for_url(
+            device, baudrate=38400, bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
             timeout=300, xonxoff=False, rtscts=False, dsrdtr=False,
             writeTimeout=None)
@@ -177,7 +178,7 @@ class Device(object):
 
         # The date we return should only include up to minute, unfortunately.
         return datetime.datetime(date.year, date.month, date.day,
-                                                         date.hour, date.minute)
+                                 date.hour, date.minute)
 
     def zero_log(self):
         raise NotmplementedError

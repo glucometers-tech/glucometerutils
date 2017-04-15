@@ -8,6 +8,7 @@ __license__ = 'MIT'
 
 import array
 import datetime
+import logging
 import re
 import struct
 import time
@@ -178,12 +179,11 @@ class _Packet(object):
 class Device(object):
   def __init__(self, device):
     if not device:
-      raise exceptions.CommandLineError(
-        '--device parameter is required, should point to the serial device '
-        'connected to the meter.')
+      logging.info('No --device parameter provided, looking for default cable.')
+      device = 'hwgrep://067b:2303'
 
-    self.serial_ = serial.Serial(
-      port=device, baudrate=9600, bytesize=serial.EIGHTBITS,
+    self.serial_ = serial.serial_for_url(
+      device, baudrate=9600, bytesize=serial.EIGHTBITS,
       parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
       timeout=1, xonxoff=False, rtscts=False, dsrdtr=False, writeTimeout=None)
 

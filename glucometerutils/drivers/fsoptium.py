@@ -80,12 +80,11 @@ def _parse_clock(datestr):
 class Device(object):
   def __init__(self, device):
     if not device:
-      raise exceptions.CommandLineError(
-        '--device parameter is required, should point to the serial device '
-        'connected to the meter.')
+      logging.info('No --device parameter provided, looking for default cable.')
+      device = 'hwgrep://1a61:3420'
 
-    self.serial_ = serial.Serial(
-      port=device, baudrate=19200, bytesize=serial.EIGHTBITS,
+    self.serial_ = serial.serial_for_url(
+      device, baudrate=19200, bytesize=serial.EIGHTBITS,
       parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
       timeout=1, xonxoff=True, rtscts=False, dsrdtr=False, writeTimeout=None)
 
