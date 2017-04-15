@@ -98,9 +98,11 @@ def main():
         print(device.set_datetime())
       elif args.set:
         try:
-          print(device.set_datetime(date_parser.parse(args.set)))
+          new_date = date_parser.parse(args.set)
         except ValueError:
-          print('%s: not a valid date' % args.set, file=sys.stderr)
+          logging.error('%s: not a valid date', args.set)
+          return 1
+        print(device.set_datetime(new_date))
       else:
         print(device.get_datetime())
     elif args.action == 'zero':
