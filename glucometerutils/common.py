@@ -22,10 +22,6 @@ NO_MEAL = ''
 BEFORE_MEAL = 'Before Meal'
 AFTER_MEAL = 'After Meal'
 
-# Constants for date format
-DATETIME_12HR = '12 hours'
-DATETIME_24HR = '24 hours'
-
 
 def convert_glucose_unit(value, from_unit, to_unit=None):
   """Convert the given value of glucose level between units.
