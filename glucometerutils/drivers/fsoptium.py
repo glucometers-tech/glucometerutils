@@ -12,8 +12,8 @@ __copyright__ = 'Copyright © 2016-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import datetime
+import logging
 import re
-import sys
 
 import serial
 
@@ -254,8 +254,7 @@ class Device(object):
         raise exceptions.InvalidResponse(line)
 
       if match.group('type') != 'G':
-        print('Non-glucose readings are not supported, ignoring.',
-              file=sys.stderr)
+        logging.warning('Non-glucose readings are not supported, ignoring.')
         continue
 
       if match.group('reading') == 'HI ':
