@@ -69,6 +69,11 @@ class FreeStyleHidDevice(object):
     TEXT_REPLY_CMD = 0x60
 
     def __init__(self, device):
+        if not device:
+            raise exceptions.CommandLineError(
+                '--device parameter is required, should point to /dev/hidraw '
+                'for the meter')
+
         if not os.path.exists(device):
             raise exceptions.ConnectionFailed(
                 message='Path %s does not exist.' % device)

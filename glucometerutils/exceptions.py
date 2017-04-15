@@ -13,6 +13,13 @@ class Error(Exception):
     return self.message
 
 
+class CommandLineError(Error):
+  """Error with commandline parameters provided."""
+
+  def __init__(self, message=''):
+    self.message = message
+
+
 class ConnectionFailed(Error):
   """It was not possible to connect to the meter."""
 

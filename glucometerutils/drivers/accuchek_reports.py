@@ -46,6 +46,11 @@ _DATETIME_FORMAT = ' '.join((_DATE_FORMAT, _TIME_FORMAT))
 
 class Device(object):
   def __init__(self, device):
+    if not device or not os.path.isdir(device):
+      raise exceptions.CommandLineError(
+        '--device parameter is required, should point to mount path for the '
+        'meter.')
+
     report_files = glob.glob(os.path.join(device, '*', 'Reports', '*.csv'))
     if not report_files:
       raise exceptions.ConnectionFailed(

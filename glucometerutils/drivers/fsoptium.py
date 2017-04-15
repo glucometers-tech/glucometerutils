@@ -79,6 +79,11 @@ def _parse_clock(datestr):
 
 class Device(object):
   def __init__(self, device):
+    if not device:
+      raise exceptions.CommandLineError(
+        '--device parameter is required, should point to the serial device '
+        'connected to the meter.')
+
     self.serial_ = serial.Serial(
       port=device, baudrate=19200, bytesize=serial.EIGHTBITS,
       parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,

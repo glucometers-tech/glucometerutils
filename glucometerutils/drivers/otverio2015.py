@@ -99,6 +99,11 @@ def _convert_timestamp(timestamp):
 
 class Device(object):
   def __init__(self, device):
+    if not device:
+      raise exceptions.CommandLineError(
+        '--device parameter is required, should point to the disk device '
+        'representing the meter.')
+
     self.device_name_ = device
     self.scsi_device_ = SCSIDevice(device, readwrite=True)
     self.scsi_ = SCSI(self.scsi_device_)

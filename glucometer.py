@@ -25,8 +25,9 @@ def main():
     '--driver', action='store', required=True,
     help='Select the driver to use for connecting to the glucometer.')
   parser.add_argument(
-    '--device', action='store', required=True,
-    help='Select the path to the glucometer device.')
+    '--device', action='store', required=False,
+    help=('Select the path to the glucometer device. Some devices require this '
+          'argument, others will try autodetection.'))
 
   parser.add_argument(
     '--vlog', action='store', required=False, type=int,
