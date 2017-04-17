@@ -26,12 +26,15 @@ information on each of the devices.
 | LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [pyserial]    |
 | LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [python-scsi] |
 | LifeScan     | OneTouch Select Plus    | `otverio2015`      | [python-scsi] |
-| Abbott       | FreeStyle InsuLinx      | `fsinsulinx`       |               |
+| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       |               |
 | Abbott       | FreeStyle Libre         | `fslibre`          |               |
 | Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]    |
 | Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   |               |
+| Abbott       | FreeStyle Optium Neo†   | `fsprecisionneo`   |               |
 | Roche        | Accu-Chek Mobile        | `accuchek_reports` |               |
 | SD Biosensor | SD CodeFree             | `sdcodefree`       | [pyserial]    |
+
+† Untested.
 
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://github.com/rosjat/python-scsi
