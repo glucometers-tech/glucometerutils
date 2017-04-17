@@ -13,11 +13,10 @@ import re
 import struct
 import time
 
-import serial
-
 from glucometerutils import common
 from glucometerutils import exceptions
 from glucometerutils.support import lifescan
+from glucometerutils.support import serial
 
 _STX = 0x02
 _ETX = 0x03
@@ -176,16 +175,12 @@ class _Packet(object):
     return self.cmd[_IDX_DATA:_IDX_ETX]
 
 
-class Device(object):
-  def __init__(self, device):
-    if not device:
-      logging.info('No --device parameter provided, looking for default cable.')
-      device = 'hwgrep://067b:2303'
+class Device(serial.SerialDevice):
+  BAUDRATE = 9600
+  DEFAULT_CABLE_ID = '067b:2303'  # Generic PL2303 cable.
 
-    self.serial_ = serial.serial_for_url(
-      device, baudrate=9600, bytesize=serial.EIGHTBITS,
-      parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-      timeout=1, xonxoff=False, rtscts=False, dsrdtr=False, writeTimeout=None)
+  def __init__(self, device):
+    super(Device, self).__init__(device)
 
     self.sent_counter_ = False
     self.expect_receive_ = False

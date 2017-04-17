@@ -10,11 +10,10 @@ import datetime
 import logging
 import re
 
-import serial
-
 from glucometerutils import common
 from glucometerutils import exceptions
 from glucometerutils.support import lifescan
+from glucometerutils.support import serial
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
@@ -123,16 +122,9 @@ def _parse_datetime(response):
   return datetime.datetime(2000 + year, month, day, hour, minute, second)
 
 
-class Device(object):
-  def __init__(self, device):
-    if not device:
-      logging.info('No --device parameter provided, looking for default cable.')
-      device = 'hwgrep://067b:2303'
-
-    self.serial_ = serial.serial_for_url(
-      device, baudrate=9600, bytesize=serial.EIGHTBITS,
-      parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-      timeout=1, xonxoff=False, rtscts=False, dsrdtr=False, writeTimeout=None)
+class Device(serial.SerialDevice):
+  BAUDRATE = 9600
+  DEFAULT_CABLE_ID = '067b:2303'  # Generic PL2303 cable.
 
   def connect(self):
     return

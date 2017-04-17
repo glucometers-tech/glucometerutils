@@ -15,10 +15,9 @@ import operator
 import struct
 import time
 
-import serial
-
 from glucometerutils import common
 from glucometerutils import exceptions
+from glucometerutils.support import serial
 
 _STX = 0x53    # Not really 'STX'
 _ETX = 0xAA    # Not really 'ETX'
@@ -64,18 +63,10 @@ def parse_reading(msgdata):
 def xor_checksum(msg):
     return functools.reduce(operator.xor, msg)
 
-class Device(object):
-    def __init__(self, device):
-        if not device:
-            logging.info(
-                'No --device parameter provided, looking for default cable.')
-            device = 'hwgrep://10c4:ea60'
-
-        self.serial_ = serial.serial_for_url(
-            device, baudrate=38400, bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-            timeout=300, xonxoff=False, rtscts=False, dsrdtr=False,
-            writeTimeout=None)
+class Device(serial.SerialDevice):
+    BAUDRATE = 38400
+    DEFAULT_CABLE_ID = '10c4:ea60'  # Generic cable.
+    TIMEOUT = 300  # We need to wait for data from the device.
 
     def read_packet(self):
         preamble = self.serial_.read(3)

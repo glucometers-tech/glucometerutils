@@ -15,10 +15,9 @@ import datetime
 import logging
 import re
 
-import serial
-
 from glucometerutils import common
 from glucometerutils import exceptions
+from glucomterutils.support import serial
 
 
 _CLOCK_RE = re.compile(
@@ -77,16 +76,9 @@ def _parse_clock(datestr):
   return datetime.datetime(year, month, day, hour, minute, second)
 
 
-class Device(object):
-  def __init__(self, device):
-    if not device:
-      logging.info('No --device parameter provided, looking for default cable.')
-      device = 'hwgrep://1a61:3420'
-
-    self.serial_ = serial.serial_for_url(
-      device, baudrate=19200, bytesize=serial.EIGHTBITS,
-      parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-      timeout=1, xonxoff=True, rtscts=False, dsrdtr=False, writeTimeout=None)
+class Device(serial.SerialDevice):
+  BAUDRATE = 19200
+  DEFAULT_CABLE_ID = '1a61:3420'
 
   def _send_command(self, command):
     cmd_bytes = bytes('$%s\r\n' % command, 'ascii')
