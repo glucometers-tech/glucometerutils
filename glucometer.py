@@ -9,6 +9,7 @@ __license__ = 'MIT'
 
 import argparse
 import importlib
+import inspect
 import logging
 import sys
 
@@ -34,6 +35,9 @@ def main():
     help=('Python logging level. See the levels at '
           'https://docs.python.org/3/library/logging.html#logging-levels'))
 
+  subparsers.add_parser(
+    'help', help=('Display a description of the driver, including supported '
+                  'features and known quirks.'))
   subparsers.add_parser(
     'info', help='Display information about the meter.')
   subparsers.add_parser(
@@ -66,6 +70,12 @@ def main():
       'No driver "%s" found, please check your --driver parameter.',
       args.driver)
     return 1
+
+  # This check needs to happen before we try to initialize the device, as the
+  # help action does not require a --device at all.
+  if args.action == 'help':
+    print(inspect.getdoc(driver))
+    return 0
 
   device = driver.Device(args.device)
 

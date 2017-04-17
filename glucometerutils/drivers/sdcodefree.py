@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
-"""Driver for SD CodeFree devices by SD Biosensor"""
+"""Driver for SD CodeFree devices by SD Biosensor.
+
+For SD Biosensor glucometers using the serial interface.
+
+Supported features:
+    - get readings, including pre-/post-meal notes;
+    - set date and time.
+
+Expected device path: /dev/ttyUSB0 or similar serial port device.
+
+IMPORTANT NOTE: the glucometer can be connected before starting the program, but
+it has to be turned on when the program asks you to.
+"""
+
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
