@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 """Driver for LifeScan OneTouch Verio 2015 devices.
 
+For Verio devices with microUSB connector. Also supports OneTouch Select Plus
+devices.
+
+Supported features:
+    - get readings;
+    - use the glucose unit preset on the device by default;
+    - get and set date and time;
+    - get serial number and software version;
+    - memory reset (caution!)
+
+Expected device path: /dev/sdb or similar USB block device.
+
 Further information on the device protocol can be found at
 
 https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
+
 """
 
 __author__ = 'Diego Elio Pettenò'

@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
-"""Driver for FreeStyle Precision Neo devices."""
+"""Driver for FreeStyle Precision Neo devices.
+
+This driver may also work with FreeStyle Optium Neo devices, but it is currently
+untested.
+
+Supported features:
+    - get readings;
+    - get and set date and time;
+    - get serial number and software version.
+
+Expected device path: /dev/hidraw9 or similar HID device.
+
+Further information on the device protocol can be found at
+
+https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-precision-neo
+
+"""
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'

@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Driver for LifeScan OneTouch Ultra Easy devices"""
+"""Driver for LifeScan OneTouch Ultra Easy devices.
+
+Also supports OneTouch Ultra Mini devices (different name, same device).
+
+Supported features:
+    - get readings;
+    - use the glucose unit preset on the device by default;
+    - get and set date and time;
+    - get serial number and software version;
+    - memory reset (caution!)
+
+Expected device path: /dev/ttyUSB0 or similar serial port device.
+"""
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'

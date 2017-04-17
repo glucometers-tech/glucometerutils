@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """Driver for Accu-Chek Mobile devices with reports mode.
 
-This driver expects a mountpoint as the device name, and will read the
-data off the CSV file found there. This means it is read-only access,
-but has no dependencies at all.
+Supported features:
+    - get readings, including comments;
+    - use the glucose unit preset on the device by default;
+    - get serial number.
+
+Expected device path: /mnt/ACCUCHEK, the mountpoint of the block device.
 
 The Accu-Chek Mobile meters should be set to "Reports" mode.
 

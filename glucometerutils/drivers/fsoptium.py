@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 """Driver for FreeStyle Optium devices.
 
+Supported features:
+    - get readings (ignores ketone results);
+    - use the glucose unit preset on the device by default;
+    - get and set date and time;
+    - get serial number and software version.
+
+Expected device path: /dev/ttyUSB0 or similar serial port device.
+
 Further information on the device protocol can be found at
 
 https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-optium

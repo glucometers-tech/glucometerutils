@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Driver for FreeStyle Libre CGM devices."""
+"""Driver for FreeStyle Libre devices.
+
+Supported features:
+    - get readings (sensor, flash and blood glucose), including comments;
+    - get and set date and time;
+    - get serial number and software version.
+
+Expected device path: /dev/hidraw9 or similar HID device.
+
+Further information on the device protocol can be found at
+
+https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre
+"""
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'

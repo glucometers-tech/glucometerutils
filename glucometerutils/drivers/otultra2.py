@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Driver for LifeScan OneTouch Ultra 2 devices"""
+"""Driver for LifeScan OneTouch Ultra 2 devices.
+
+Supported features:
+    - get readings, including pre-/post-meal notes and other comments;
+    - use the glucose unit preset on the device by default;
+    - get and set date and time;
+    - get serial number and software version;
+    - memory reset (caution!)
+
+Expected device path: /dev/ttyUSB0 or similar serial port device.
+"""
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'

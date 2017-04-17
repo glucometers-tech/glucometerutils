@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 """Driver for FreeStyle InsuLinx devices.
 
+Supported features:
+    - get readings;
+    - get and set date and time;
+    - get serial number and software version.
+
+Expected device path: /dev/hidraw9 or similar HID device.
+
 WARNING: currently untested! Based off reverse engineering notes provided by
 Xavier Claessens.
 
