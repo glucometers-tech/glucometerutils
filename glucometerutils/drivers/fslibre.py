@@ -68,10 +68,12 @@ def _parse_record(record, entry_map):
     if not record:
         return {}
 
-    return {
-        key: int(record[idx])
-        for idx, key in entry_map
-    }
+    try:
+        return {
+            key: int(record[idx]) for idx, key in entry_map
+        }
+    except IndexError:
+        return {}
 
 
 def _extract_timestamp(parsed_record):
@@ -145,7 +147,9 @@ def _parse_arresult(record):
             comment_parts.append('Long-acting insulin')
 
     if parsed_record['rapid-acting-flag']:
-        if parsed_record['double-rapid-acting-insulin']:
+        # provide default value, as this record does not always exist
+        # (even if rapid-acting-flag is set)
+        if parsed_record.get('double-rapid-acting-insulin', 0):
             comment_parts.append(
                 'Rapid-acting insulin (%d)' %
                 (parsed_record['double-rapid-acting-insulin']/2))
