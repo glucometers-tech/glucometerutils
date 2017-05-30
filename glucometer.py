@@ -65,10 +65,10 @@ def main():
 
   try:
     driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
-  except ImportError:
+  except ImportError as e:
     logging.error(
-      'No driver "%s" found, please check your --driver parameter.',
-      args.driver)
+      'Error importing driver "%s", please check your --driver parameter:\n%s',
+      args.driver, e)
     return 1
 
   # This check needs to happen before we try to initialize the device, as the
