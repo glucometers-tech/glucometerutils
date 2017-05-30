@@ -28,14 +28,14 @@ class TestOTUltra2(unittest.TestCase):
         self.device = otultra2.Device('mockdevice')
 
     def _set_return_string(self, string):
-        self.mock_readline.return_value = bytes(string, 'ascii')
+        self.mock_readline.return_value = bytearray(string, 'ascii')
 
     def test_checksum(self):
-        checksum = otultra2._calculate_checksum(bytes('T', 'ascii'))
+        checksum = otultra2._calculate_checksum(bytearray('T', 'ascii'))
         self.assertEqual(0x0054, checksum)
 
         checksum = otultra2._calculate_checksum(
-            bytes('T "SAT","08/03/13","22:12:00   "', 'ascii'))
+            bytearray('T "SAT","08/03/13","22:12:00   "', 'ascii'))
         self.assertEqual(0x0608, checksum)
 
     def test_missing_checksum(self):

@@ -104,7 +104,7 @@ def _encode_message(cmd):
   checksum = _STRUCT_CHECKSUM.pack(lifescan.crc_ccitt(message))
 
   # Pad the message to match the size of the register.
-  return message + checksum + bytes(
+  return message + checksum + bytearray(
     _REGISTER_SIZE - 2 - len(message))
 
 def _convert_timestamp(timestamp):
