@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Common routines and base driver class for serial-based meters.
 """
 
