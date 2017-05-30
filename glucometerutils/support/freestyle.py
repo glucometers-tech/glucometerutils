@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Common routines to implement the FreeStyle common protocol.
 
 Protocol documentation available at
