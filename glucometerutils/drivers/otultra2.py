@@ -94,7 +94,7 @@ def _validate_and_strip_checksum(line):
   try:
     checksum_given = int(checksum_string, 16)
     checksum_calculated = _calculate_checksum(
-      bytes(response, 'ascii'))
+      bytearray(response, 'ascii'))
 
     if checksum_given != checksum_calculated:
       raise exceptions.InvalidChecksum(checksum_given,
@@ -148,7 +148,7 @@ class Device(serial.SerialDevice):
     Args:
       cmd: command and parameters to send (without newline)
     """
-    cmdstring = bytes('\x11\r' + cmd + '\r', 'ascii')
+    cmdstring = bytearray('\x11\r' + cmd + '\r', 'ascii')
     self.serial_.write(cmdstring)
     self.serial_.flush()
 

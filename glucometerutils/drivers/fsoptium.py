@@ -89,7 +89,7 @@ class Device(serial.SerialDevice):
   DEFAULT_CABLE_ID = '1a61:3420'
 
   def _send_command(self, command):
-    cmd_bytes = bytes('$%s\r\n' % command, 'ascii')
+    cmd_bytes = bytearray('$%s\r\n' % command, 'ascii')
     self.serial_.write(cmd_bytes)
     self.serial_.flush()
 

@@ -11,6 +11,7 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
+import io
 import csv
 import datetime
 import os.path
@@ -78,7 +79,7 @@ class FreeStyleHidDevice(object):
         if not os.path.exists(device):
             raise exceptions.ConnectionFailed(
                 message='Path %s does not exist.' % device)
-        self.handle_ = open(device, 'w+b')
+        self.handle_ = io.open(device, 'w+b')
 
     def connect(self):
         """Open connection to the device, starting the knocking sequence."""
@@ -106,14 +107,14 @@ class FreeStyleHidDevice(object):
         # First byte in the written buffer is the report number, on Linux HID
         # interface.
         usb_packet = b'\x00' + _STRUCT_PREAMBLE.pack(
-            message_type, cmdlen) + command + bytes(62 - cmdlen)
+            message_type, cmdlen) + command + bytearray(62 - cmdlen)
 
         if self.handle_.write(usb_packet) < 0:
-            raise exceptions.InvalidResponse()
+            raise exceptions.InvalidResponse('error writing command to device')
 
     def _read_response(self):
         """Read the response from the device and extracts it."""
-        usb_packet = self.handle_.read(64)
+        usb_packet = bytearray(self.handle_.read(64))
 
         assert usb_packet
         message_type = usb_packet[0]
@@ -196,8 +197,8 @@ class FreeStyleHidDevice(object):
         time_cmd = '$time,{hour},{minute}'.format(
             hour=date.hour, minute=date.minute)
 
-        self._send_text_command(bytes(date_cmd, "ascii"))
-        self._send_text_command(bytes(time_cmd, "ascii"))
+        self._send_text_command(bytearray(date_cmd, "ascii"))
+        self._send_text_command(bytearray(time_cmd, "ascii"))
 
         return self.get_datetime()
 
