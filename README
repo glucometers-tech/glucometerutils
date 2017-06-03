@@ -26,18 +26,20 @@ information on each of the devices.
 | LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [pyserial]    |
 | LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [python-scsi] |
 | LifeScan     | OneTouch Select Plus    | `otverio2015`      | [python-scsi] |
-| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       |               |
-| Abbott       | FreeStyle Libre         | `fslibre`          |               |
+| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       | [hidapi]‡     |
+| Abbott       | FreeStyle Libre         | `fslibre`          | [hidapi]‡     |
 | Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]    |
-| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   |               |
-| Abbott       | FreeStyle Optium Neo†   | `fsprecisionneo`   |               |
+| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [hidapi]‡     |
+| Abbott       | FreeStyle Optium Neo†   | `fsprecisionneo`   | [hidapi]‡     |
 | Roche        | Accu-Chek Mobile        | `accuchek_reports` |               |
 | SD Biosensor | SD CodeFree             | `sdcodefree`       | [pyserial]    |
 
 † Untested.
+‡ Optional dependency on Linux; required on other operating systems.
 
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://github.com/rosjat/python-scsi
+[hidapi]: https://pypi.python.org/pypi/hidapi
 
 ## Dump format
 

@@ -69,16 +69,39 @@ class FreeStyleHidDevice(object):
     TEXT_CMD = 0x60
     TEXT_REPLY_CMD = 0x60
 
+    USB_VENDOR_ID = 0x1a61  # Abbott Diabetes Care
+    USB_PRODUCT_ID = None
+
     def __init__(self, device):
-        if not device:
+        # If we do not know for sure the device ID, rely on the user providing a
+        # device path.
+        if self.USB_PRODUCT_ID is None and not device:
             raise exceptions.CommandLineError(
                 '--device parameter is required, should point to /dev/hidraw '
                 'for the meter')
 
-        if not os.path.exists(device):
+        # If the user passed a device path that does not exist, raise an error.
+        if device and not os.path.exists(device):
             raise exceptions.ConnectionFailed(
                 message='Path %s does not exist.' % device)
-        self.handle_ = open(device, 'w+b')
+
+        # If the user passed a device, try opening it. Note that I have had no
+        # success on actually opening the /dev/hidraw path but that's a
+        # different problem.
+        try:
+            if device:
+                self.handle_ = open(device, 'w+b')
+            else:
+                try:
+                    import hid
+                except ImportError:
+                    raise exceptions.ConnectionFailed(
+                        message='Missing requied "hidapi" module.')
+                self.handle_ = hid.device()
+                self.handle_.open(self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
+        except OSError:
+            raise exceptions.ConnectionFailed(
+                message='Unable to connect to meter.')
 
     def connect(self):
         """Open connection to the device, starting the knocking sequence."""
@@ -103,8 +126,7 @@ class FreeStyleHidDevice(object):
         cmdlen = len(command)
         assert cmdlen <= 62
 
-        # First byte in the written buffer is the report number, on Linux HID
-        # interface.
+        # First byte in the written buffer is the report number.
         usb_packet = b'\x00' + _STRUCT_PREAMBLE.pack(
             message_type, cmdlen) + command + bytes(62 - cmdlen)
 
@@ -126,7 +148,8 @@ class FreeStyleHidDevice(object):
         if message_type == 0x22 and message_length == 1:
             return self._read_response()
 
-        return (message_type, message_content)
+        # hidapi module returns a list of bytes rather than a bytes object.
+        return (message_type, bytes(message_content))
 
     def _send_text_command(self, command):
         """Send a command to the device that expects a text reply."""

@@ -6,7 +6,8 @@ Supported features:
     - get and set date and time;
     - get serial number and software version.
 
-Expected device path: /dev/hidraw9 or similar HID device.
+Expected device path: /dev/hidraw9 or similar HID device. Optional when using
+HIDAPI.
 
 WARNING: currently untested! Based off reverse engineering notes provided by
 Xavier Claessens.
@@ -41,7 +42,9 @@ _InsulinxReading = collections.namedtuple('_InsulinxReading', (
 
 
 class Device(freestyle.FreeStyleHidDevice):
-    """Glucometer driver for FreeStyle Precision Neo devices."""
+    """Glucometer driver for FreeStyle InsuLinux devices."""
+
+    USB_PRODUCT_ID = 0x3460
 
     def get_meter_info(self):
         """Return the device information in structured form."""

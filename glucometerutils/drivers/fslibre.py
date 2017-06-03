@@ -6,11 +6,13 @@ Supported features:
     - get and set date and time;
     - get serial number and software version.
 
-Expected device path: /dev/hidraw9 or similar HID device.
+Expected device path: /dev/hidraw9 or similar HID device. Optional when using
+HIDAPI.
 
 Further information on the device protocol can be found at
 
 https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre
+
 """
 
 __author__ = 'Diego Elio Pettenò'
@@ -163,6 +165,8 @@ def _parse_arresult(record):
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
+
+    USB_PRODUCT_ID = 0x3650
 
     def get_meter_info(self):
         """Return the device information in structured form."""
