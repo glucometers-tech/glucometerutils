@@ -50,6 +50,7 @@ class HidDevice(object):
         # If the user passed a device, try opening it.
         if device:
             self.handle_ = open(device, 'w+b')
+            self.handle_mode_ = 'hidraw'
         else:
             logging.info(
                 'No --device parameter provided, using hidapi library.')
@@ -57,6 +58,7 @@ class HidDevice(object):
                 import hid
                 self.handle_ = hid.device()
                 self.handle_.open(self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
+                self.handle_mode_ = 'hidapi'
             except ImportError:
                 raise exceptions.ConnectionFailed(
                     message='Missing requied "hidapi" module.')
@@ -76,4 +78,7 @@ class HidDevice(object):
         This is important as it handles the one incompatible interface between
         hidraw devices and hidapi handles.
         """
-        return bytes(self.handle_.read(size))
+        if self.handle_mode_ == 'hidraw':
+            return self.handle_.read(size)
+        else:
+            return bytes(self.handle_.read(size, timeout_ms=1000))
