@@ -13,11 +13,11 @@ __license__ = 'MIT'
 
 import csv
 import datetime
-import os.path
 import re
 import struct
 
 from glucometerutils import exceptions
+from glucometerutils.support import hiddevice
 
 # Sequence of initialization messages sent to the device to establish HID
 # protocol.
@@ -54,7 +54,7 @@ def _verify_checksum(message, expected_checksum_hex):
         raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
 
 
-class FreeStyleHidDevice(object):
+class FreeStyleHidDevice(hiddevice.HidDevice):
     """Base class implementing the FreeStyle HID common protocol.
 
     This class implements opening, initializing the connection and sending
@@ -71,37 +71,6 @@ class FreeStyleHidDevice(object):
 
     USB_VENDOR_ID = 0x1a61  # Abbott Diabetes Care
     USB_PRODUCT_ID = None
-
-    def __init__(self, device):
-        # If we do not know for sure the device ID, rely on the user providing a
-        # device path.
-        if self.USB_PRODUCT_ID is None and not device:
-            raise exceptions.CommandLineError(
-                '--device parameter is required, should point to /dev/hidraw '
-                'for the meter')
-
-        # If the user passed a device path that does not exist, raise an error.
-        if device and not os.path.exists(device):
-            raise exceptions.ConnectionFailed(
-                message='Path %s does not exist.' % device)
-
-        # If the user passed a device, try opening it. Note that I have had no
-        # success on actually opening the /dev/hidraw path but that's a
-        # different problem.
-        try:
-            if device:
-                self.handle_ = open(device, 'w+b')
-            else:
-                try:
-                    import hid
-                except ImportError:
-                    raise exceptions.ConnectionFailed(
-                        message='Missing requied "hidapi" module.')
-                self.handle_ = hid.device()
-                self.handle_.open(self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
-        except OSError:
-            raise exceptions.ConnectionFailed(
-                message='Unable to connect to meter.')
 
     def connect(self):
         """Open connection to the device, starting the knocking sequence."""
@@ -130,12 +99,11 @@ class FreeStyleHidDevice(object):
         usb_packet = b'\x00' + _STRUCT_PREAMBLE.pack(
             message_type, cmdlen) + command + bytes(62 - cmdlen)
 
-        if self.handle_.write(usb_packet) < 0:
-            raise exceptions.InvalidResponse()
+        self._write(usb_packet)
 
     def _read_response(self):
         """Read the response from the device and extracts it."""
-        usb_packet = self.handle_.read(64)
+        usb_packet = self._read()
 
         assert usb_packet
         message_type = usb_packet[0]

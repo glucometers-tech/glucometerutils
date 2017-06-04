@@ -27,6 +27,13 @@ class ConnectionFailed(Error):
     self.message = message
 
 
+class CommandError(Error):
+  """It was not possible to send a command to the device."""
+
+  def __init__(self, message="Unable to send command to device."):
+    self.message = message
+
+
 class InvalidResponse(Error):
   """The response received from the meter was not understood"""
 
