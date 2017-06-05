@@ -31,6 +31,7 @@ information on each of the devices.
 | Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]    |
 | Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [hidapi]‡     |
 | Abbott       | FreeStyle Optium Neo†   | `fsprecisionneo`   | [hidapi]‡     |
+| Abbott       | FreeStyle Optium Neo H† | `fsprecisionneo`   | [hidapi]‡     |
 | Roche        | Accu-Chek Mobile        | `accuchek_reports` |               |
 | SD Biosensor | SD CodeFree             | `sdcodefree`       | [pyserial]    |
 
