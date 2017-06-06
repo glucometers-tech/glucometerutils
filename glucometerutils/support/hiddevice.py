@@ -30,10 +30,17 @@ class HidDevice(object):
 
     If the VID/PID pair is not provided, the driver will require a device path
     to be used.
+
+    Optional parameters available:
+
+      TIMEOUT_MS: (int, default: 1000) the read timeout in milliseconds, used
+        for hidapi reads only.
     """
 
     USB_VENDOR_ID = None
     USB_PRODUCT_ID = None
+
+    TIMEOUT_MS = 1000
 
     def __init__(self, device):
         if None in (self.USB_VENDOR_ID, self.USB_PRODUCT_ID) and not device:
@@ -81,4 +88,4 @@ class HidDevice(object):
         if self.handle_mode_ == 'hidraw':
             return self.handle_.read(size)
         else:
-            return bytes(self.handle_.read(size, timeout_ms=1000))
+            return bytes(self.handle_.read(size, timeout_ms=self.TIMEOUT_MS))
