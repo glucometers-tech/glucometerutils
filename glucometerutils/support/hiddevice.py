@@ -33,14 +33,14 @@ class HidDevice(object):
 
     Optional parameters available:
 
-      TIMEOUT_MS: (int, default: 1000) the read timeout in milliseconds, used
-        for hidapi reads only.
+      TIMEOUT_MS: (int, default: NOne) the read timeout in milliseconds, used
+        for hidapi reads only. If -1, hidapi will be provided no timeout.
     """
 
     USB_VENDOR_ID = None
     USB_PRODUCT_ID = None
 
-    TIMEOUT_MS = 1000
+    TIMEOUT_MS = None
 
     def __init__(self, device):
         if None in (self.USB_VENDOR_ID, self.USB_PRODUCT_ID) and not device:
@@ -85,7 +85,7 @@ class HidDevice(object):
         This is important as it handles the one incompatible interface between
         hidraw devices and hidapi handles.
         """
-        if self.handle_mode_ == 'hidraw':
-            return self.handle_.read(size)
+        if self.handle_mode_ == 'hidraw' or self.TIMEOUT_MS is None:
+            return bytes(self.handle_.read(size))
         else:
             return bytes(self.handle_.read(size, timeout_ms=self.TIMEOUT_MS))
