@@ -13,6 +13,7 @@ __license__ = 'MIT'
 
 import csv
 import datetime
+import logging
 import re
 import struct
 
@@ -220,5 +221,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
 
         records_str = match.group('message')
         _verify_checksum(records_str, match.group('checksum'))
+
+        logging.debug('Received multi-record string: %s', records_str)
 
         return csv.reader(records_str.split('\r\n'))
