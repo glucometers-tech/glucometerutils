@@ -25,7 +25,7 @@ import re
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucomterutils.support import serial
+from glucometerutils.support import serial
 
 
 _CLOCK_RE = re.compile(
