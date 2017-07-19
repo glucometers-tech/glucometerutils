@@ -31,7 +31,7 @@ from glucometerutils.support import freestyle
 
 
 # The type is a string because it precedes the parsing of the object.
-_TYPE_READING = { 'Ketone' : '9' , 'Glucose' : '7' }
+_TYPE_READING = { 'ketone' : '9' , 'glucose' : '7' }
 
 _NeoReading = {
 
@@ -96,6 +96,13 @@ class Device(freestyle.FreeStyleHidDevice):
             if not _TYPE_READING_NOW in _TYPE_READING.values():
                 continue
 
+            typeofmeasure = list(_TYPE_READING.keys())[list(_TYPE_READING.values()).index(_TYPE_READING_NOW)]
+
+            if typeofmeasure is 'glucose':
+                unit = self.get_glucose_unit()
+            elif typeofmeasure is 'ketone':
+                unit = self.get_ketone_unit()
+
             # Build a _reading object by parsing each of the entries in the CSV
             # as integers.
             raw_reading = _NeoReading[_TYPE_READING_NOW]._make([int(v) for v in record])
@@ -104,4 +111,4 @@ class Device(freestyle.FreeStyleHidDevice):
                 raw_reading.year + 2000, raw_reading.month, raw_reading.day,
                 raw_reading.hour, raw_reading.minute)
 
-            yield common.Reading(timestamp, raw_reading.value, comment=list(_TYPE_READING.keys())[list(_TYPE_READING.values()).index(_TYPE_READING_NOW)])
+            yield common.Reading(timestamp, raw_reading.value, typeofmeasure=typeofmeasure, unit=unit)
