@@ -53,7 +53,7 @@ _STRUCT_CHECKSUM = _STRUCT_UINT16
 _STRUCT_TIMESTAMP = _STRUCT_UINT32
 _STRUCT_RECORDID = _STRUCT_UINT16
 _STRUCT_READING = _STRUCT_UINT32
-_STRUCT_RECORD = struct.Struct('<BBHBHIIBBB')
+_STRUCT_RECORD = struct.Struct('<BBHBHIHBBBBB')
 
 _QUERY_REQUEST = b'\x04\xe6\x02'
 _QUERY_KEY_SERIAL = b'\x00'
@@ -253,8 +253,9 @@ class Device(object):
           response[0], response[1]))
 
     (unused_const1, unused_const2, unused_counter, unused_const3,
-     unused_counter2, timestamp, value, unused_flags, unused_const4,
-     unused_const5) = _STRUCT_RECORD.unpack(response)
+     unused_counter2, timestamp, value, unused_meal, unused_const4,
+     unused_flags, unused_const5, unused_const6) = _STRUCT_RECORD.unpack(
+       response)
 
     return common.Reading(_convert_timestamp(timestamp), float(value))
 
