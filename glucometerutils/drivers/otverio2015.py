@@ -24,7 +24,9 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2016-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
+import binascii
 import datetime
+import logging
 import struct
 
 from pyscsi.pyscsi.scsi import SCSI
@@ -94,6 +96,8 @@ def _extract_message(register):
     raise exceptions.InvalidChecksum(encoded_checksum, calculated_checksum)
 
   response = register[_STRUCT_PREAMBLE.size:coda_offset]
+
+  logging.debug('Read packet: %s' % binascii.hexlify(response))
   return response
 
 def _encode_message(cmd):
@@ -102,10 +106,12 @@ def _encode_message(cmd):
   preamble = _STRUCT_PREAMBLE.pack(_STX, length)
   message = preamble + cmd + bytes((_ETX,))
   checksum = _STRUCT_CHECKSUM.pack(lifescan.crc_ccitt(message))
+  message += checksum
+
+  logging.debug('Sending packet: %s' % binascii.hexlify(message))
 
   # Pad the message to match the size of the register.
-  return message + checksum + bytes(
-    _REGISTER_SIZE - 2 - len(message))
+  return message + bytes(_REGISTER_SIZE - len(message))
 
 def _convert_timestamp(timestamp):
   return datetime.datetime.utcfromtimestamp(timestamp + _EPOCH_BASE)
