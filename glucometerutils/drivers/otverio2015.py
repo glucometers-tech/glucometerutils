@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-"""Driver for LifeScan OneTouch Verio 2015 devices.
+"""Driver for LifeScan OneTouch Verio (2015) and Select Plus devices.
 
-For Verio devices with microUSB connector. Also supports OneTouch Select Plus
-devices.
+Verio 2015 devices can be recognized by microUSB connectors.
 
 Supported features:
-    - get readings;
+    - get readings, including pre-/post-meal notes †;
     - use the glucose unit preset on the device by default;
     - get and set date and time;
     - get serial number and software version;
     - memory reset (caution!)
 
 Expected device path: /dev/sdb or similar USB block device.
+
+† Pre-/post-meal notes are only supported on Select Plus devices.
 
 Further information on the device protocol can be found at
 
@@ -73,6 +74,12 @@ _READ_RECORD_REQUEST_PREFIX = b'\x04\x31\x02'
 _READ_RECORD_REQUEST_SUFFIX = b'\x00'
 
 _MEMORY_ERASE_REQUEST = b'\x04\x1a'
+
+_MEAL_CODES = {
+  b'\x00': common.NO_MEAL,
+  b'\x01': common.BEFORE_MEAL,
+  b'\x02': common.AFTER_MEAL,
+}
 
 def _extract_message(register):
   """Parse the message preamble and verify checksums."""
@@ -253,11 +260,12 @@ class Device(object):
           response[0], response[1]))
 
     (unused_const1, unused_const2, unused_counter, unused_const3,
-     unused_counter2, timestamp, value, unused_meal, unused_const4,
-     unused_flags, unused_const5, unused_const6) = _STRUCT_RECORD.unpack(
+     unused_counter2, timestamp, value, meal_flag, unused_const4, unused_flags,
+     unused_const5, unused_const6) = _STRUCT_RECORD.unpack(
        response)
 
-    return common.Reading(_convert_timestamp(timestamp), float(value))
+    return common.Reading(
+      _convert_timestamp(timestamp), float(value), meal=_MEAL_CODES[meal_flag])
 
   def get_readings(self):
     record_count = self._get_reading_count()
