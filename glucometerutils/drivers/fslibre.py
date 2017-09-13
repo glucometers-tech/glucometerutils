@@ -143,8 +143,8 @@ def _parse_arresult(record):
     if parsed_record['long-acting-flag']:
         if parsed_record['double-long-acting-insulin']:
             comment_parts.append(
-                'Long-acting insulin (%d)' %
-                (parsed_record['double-long-acting-insulin']/2))
+                'Long-acting insulin (%.1f)' %
+                (parsed_record['double-long-acting-insulin']/2.))
         else:
             comment_parts.append('Long-acting insulin')
 
@@ -153,8 +153,8 @@ def _parse_arresult(record):
         # (even if rapid-acting-flag is set)
         if parsed_record.get('double-rapid-acting-insulin', 0):
             comment_parts.append(
-                'Rapid-acting insulin (%d)' %
-                (parsed_record['double-rapid-acting-insulin']/2))
+                'Rapid-acting insulin (%.1f)' %
+                (parsed_record['double-rapid-acting-insulin']/2.))
         else:
             comment_parts.append('Rapid-acting insulin')
 
