@@ -1,0 +1,30 @@
+# udev rules for glucometer devices using usb/tty/hid interfaces
+
+# Installation:
+# - Copy this file to /etc/udev/rules.d/
+# - Run the command:
+#       udevadm control --reload && udevadm trigger
+
+ACTION!="add|change", GOTO="glucometerutils_rules_end"
+SUBSYSTEM!="usb|tty|hidraw", GOTO="glucometerutils_rules_end"
+
+
+# LifeScan devices
+
+# LifeScan OneTouch Ultra 2
+# LifeScan OneTouch Ultra Easy
+ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", TAG+="uaccess"
+
+
+# SD Biosensor SD CodeFree devices
+
+# SD CodeFree
+ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", TAG+="uaccess"
+
+
+# Abbott Freestyle devices
+
+ATTRS{idVendor}=="1a61", TAG+="uaccess"
+
+
+LABEL="glucometerutils_rules_end"
