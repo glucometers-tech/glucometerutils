@@ -45,7 +45,7 @@ _HISTORY_ENTRY_MAP = _BASE_ENTRY_MAP + (
 
 # Fields of the results returned by $arresult? where type = 2
 _ARRESULT_TYPE2_ENTRY_MAP = (
-    (9, 'reading-type'),  # 0 = sensor, 2 = glucose
+    (9, 'reading-type'),  # 0 = glucose blood strip, 2 = sensor
     (12, 'value'),
     (15, 'sport-flag'),
     (16, 'medication-flag'),
