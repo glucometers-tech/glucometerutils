@@ -113,11 +113,14 @@ def _parse_arresult(record):
         return None
 
     comment_parts = []
+    measure_method = None
 
     if parsed_record['reading-type'] == 2:
         comment_parts.append('(Scan)')
+        measure_method = common.CGM
     elif parsed_record['reading-type'] == 0:
         comment_parts.append('(Blood)')
+        measure_method = common.BLOOD_SAMPLE
     else:
         # ketone reading
         return None
@@ -161,7 +164,8 @@ def _parse_arresult(record):
     return common.GlucoseReading(
         _extract_timestamp(parsed_record),
         parsed_record['value'],
-        comment='; '.join(comment_parts))
+        comment='; '.join(comment_parts),
+        measure_method=measure_method)
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
@@ -201,7 +205,8 @@ class Device(freestyle.FreeStyleHidDevice):
             yield common.GlucoseReading(
                 _extract_timestamp(parsed_record),
                 parsed_record['value'],
-                comment='(Sensor)')
+                comment='(Sensor)',
+                measure_method=common.CGM)
 
         # Then get the results of explicit scans and blood tests (and other
         # events).
