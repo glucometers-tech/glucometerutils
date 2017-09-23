@@ -52,7 +52,7 @@ def main():
     help='Select the unit to use for the dumped data.')
   parser_dump.add_argument(
     '--sort-by', action='store', default='timestamp',
-    choices=common.Reading._fields,
+    choices=common._ReadingBase._fields,
     help='Field to order the dumped data by.')
 
   parser_date = subparsers.add_parser(
