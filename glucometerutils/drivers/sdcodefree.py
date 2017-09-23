@@ -197,7 +197,7 @@ class Device(serial.SerialDevice):
             r = parse_reading(rpkt)
             meal = _MEAL_FLAG[r.meal_flag]
 
-            yield common.Reading(
+            yield common.GlucoseReading(
                 datetime.datetime(
                     2000 + r.year, r.month, r.day, r.hour, r.minute),
                 r.value, meal=meal)

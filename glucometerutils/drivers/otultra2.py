@@ -325,5 +325,5 @@ class Device(serial.SerialDevice):
 
       # OneTouch2 always returns the data in mg/dL even if the glucometer is set
       # to mmol/L, so there is no conversion required.
-      yield common.Reading(
+      yield common.GlucoseReading(
         date, float(line_data['value']), meal=meal, comment=comment)

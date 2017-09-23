@@ -271,4 +271,4 @@ class Device(serial.SerialDevice):
 
       # The reading, if present, is always in mg/dL even if the glucometer is
       # set to mmol/L.
-      yield common.Reading(timestamp, value)
+      yield common.GlucoseReading(timestamp, value)
