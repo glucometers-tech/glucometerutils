@@ -54,6 +54,9 @@ def main():
     '--sort-by', action='store', default='timestamp',
     choices=common._ReadingBase._fields,
     help='Field to order the dumped data by.')
+  parser_dump.add_argument(
+    '--with-ketone', action='store_true', default=False,
+    help='Enable ketone reading if available on the glucometer.')
 
   parser_date = subparsers.add_parser(
     'datetime', help='Reads or sets the date and time of the glucometer.')
@@ -98,6 +101,10 @@ def main():
         unit = device_info.native_unit
 
       readings = device.get_readings()
+
+      if not args.with_ketone:
+        readings = (reading for reading in readings
+                    if not isinstance(reading, common.KetoneReading))
 
       if args.sort_by is not None:
         readings = sorted(
