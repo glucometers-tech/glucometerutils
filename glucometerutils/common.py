@@ -57,24 +57,28 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
     return round(value * 18.0, 0)
 
 _ReadingBase = collections.namedtuple(
-  '_ReadingBase', ['timestamp', 'value', 'meal', 'comment'])
+  '_ReadingBase', ['timestamp', 'value', 'meal', 'comment', 'measure_method'])
 
 class Reading(_ReadingBase):
-  def __new__(cls, timestamp, value, meal=NO_MEAL, comment=''):
     """Constructor for the reading object.
+  def __new__(cls, timestamp, value, meal=NO_MEAL, comment='',
+              measure_method=BLOOD_SAMPLE):
 
     Args:
       timestamp: (datetime) Timestamp of the reading as reported by the meter.
       value: (float) Value of the reading, in mg/dL.
       meal: (string) Meal-relativeness as reported by the reader, if any.
       comment: (string) Comment reported by the reader, if any.
+      measure_method: (string) Measure method as reported by the reader if any,
+        assuming blood sample otherwise.
 
     The value is stored in mg/dL, even though this is not the standard value,
     because at least most of the LifeScan devices report the raw data in this
     format.
     """
     return super(Reading, cls).__new__(
-      cls, timestamp=timestamp, value=value, meal=meal, comment=comment)
+      cls, timestamp=timestamp, value=value, meal=meal, comment=comment,
+      measure_method=measure_method)
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
@@ -86,8 +90,9 @@ class Reading(_ReadingBase):
 
   def as_csv(self, unit):
     """Returns the reading as a formatted comma-separated value string."""
-    return '"%s","%.2f","%s","%s"' % (
-      self.timestamp, self.get_value_as(unit), self.meal, self.comment)
+    return '"%s","%.2f","%s","%s","%s"' % (
+      self.timestamp, self.get_value_as(unit), self.meal, self.measure_method,
+      self.comment)
 
 
 _MeterInfoBase = collections.namedtuple(
