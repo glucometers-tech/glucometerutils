@@ -22,6 +22,10 @@ NO_MEAL = ''
 BEFORE_MEAL = 'Before Meal'
 AFTER_MEAL = 'After Meal'
 
+# Constants for measure method
+BLOOD_SAMPLE = 'blood sample'
+CGM = 'CGM' # Continuous Glucose Monitoring
+
 
 def convert_glucose_unit(value, from_unit, to_unit=None):
   """Convert the given value of glucose level between units.
