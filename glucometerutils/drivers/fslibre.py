@@ -158,7 +158,7 @@ def _parse_arresult(record):
         else:
             comment_parts.append('Rapid-acting insulin')
 
-    return common.Reading(
+    return common.GlucoseReading(
         _extract_timestamp(parsed_record),
         parsed_record['value'],
         comment='; '.join(comment_parts))
@@ -198,7 +198,7 @@ class Device(freestyle.FreeStyleHidDevice):
                 # The reading is considered invalid, so ignore it.
                 continue
 
-            yield common.Reading(
+            yield common.GlucoseReading(
                 _extract_timestamp(parsed_record),
                 parsed_record['value'],
                 comment='(Sensor)')

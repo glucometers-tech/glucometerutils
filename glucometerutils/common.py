@@ -59,10 +59,10 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
 _ReadingBase = collections.namedtuple(
   '_ReadingBase', ['timestamp', 'value', 'meal', 'comment', 'measure_method'])
 
-class Reading(_ReadingBase):
-    """Constructor for the reading object.
+class GlucoseReading(_ReadingBase):
   def __new__(cls, timestamp, value, meal=NO_MEAL, comment='',
               measure_method=BLOOD_SAMPLE):
+    """Constructor for the glucose reading object.
 
     Args:
       timestamp: (datetime) Timestamp of the reading as reported by the meter.

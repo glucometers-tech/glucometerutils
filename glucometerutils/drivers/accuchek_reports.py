@@ -128,7 +128,7 @@ class Device(object):
       if record[_RESULT_CSV_KEY] is None:
         continue
 
-      yield common.Reading(
+      yield common.GlucoseReading(
         self._extract_datetime(record),
         common.convert_glucose_unit(float(record[_RESULT_CSV_KEY]),
                                     _UNIT_MAP[record[_UNIT_CSV_KEY]]),

@@ -77,4 +77,4 @@ class Device(freestyle.FreeStyleHidDevice):
                 raw_reading.year + 2000, raw_reading.month, raw_reading.day,
                 raw_reading.hour, raw_reading.minute)
 
-            yield common.Reading(timestamp, raw_reading.value)
+            yield common.GlucoseReading(timestamp, raw_reading.value)

@@ -264,7 +264,7 @@ class Device(object):
      unused_const5, unused_const6) = _STRUCT_RECORD.unpack(
        response)
 
-    return common.Reading(
+    return common.GlucoseReading(
       _convert_timestamp(timestamp), float(value), meal=_MEAL_CODES[meal_flag])
 
   def get_readings(self):

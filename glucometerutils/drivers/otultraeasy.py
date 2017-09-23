@@ -319,4 +319,4 @@ class Device(serial.SerialDevice):
       timestamp = _convert_timestamp(record_response.data[2:6])
       value, = _STRUCT_TIMESTAMP.unpack_from(record_response.data, 6)
 
-      yield common.Reading(timestamp, float(value))
+      yield common.GlucoseReading(timestamp, float(value))
