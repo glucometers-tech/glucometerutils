@@ -57,7 +57,7 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
     return round(value * 18.0, 0)
 
 _ReadingBase = collections.namedtuple(
-  '_ReadingBase', ['timestamp', 'value', 'meal', 'comment', 'measure_method'])
+  '_ReadingBase', ['timestamp', 'value', 'comment', 'measure_method'])
 
 class GlucoseReading(_ReadingBase):
   def __new__(cls, timestamp, value, meal=NO_MEAL, comment='',
@@ -76,9 +76,11 @@ class GlucoseReading(_ReadingBase):
     because at least most of the LifeScan devices report the raw data in this
     format.
     """
-    return super(Reading, cls).__new__(
-      cls, timestamp=timestamp, value=value, meal=meal, comment=comment,
+    instance = super(GlucoseReading, cls).__new__(
+      cls, timestamp=timestamp, value=value, comment=comment,
       measure_method=measure_method)
+    setattr(instance, 'meal', meal)
+    return instance
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
@@ -92,6 +94,33 @@ class GlucoseReading(_ReadingBase):
     """Returns the reading as a formatted comma-separated value string."""
     return '"%s","%.2f","%s","%s","%s"' % (
       self.timestamp, self.get_value_as(unit), self.meal, self.measure_method,
+      self.comment)
+
+class KetoneReading(_ReadingBase):
+  def __new__(cls, timestamp, value, comment='', **kwargs):
+    """Constructor for the ketone reading object.
+
+    Args:
+      timestamp: (datetime) Timestamp of the reading as reported by the meter.
+      value: (float) Value of the reading, in mmol/L.
+      comment: (string) Comment reported by the reader, if any.
+
+    The value is stored in mg/dL, even though this is not the standard value,
+    because at least most of the LifeScan devices report the raw data in this
+    format.
+    """
+    return super(KetoneReading, cls).__new__(
+      cls, timestamp=timestamp, value=value, comment=comment,
+      measure_method=BLOOD_SAMPLE)
+
+  def get_value_as(self, *args):
+    """Returns the reading value in mmol/L."""
+    return self.value
+
+  def as_csv(self, unit):
+    """Returns the reading as a formatted comma-separated value string."""
+    return '"%s","%.2f","%s","%s"' % (
+      self.timestamp, self.get_value_as(unit), self.measure_method,
       self.comment)
 
 
