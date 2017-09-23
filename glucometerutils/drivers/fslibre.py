@@ -45,7 +45,9 @@ _HISTORY_ENTRY_MAP = _BASE_ENTRY_MAP + (
 
 # Fields of the results returned by $arresult? where type = 2
 _ARRESULT_TYPE2_ENTRY_MAP = (
-    (9, 'reading-type'),  # 0 = glucose blood strip, 2 = sensor
+    (9, 'reading-type'),  # 0 = glucose blood strip,
+                          # 1 = ketone blood strip,
+                          # 2 = glucose sensor
     (12, 'value'),
     (15, 'sport-flag'),
     (16, 'medication-flag'),
@@ -93,6 +95,11 @@ def _extract_timestamp(parsed_record):
         parsed_record['second'])
 
 
+def _convert_ketone_unit(raw_value):
+    """Convert raw ketone value as read in the device to its value in mmol/L."""
+    return int((raw_value + 1) / 2.) / 10.
+
+
 def _parse_arresult(record):
     """Takes an array of string fields as input and parses it into a Reading."""
 
@@ -114,15 +121,27 @@ def _parse_arresult(record):
 
     comment_parts = []
     measure_method = None
+    cls = None
+    value = None
 
     if parsed_record['reading-type'] == 2:
         comment_parts.append('(Scan)')
         measure_method = common.CGM
+        cls = common.GlucoseReading
+        value = parsed_record['value']
     elif parsed_record['reading-type'] == 0:
         comment_parts.append('(Blood)')
         measure_method = common.BLOOD_SAMPLE
+        cls = common.GlucoseReading
+        value = parsed_record['value']
+    elif parsed_record['reading-type'] == 1:
+        comment_parts.append('(Ketone)')
+        measure_method = common.BLOOD_SAMPLE
+        cls = common.KetoneReading
+        # automatically convert the raw value in mmol/L
+        value = _convert_ketone_unit(parsed_record['value'])
     else:
-        # ketone reading
+        # unknown reading
         return None
 
     custom_comments = record[29:35]
@@ -161,9 +180,10 @@ def _parse_arresult(record):
         else:
             comment_parts.append('Rapid-acting insulin')
 
-    return common.GlucoseReading(
+
+    return cls(
         _extract_timestamp(parsed_record),
-        parsed_record['value'],
+        value,
         comment='; '.join(comment_parts),
         measure_method=measure_method)
 
