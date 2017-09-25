@@ -53,10 +53,10 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
     return round(value * 18.0, 0)
 
 _ReadingBase = collections.namedtuple(
-  '_ReadingBase', ['timestamp', 'value', 'meal', 'comment'])
+  '_ReadingBase', ['timestamp', 'value', 'meal', 'comment','typeofmeasure', 'unit'])
 
 class Reading(_ReadingBase):
-  def __new__(cls, timestamp, value, meal=NO_MEAL, comment=''):
+  def __new__(cls, timestamp, value, meal=NO_MEAL, comment='', typeofmeasure='glucose', unit=UNIT_MGDL):
     """Constructor for the reading object.
 
     Args:
@@ -70,7 +70,7 @@ class Reading(_ReadingBase):
     format.
     """
     return super(Reading, cls).__new__(
-      cls, timestamp=timestamp, value=value, meal=meal, comment=comment)
+      cls, timestamp=timestamp, value=value, meal=meal, comment=comment, typeofmeasure=typeofmeasure, unit=unit)
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
@@ -82,16 +82,16 @@ class Reading(_ReadingBase):
 
   def as_csv(self, unit):
     """Returns the reading as a formatted comma-separated value string."""
-    return '"%s","%.2f","%s","%s"' % (
-      self.timestamp, self.get_value_as(unit), self.meal, self.comment)
+    return '"%s","%.2f","%s","%s","%s"' % (
+      self.timestamp, self.get_value_as(unit), self.meal, self.comment, self.typeofmeasure)
 
 
 _MeterInfoBase = collections.namedtuple(
-  '_MeterInfoBase', ['model', 'serial_number', 'version_info', 'native_unit'])
+  '_MeterInfoBase', ['model', 'serial_number', 'version_info', 'native_unit', 'ketone_unit'])
 
 class MeterInfo(_MeterInfoBase):
   def __new__(cls, model, serial_number='N/A', version_info=(),
-              native_unit=UNIT_MGDL):
+              native_unit=UNIT_MGDL, ketone_unit=UNIT_MMOLL):
     """Construct a meter information object.
 
     Args:
@@ -99,10 +99,11 @@ class MeterInfo(_MeterInfoBase):
       serial_number: (string) Optional serial number to identify the device.
       version_info: (list(string)) Optional hardware/software version information.
       native_unit: (UNIT_MGDL|UNIT_MMOLL) Native unit of the device for display.
+      ketone_unit: (UNIT_MGDL|UNIT_MMOLL) Ketone unit of the device for display.
     """
     return super(MeterInfo, cls).__new__(
       cls, model=model, serial_number=serial_number, version_info=version_info,
-      native_unit=native_unit)
+      native_unit=native_unit, ketone_unit=ketone_unit)
 
   def __str__(self):
     version_information_string = 'N/A'
@@ -115,6 +116,7 @@ class MeterInfo(_MeterInfoBase):
       Version Information:
           {version_information_string}
       Native Unit: {native_unit}
+      Ketone Unit: {ketone_unit}
       """).format(model=self.model, serial_number=self.serial_number,
                   version_information_string=version_information_string,
-                  native_unit=self.native_unit)
+                  native_unit=self.native_unit, ketone_unit=self.ketone_unit)
