@@ -82,7 +82,7 @@ class Device(freestyle.FreeStyleHidDevice):
             # Build a _reading object by parsing each of the entries in the raw
             # record
             values = [int(v) for v in record]
-            raw_reading = _NeoReading._make(values[:len(_NeoReading._fields])
+            raw_reading = _NeoReading._make(values[:len(_NeoReading._fields)])
 
             timestamp = datetime.datetime(
                 raw_reading.year + 2000, raw_reading.month, raw_reading.day,
