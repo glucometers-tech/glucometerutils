@@ -42,7 +42,7 @@ class HidDevice(object):
 
     TIMEOUT_MS = None
 
-    def __init__(self, device):
+    def __init__(self, device, with_ketone=False):
         if None in (self.USB_VENDOR_ID, self.USB_PRODUCT_ID) and not device:
             raise exceptions.CommandLineError(
                 '--device parameter is required, should point to a /dev/hidraw '
@@ -53,6 +53,8 @@ class HidDevice(object):
         if device and not os.path.exists(device):
             raise exceptions.ConnectionFailed(
                 message='Path %s does not exist.' % device)
+
+        self.with_ketone = with_ketone
 
         # If the user passed a device, try opening it.
         if device:
