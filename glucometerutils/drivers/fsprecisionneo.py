@@ -74,8 +74,7 @@ class Device(freestyle.FreeStyleHidDevice):
             cls = None
             if record and record[0] == _TYPE_GLUCOSE_READING:
                 cls = common.GlucoseReading
-            elif self.with_ketone and record or (record and record[0] ==
-                                                 _TYPE_KETONE_READING):
+            elif record and record[0] == _TYPE_KETONE_READING:
                 cls = common.KetoneReading
             else:
                 continue

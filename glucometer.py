@@ -82,7 +82,7 @@ def main():
     print(inspect.getdoc(driver))
     return 0
 
-  device = driver.Device(args.device, args.with_ketone)
+  device = driver.Device(args.device)
 
   device.connect()
   device_info = device.get_meter_info()

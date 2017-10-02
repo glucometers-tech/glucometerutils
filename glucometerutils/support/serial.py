@@ -45,10 +45,8 @@ class SerialDevice(object):
 
     TIMEOUT = 1
 
-    def __init__(self, device, with_ketone=False):
+    def __init__(self, device):
         assert self.BAUDRATE is not None
-
-        self.with_ketone = with_ketone
 
         if not device and self.DEFAULT_CABLE_ID:
             logging.info(
