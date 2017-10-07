@@ -1,0 +1,48 @@
+# Glucometer Utilities rrdexport
+
+The rrdexport i created for personal use.
+I think it is fine to see the data in a graph or graphs for the last 7 days.
+
+Right now i have it only tested with glucometers I own.
+I connot guarranty that the graphs are correct for every glucometer.
+
+## Usage / Prerequisites
+
+as the primary Prerequisites you need to install / enable the python 3
+and the rrd module.
+
+for OpenSuSE:
+zypper in python-pyrrd python-rrdtool python-setuptools rrdtool rrdtool-devel python3-devel
+
+enabled the module with the following command:
+
+pip3 install rrdtool
+
+## Development
+
+If you want to contribute code, please note that the target language
+is Python 3.2, and that the style to follow is for the most part PEP8
+compatible.
+
+## License
+
+Copyright © 2017 Florian Ballangó <florianballango@gmx.de>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
