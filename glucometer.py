@@ -15,6 +15,7 @@ import sys
 
 from glucometerutils import common
 from glucometerutils import exceptions
+from glucometerutils import rrdexport
 
 def main():
   if sys.version_info < (3, 2):
@@ -61,6 +62,17 @@ def main():
     '--set', action='store', nargs='?', const='now', default=None,
     help='Set the date rather than just reading it from the device.')
 
+  parser_rrd = subparsers.add_parser(
+    'rrd', help='Dump values into RRD Database.'
+                'Please use same Values like the dump command (--driver and --device)')
+  parser_rrd.add_argument(
+    '--unit', action='store', choices=common.VALID_UNITS,
+    help='Select the unit to use for the dumped data.')
+  parser_rrd.add_argument(
+    '--sort-by', action='store', default='timestamp',
+    choices=common.Reading._fields,
+    help='Field to order the dumped data by.')
+
   args = parser.parse_args()
 
   logging.basicConfig(level=args.vlog)
@@ -104,6 +116,7 @@ def main():
           readings, key=lambda reading: getattr(reading, args.sort_by))
 
       for reading in readings:
+        #print(readings)
         print(reading.as_csv(unit))
     elif args.action == 'datetime':
       if args.set == 'now':
@@ -130,6 +143,14 @@ def main():
       else:
         print('\nDevice data log not zeroed.')
         return 1
+    elif args.action == 'rrd':
+      sort = args.sort_by
+      unit = args.unit
+      if unit is None:
+        unit = device_info.native_unit
+      print ('device,unit and sort= ' + str(device) + ' & ' + str(unit) + ' & ' + str(sort) )
+      rrdexport.dumprrd(device,unit,sort)
+      
     else:
       return 1
   except exceptions.Error as err:
