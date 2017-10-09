@@ -117,4 +117,3 @@ def dumprrd(device,unit,sort):
   print ("the Graph is created: " + rrdgraphic )
   #os.system("gwenview " + rrdgraphic)
   webbrowser.open(rrdgraphic)
-  return 0
