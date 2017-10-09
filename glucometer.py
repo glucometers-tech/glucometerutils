@@ -15,7 +15,7 @@ import sys
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils import rrdexport
+
 
 def main():
   if sys.version_info < (3, 2):
@@ -144,6 +144,7 @@ def main():
         print('\nDevice data log not zeroed.')
         return 1
     elif args.action == 'rrd':
+      from glucometerutils import rrdexport
       sort = args.sort_by
       unit = args.unit
       if unit is None:
