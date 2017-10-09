@@ -116,7 +116,6 @@ def main():
           readings, key=lambda reading: getattr(reading, args.sort_by))
 
       for reading in readings:
-        #print(readings)
         print(reading.as_csv(unit))
     elif args.action == 'datetime':
       if args.set == 'now':
