@@ -80,7 +80,7 @@ class _Packet(object):
     self.cmd.extend(serial.read(3))
 
     if self.cmd[_IDX_STX] != _STX:
-      raise lifescan_command.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'at position %s expected %02x, received %02x' % (
           _IDX_STX, _STX, self.cmd[_IDX_STX]))
 
@@ -91,7 +91,7 @@ class _Packet(object):
     self.cmd.extend(serial.read(3))
 
     if self.cmd[_IDX_ETX] != _ETX:
-      raise lifescan_command.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'at position %s expected %02x, received %02x' % (
           _IDX_ETX, _ETX, self.cmd[_IDX_ETX]))
 
@@ -209,7 +209,7 @@ class Device(serial.SerialDevice):
     response.read_from(self.serial_)
 
     if not response.disconnect and response.sent_counter != self.expect_receive_:
-      raise lifescan_command.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'at position 2[0b] expected %02x, received %02x' % (
           self.expect_receive_, response.expect_receive))
 
@@ -299,7 +299,7 @@ class Device(serial.SerialDevice):
     elif response.data[2] == 1:
       return common.UNIT_MMOLL
     else:
-      raise lifescan_command.MalformedCommand(
+      raise lifescan.MalformedCommand(
         'at position PM1 invalid value %02x for unit' % response.data[2])
 
   def _get_reading(self, record_id):
