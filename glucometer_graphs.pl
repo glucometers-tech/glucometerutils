@@ -1,4 +1,10 @@
 #!/usr/bin/perl
+#
+# Perl script to convert CSV output from glucometer into graphs, using gnuplot.
+#
+# Author: Timothy Allen <tim@treehouse.org.za>
+# License: MIT
+#
 
 use strict;
 use warnings;
