@@ -637,7 +637,7 @@ plot 1/0
 
 push @data, qq(
 unset multiplot
-test
+#test
 );
 
 # Cleanup stored variables
@@ -658,7 +658,7 @@ undefine \$DataMaxMinTable
 
 # run the data through gnuplot
 $gnuplot_data = join "\n", @data;
-print $gnuplot_data;
+#print $gnuplot_data;
 
 open( my $ofh, '>', $output )
     or die "Could not open file '$output' $!";
