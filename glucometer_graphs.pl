@@ -521,7 +521,7 @@ if (A1C == 0 && MedianTotal < 35) {
     A1C = (MedianTotal + 2.59) / 1.59
 }
 
-A1C_LABEL = gprintf("Average A1c: %.1f", A1C)
+A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
 set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
@@ -608,7 +608,7 @@ if (A1C == 0 && MedianTotal$label < 35) {
     A1C = (MedianTotal$label + 2.59) / 1.59
 }
 
-A1C_LABEL = gprintf("Average A1c: %.1f", A1C)
+A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
 set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
