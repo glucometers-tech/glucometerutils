@@ -102,9 +102,15 @@ while ( my $row = <$ifh> ) {
     # Clean up the comments
     $row =~ s#\((Scan|Sensor)\)(; )?##i;
     $row =~ s#\(Blood\)(; )?##i;
-    $row =~ s#Food \(.*?\)(; )?#{/: 🍎}#i;
-    $row =~ s#Rapid-acting insulin \(.*?\)(; )?#~{/: 💉}{-1{/:=10 Rapid}}#i;
-    $row =~ s#Long-acting insulin \(.*?\)(; )?#~{/: 💉}{-1{/:=10 Long}}#i;
+    $row =~ s#Food \(.*?\)(; )?#:food:#i;
+    $row =~ s#Rapid-acting insulin \(.*?\)(; )?#:rapid-insulin:#i;
+    $row =~ s#Long-acting insulin \(.*?\)(; )?#:long-insulin:#i;
+    # Collapse two shots of insulin into one diagram to avoid overlapping labels
+    $row =~ s#(:(rapid|long)-insulin:){2}#:insulin:#i;
+    $row =~ s#:food:#{/: 🍎}#i;
+    $row =~ s#:insulin:#{/: 💉}#i;
+    $row =~ s#:rapid-insulin:#~{/: 💉}{-1{/:=10 Rapid}}#i;
+    $row =~ s#:long-insulin:#~{/: 💉}{-1{/:=10 Long}}#i;
 
     # Parse CSV into whitespace-separated tokens to avoid conflicting separators
     $row =~ s#^"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})","([\d\.]+)",.*,"(.*?)"$#$1T$2 $3 "$4"#;
