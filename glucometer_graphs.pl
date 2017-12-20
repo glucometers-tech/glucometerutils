@@ -103,14 +103,16 @@ while ( my $row = <$ifh> ) {
     $row =~ s#\((Scan|Sensor)\)(; )?##i;
     $row =~ s#\(Blood\)(; )?##i;
     $row =~ s#Food \(.*?\)(; )?#:food:#i;
-    $row =~ s#Rapid-acting insulin \(.*?\)(; )?#:rapid-insulin:#i;
-    $row =~ s#Long-acting insulin \(.*?\)(; )?#:long-insulin:#i;
+    $row =~ s#Rapid-acting insulin \((\d+).*?\)(; )?#:rapid-insulin$1:#i;
+    $row =~ s#Long-acting insulin \((\d+).*?\)(; )?#:long-insulin$1:#i;
     # Collapse two shots of insulin into one diagram to avoid overlapping labels
-    $row =~ s#(:(rapid|long)-insulin:){2}#:insulin:#i;
+    $row =~ s#(:(rapid|long)-insulin.*?:){2}#:insulin:#i;
     $row =~ s#:food:#{/: 🍎}#i;
-    $row =~ s#:insulin:#{/: 💉}#i;
-    $row =~ s#:rapid-insulin:#~{/: 💉}{-1{/:=10 Rapid}}#i;
-    $row =~ s#:long-insulin:#~{/: 💉}{-1{/:=10 Long}}#i;
+    $row =~ s#:insulin.*?:#{/: 💉}#i;
+    #$row =~ s#:rapid-insulin(.*?):#~{/: 💉}{-1{/:=10 Rapid}^{/:=10 $1}}#i;
+    #$row =~ s#:long-insulin(.*)?:#{/: 💉}{-1{/:=10 Long}^{/:=10 $1}}#i;
+    $row =~ s#:rapid-insulin(.*?):#{/: 💉}^{/:=10 $1}#i;
+    $row =~ s#:long-insulin(.*)?:#{/: 💉}^{/:=10 $1}#i;
 
     # Parse CSV into whitespace-separated tokens to avoid conflicting separators
     $row =~ s#^"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})","([\d\.]+)",.*,"(.*?)"$#$1T$2 $3 "$4"#;
@@ -170,6 +172,17 @@ $intervals = calculate_max_min( 'lines' => \@filelines, 'format' => '%Y-%m-%dT%H
 push @data, qq(
 set terminal pdf size $page_size enhanced font 'Calibri,14' linewidth 1
 #set output '$output'
+
+# Set universal styles
+set style fill transparent solid 1 noborder
+
+# Set style for below-target fills
+set linetype 110 lc rgb "#d71920" # red
+# Set style for above-target fills
+set linetype 111 lc rgb "#f1b80e" # yellow
+# Set style for graph lines
+set linetype 112 lc rgb "#02538f" # blue
+
 );
 
 # Read each line into a $Data variable for use by gnuplot
@@ -400,9 +413,6 @@ set format y "%.0f" numeric
 set xrange ["00:00":"23:58"]
 set yrange [0:$graph_max]
 
-set style line 100 dt 3 lw 1 lc rgb "#202020"
-set style line 101 dt 1 lw 1 lc rgb "#202020"
-set linetype 110 lc rgb "red"
 
 set lmargin 12
 set rmargin 10
@@ -426,18 +436,20 @@ foreach my $d ( sort keys %seen_days ) {
 set title "Daily Glucose Summary for $title" font "Calibri,18"
 set xlabel "Time" offset 0,-0.25
 set ylabel "Blood glucose"
-set xtics left tc rgb "#000000"
-set ytics 2    tc rgb "#000000"
-set grid ytics ls 100 front
+set xtics left scale 0 tc rgb "#000000"
+set ytics 2    scale 0 tc rgb "#000000"
+set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
 
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fc ls 6 fs solid 0.2 back
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fs solid 0.2 transparent fc "#0072b2" lc "#989898" back
 
 AVG = Mean$label
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
 set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.5 front size char strlen(AVG_LABEL), char 3
 set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
 
-plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 1 ) with lines lw 3 lc variable , \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
+#plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose ? 111 : ( \$2 < $min_glucose ? 110 : 1 ) ) with lines lw 3 lc variable , \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
+
+plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( $max_glucose ) with filledcurves above lc 111 fs solid 1.0, \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( $min_glucose ) with filledcurves below lc 110 fs solid 1.0, \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2 with lines lw 3 lc 112, \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
 
 # Add an x grid
 set multiplot previous
@@ -448,8 +460,9 @@ set xtics tc rgb "#ffffff00"
 set ytics tc rgb "#ffffff00"
 unset grid
 unset object 1
-set grid xtics ls 101
+set grid xtics lt 1 dt 1 lw 1 lc rgb "#909090"
 plot 1/0
+unset grid
 );
 
     if ( $count_graphs % $graphs_per_page == 0 && $count_graphs < $total_day_graphs ) {
@@ -478,12 +491,6 @@ set format y "%.0f" numeric
 set xrange ["00:00":"23:58"]
 set yrange [0:$graph_max]
 
-set style line 100 dt 3 lw 1 lc rgb "#202020"
-set style line 101 dt 1 lw 1 lc rgb "#202020"
-set linetype 110 lc rgb "red"
-set linetype 111 lc rgb "#B0B0B0"
-set style fill transparent solid 0.5 noborder
-
 set lmargin 12
 set rmargin 10
 set tmargin 5
@@ -494,11 +501,11 @@ set multiplot title layout $graphs_per_page,1
 set title "Overall Average Daily Glucose" font "Calibri,18"
 set xlabel "Time" offset 0,-0.25
 set ylabel "Blood glucose"
-set xtics left tc rgb "#000000"
-set ytics 2    tc rgb "#000000"
-set grid ytics ls 100 front
+set xtics left scale 0 tc rgb "#000000"
+set ytics 2    scale 0 tc rgb "#000000"
+set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
 
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fc ls 6 fs solid 0.05 back
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fs solid 0.2 transparent fc "#0072b2" lc "#989898" back
 
 AVG = MedianTotal
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
@@ -525,7 +532,7 @@ A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
 set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
-plot \$DataMaxMinTable using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc 111, \$SmoothDataAvg using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 1 ) with lines lw 3 lc variable
+plot \$DataMaxMinTable using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#878787" fs transparent solid 0.5, \$SmoothDataAvg using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
 
 # Add an x grid
 set multiplot previous
@@ -536,8 +543,9 @@ set xtics tc rgb "#ffffff00"
 set ytics tc rgb "#ffffff00"
 unset grid
 unset object 1
-set grid xtics ls 101
+set grid xtics lt 1 dt 1 lw 1 lc rgb "#909090"
 plot 1/0
+unset grid
 );
 # End overall average plot
 
@@ -557,12 +565,6 @@ set format y "%.0f" numeric
 set xrange ["00:00":"23:58"]
 set yrange [0:$graph_max]
 
-set style line 100 dt 3 lw 1 lc rgb "#202020"
-set style line 101 dt 1 lw 1 lc rgb "#202020"
-set linetype 110 lc rgb "red"
-set linetype 111 lc rgb "#B0B0B0"
-set style fill transparent solid 0.5 noborder
-
 set lmargin 12
 set rmargin 10
 set tmargin 5
@@ -581,11 +583,11 @@ foreach my $year ( sort keys %seen_weeks ) {
 set title "Average Daily Glucose from $title" font "Calibri,18"
 set xlabel "Time" offset 0,-0.25
 set ylabel "Blood glucose"
-set xtics left tc rgb "#000000"
-set ytics 2    tc rgb "#000000"
-set grid ytics ls 100 front
+set xtics left scale 0 tc rgb "#000000"
+set ytics 2    scale 0 tc rgb "#000000"
+set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
 
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fc ls 6 fs solid 0.05 back
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fs solid 0.2 transparent fc "#0072b2" lc "#989898" back
 
 AVG = MedianTotal$label
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
@@ -612,7 +614,7 @@ A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
 set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
-plot \$DataWeekMaxMinTable$label using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc 111, \$SmoothDataWeekAvg$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 1 ) with lines lw 3 lc variable
+plot \$DataWeekMaxMinTable$label using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#878787" fs transparent solid 0.5, \$SmoothDataWeekAvg$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
 
 # Add an x grid
 set multiplot previous
@@ -623,9 +625,9 @@ set xtics tc rgb "#ffffff00"
 set ytics tc rgb "#ffffff00"
 unset grid
 unset object 1
-set grid xtics ls 101
+set grid xtics lt 1 dt 1 lw 1 lc rgb "#909090"
 plot 1/0
-
+unset grid
 );
         if ( $count_graphs % $graphs_per_page == 0 && $count_graphs < $total_day_graphs ) {
             push @data, qq(unset multiplot);
