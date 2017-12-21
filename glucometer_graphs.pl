@@ -100,22 +100,32 @@ open( my $ifh, '<:encoding(UTF-8)', $input )
 while ( my $row = <$ifh> ) {
     chomp( $row );
     # Clean up the comments
-    $row =~ s#\((Scan|Sensor)\)(; )?##i;
-    $row =~ s#\(Blood\)(; )?##i;
-    $row =~ s#Food \(.*?\)(; )?#:food:#i;
-    $row =~ s#Rapid-acting insulin \((\d+).*?\)(; )?#:rapid-insulin$1:#i;
-    $row =~ s#Long-acting insulin \((\d+).*?\)(; )?#:long-insulin$1:#i;
-    # Collapse two shots of insulin into one diagram to avoid overlapping labels
-    $row =~ s#(:(rapid|long)-insulin.*?:){2}#:insulin:#i;
-    $row =~ s#:food:#{/: 🍎}#i;
-    $row =~ s#:insulin.*?:#{/: 💉}#i;
-    #$row =~ s#:rapid-insulin(.*?):#~{/: 💉}{-1{/:=10 Rapid}^{/:=10 $1}}#i;
-    #$row =~ s#:long-insulin(.*)?:#{/: 💉}{-1{/:=10 Long}^{/:=10 $1}}#i;
-    $row =~ s#:rapid-insulin(.*?):#{/: 💉}^{/:=10 $1}#i;
-    $row =~ s#:long-insulin(.*)?:#{/: 💉}^{/:=10 $1}#i;
+    my @comments;
+    for my $row_comment ( $row =~ m#,"([^"]+?)"$# ) {
+        for my $comment ( split /; /, $row_comment ) {
+            if ($comment =~ /(Food|Rapid-acting insulin|Long-acting insulin)(?: \((.*?)\))/ ) {
+                my $type = $1;
+                my $value = $2 if defined $2;
+                $value =~ s#(\d+)(\.\d+)?#$1#;
+                $value .= "R" if ( $type =~ /Rapid/i );
+                $value .= "L" if ( $type =~ /Long/i );
+
+                $type  =~ s#Food#{/: 🍎}#i;
+                $type  =~ s#Rapid-acting insulin#{/: 💉}^{/:=10 ${value}}#i;
+                $type  =~ s#Long-acting insulin#{/: 💉}^{/:=10 ${value}}#i;
+
+                if ( grep m#\{.*?💉\}#, @comments ) {
+                    map { s#^(\{.*?💉\}.*\d+\S?)(.*)$#$1/$value$2#i; } @comments;
+                } else {
+                    push @comments, $type;
+                }
+            }
+        }
+    }
+    my $comment = join "", @comments;
 
     # Parse CSV into whitespace-separated tokens to avoid conflicting separators
-    $row =~ s#^"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})","([\d\.]+)",.*,"(.*?)"$#$1T$2 $3 "$4"#;
+    $row =~ s#^"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})","([\d\.]+)",.*,"(.*?)"$#$1T$2 $3 "$comment"#;
 
     # Remove icons if not requested
     $row =~ s# "[^"]+"## if ( $noicons );
@@ -260,10 +270,10 @@ foreach my $year ( sort keys %seen_weeks ) {
         push @data, qq(\$DataWeekMaxMin$label << EOD);
         @sortedlines = ();
         foreach my $time  ( sort keys %{$week_intervals} ) {
-            push @sortedlines, qq($time $intervals->{$time}->{max} $intervals->{$time}->{min});
+            push @sortedlines, qq($time $week_intervals->{$time}->{max} $week_intervals->{$time}->{min});
         }
         @sortedlines = map { "    $_" } @sortedlines; # indent data structure
-        push @data, sort @sortedlines;
+        push @data, join "\n", sort @sortedlines;
         push @data, qq(EOD);
     }
 }
@@ -335,7 +345,6 @@ plot \$DataAvg using 1:2 smooth bezier
 #plot sum = init(0), \$DataAvg using 1:(avg5(\$2)) every 2 smooth mcsplines, \$DataAvg using 1:2 smooth bezier
 #
 unset table
-
 
 # Convert DataMaxMin from CSV to table
 set table \$DataMaxMinTable
@@ -440,7 +449,7 @@ set xtics left scale 0 tc rgb "#000000"
 set ytics 2    scale 0 tc rgb "#000000"
 set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
 
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fs solid 0.2 transparent fc "#0072b2" lc "#989898" back
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose back fc rgb "#0072b2" fs solid 0.2 transparent border rgb "#a8a8a8"
 
 AVG = Mean$label
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
@@ -505,7 +514,7 @@ set xtics left scale 0 tc rgb "#000000"
 set ytics 2    scale 0 tc rgb "#000000"
 set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
 
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fs solid 0.2 transparent fc "#0072b2" lc "#989898" back
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose back fc rgb "#0072b2" fs solid 0.2 transparent border rgb "#a8a8a8"
 
 AVG = MedianTotal
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
@@ -532,7 +541,7 @@ A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
 set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
-plot \$DataMaxMinTable using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#878787" fs transparent solid 0.5, \$SmoothDataAvg using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
+plot \$DataMaxMinTable using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#979797" fs transparent solid 0.5, \$SmoothDataAvg using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
 
 # Add an x grid
 set multiplot previous
@@ -587,7 +596,7 @@ set xtics left scale 0 tc rgb "#000000"
 set ytics 2    scale 0 tc rgb "#000000"
 set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
 
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose fs solid 0.2 transparent fc "#0072b2" lc "#989898" back
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose back fc rgb "#0072b2" fs solid 0.2 transparent border rgb "#a8a8a8"
 
 AVG = MedianTotal$label
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
@@ -614,7 +623,7 @@ A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
 set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
-plot \$DataWeekMaxMinTable$label using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#878787" fs transparent solid 0.5, \$SmoothDataWeekAvg$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
+plot \$DataWeekMaxMinTable$label using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#979797" fs transparent solid 0.5, \$SmoothDataWeekAvg$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
 
 # Add an x grid
 set multiplot previous
@@ -695,4 +704,4 @@ close( $ofh )
 #print GNUPLOT $gnuplot_data;
 #close(GNUPLOT);
 
-# vim: set expandtab shiftwidth=4 softtabstop=4 tw=1000 :
+# vim: set expandtab shiftwidth=4 softtabstop=4 tw=0 :
