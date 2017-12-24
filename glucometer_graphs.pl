@@ -244,7 +244,7 @@ foreach my $year ( sort keys %seen_weeks ) {
         # Select data from the week in question
         my @weeklines;
 
-        foreach my $row (@filelines) {
+        foreach my $row ( @filelines ) {
                 foreach my $dow ( 0 .. 6 ) {
                 my $day = $mon + ( ONE_DAY * $dow );
                 my $d   = $day->strftime("%Y-%m-%d");
@@ -428,65 +428,10 @@ set rmargin 10
 set tmargin 5
 set bmargin 5
 
-set multiplot title layout $graphs_per_page,1
-
 );
-
-# For each day, generate a graph with some fancy options
-foreach my $d ( sort keys %seen_days ) {
-    my $label = "$1$2$3" if ( $d =~ m#(\d{4})-(\d{2})-(\d{2})# );
-    my $time  = Time::Piece->strptime( $d, "%Y-%m-%d" );
-    #my $title = $time->strftime("%a %d %b %Y");
-    my $title = $time->strftime("%A, %d %B %Y");
-
-    $count_graphs++;
-
-    push @data, qq(
-set title "Daily Glucose Summary for $title" font "Calibri,18"
-set xlabel "Time" offset 0,-0.25
-set ylabel "Blood glucose"
-set xtics left scale 0 tc rgb "#000000"
-set ytics 2    scale 0 tc rgb "#000000"
-set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
-
-set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose back fc rgb "#0072b2" fs solid 0.2 transparent border rgb "#a8a8a8"
-
-AVG = Mean$label
-AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
-set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.5 front size char strlen(AVG_LABEL), char 3
-set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
-
-#plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose ? 111 : ( \$2 < $min_glucose ? 110 : 1 ) ) with lines lw 3 lc variable , \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
-
-plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( $max_glucose ) with filledcurves above lc 111 fs solid 1.0, \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( $min_glucose ) with filledcurves below lc 110 fs solid 1.0, \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2 with lines lw 3 lc 112, \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
-
-# Add an x grid
-set multiplot previous
-set title "  "
-set xlabel " " offset 0,-0.25
-set ylabel " "
-set xtics tc rgb "#ffffff00"
-set ytics tc rgb "#ffffff00"
-unset grid
-unset object 1
-set grid xtics lt 1 dt 1 lw 1 lc rgb "#909090"
-plot 1/0
-unset grid
-);
-
-    if ( $count_graphs % $graphs_per_page == 0 && $count_graphs < $total_day_graphs ) {
-        push @data, qq(unset multiplot);
-        push @data, qq(set multiplot layout $graphs_per_page,1);
-        $page_number++;
-    }
-
-}
-# End daily graph plot
 
 # Plot and display a graph with the average glucose values for every $interval for all recorded days
 push @data, qq(
-unset multiplot
-
 # ensure separator handles tables
 set datafile separator whitespace
 
@@ -505,7 +450,19 @@ set rmargin 10
 set tmargin 5
 set bmargin 5
 
-set multiplot title layout $graphs_per_page,1
+set multiplot layout $graphs_per_page,1
+
+# Add an x grid
+set title "  "
+set xlabel " " offset 0,-0.25
+set ylabel " "
+set xtics tc rgb "#ffffff00"
+set ytics tc rgb "#ffffff00"
+unset grid
+set grid xtics lt 1 dt 1 lw 0.75 lc rgb "#a0a0a0" back
+plot 1/0
+unset grid
+set multiplot previous
 
 set title "Overall Average Daily Glucose" font "Calibri,18"
 set xlabel "Time" offset 0,-0.25
@@ -518,7 +475,7 @@ set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose
 
 AVG = MedianTotal
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
-set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.5 front size char strlen(AVG_LABEL), char 3
+set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.7 front size char strlen(AVG_LABEL), char 3
 set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
 
 A1C = 0
@@ -538,23 +495,18 @@ if (A1C == 0 && MedianTotal < 35) {
 }
 
 A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
-set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
+set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.7 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
 plot \$DataMaxMinTable using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#979797" fs transparent solid 0.5, \$SmoothDataAvg using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
 
-# Add an x grid
-set multiplot previous
-set title "  "
-set xlabel " " offset 0,-0.25
-set ylabel " "
-set xtics tc rgb "#ffffff00"
-set ytics tc rgb "#ffffff00"
-unset grid
 unset object 1
-set grid xtics lt 1 dt 1 lw 1 lc rgb "#909090"
-plot 1/0
-unset grid
+unset object 2
+unset object 3
+unset label 2
+unset label 3
+
+unset multiplot
 );
 # End overall average plot
 
@@ -579,16 +531,31 @@ set rmargin 10
 set tmargin 5
 set bmargin 5
 
-set multiplot title layout $graphs_per_page,1
+set multiplot layout $graphs_per_page,1
 );
-foreach my $year ( sort keys %seen_weeks ) {
-    foreach my $week ( sort keys %{$seen_weeks{$year}} ) {
+
+$count_graphs = 0;
+foreach my $year ( reverse sort keys %seen_weeks ) {
+    foreach my $week ( reverse sort keys %{$seen_weeks{$year}} ) {
         my $time  = Time::Piece->strptime( "$year", "%Y" );
         my $mon = $time + ( ONE_WEEK * ( $week - 1 ) ) + ( ONE_DAY );
         my $sun = $time + ( ONE_WEEK * ( $week - 1 ) ) + ( ONE_DAY * 7 );
         my $title = $mon->strftime("%A, %d %B %Y") . " to " . $sun->strftime("%A, %d %B %Y");
         my $label = $mon->strftime("%Y%m%d");
+        $count_graphs++;
         push @data, qq(
+# Add an x grid
+set title "  "
+set xlabel " " offset 0,-0.25
+set ylabel " "
+set xtics tc rgb "#ffffff00"
+set ytics tc rgb "#ffffff00"
+unset grid
+set grid xtics lt 1 dt 1 lw 0.75 lc rgb "#a0a0a0" back
+plot 1/0
+unset grid
+set multiplot previous
+
 set title "Average Daily Glucose from $title" font "Calibri,18"
 set xlabel "Time" offset 0,-0.25
 set ylabel "Blood glucose"
@@ -600,7 +567,7 @@ set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose
 
 AVG = MedianTotal$label
 AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
-set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.5 front size char strlen(AVG_LABEL), char 3
+set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.7 front size char strlen(AVG_LABEL), char 3
 set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
 
 A1C = 0
@@ -620,31 +587,84 @@ if (A1C == 0 && MedianTotal$label < 35) {
 }
 
 A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
-set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.5 front size char strlen(A1C_LABEL), char 3
+set object 3 rect at graph 0.07, graph 0.9 fc ls 4 fs transparent solid 0.7 front size char strlen(A1C_LABEL), char 3
 set label 3 A1C_LABEL at graph 0.07, graph 0.9 front center
 
 plot \$DataWeekMaxMinTable$label using (strftime("%H:%M:%S", \$1)):2:3 with filledcurves lc rgb "#979797" fs transparent solid 0.5, \$SmoothDataWeekAvg$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose || \$2 < $min_glucose ? 110 : 112 ) with lines lw 3 lc variable
 
+unset object 1
+unset object 2
+unset object 3
+unset label 2
+unset label 3
+);
+        if ( $count_graphs % $graphs_per_page == 0 && $count_graphs <= $total_week_graphs ) {
+            push @data, qq(unset multiplot);
+            push @data, qq(set multiplot layout $graphs_per_page,1) unless ($count_graphs == $total_week_graphs);
+            $page_number++;
+        }
+    }
+}
+
+push @data, qq(
+set multiplot layout $graphs_per_page,1
+);
+$count_graphs = 0;
+# For each day, generate a graph with some fancy options
+foreach my $d ( reverse sort keys %seen_days ) {
+    my $label = "$1$2$3" if ( $d =~ m#(\d{4})-(\d{2})-(\d{2})# );
+    my $time  = Time::Piece->strptime( $d, "%Y-%m-%d" );
+    #my $title = $time->strftime("%a %d %b %Y");
+    my $title = $time->strftime("%A, %d %B %Y");
+
+    $count_graphs++;
+
+    push @data, qq(
 # Add an x grid
-set multiplot previous
 set title "  "
 set xlabel " " offset 0,-0.25
 set ylabel " "
 set xtics tc rgb "#ffffff00"
 set ytics tc rgb "#ffffff00"
 unset grid
-unset object 1
-set grid xtics lt 1 dt 1 lw 1 lc rgb "#909090"
+set grid xtics lt 1 dt 1 lw 0.75 lc rgb "#a0a0a0" back
 plot 1/0
 unset grid
+set multiplot previous
+
+set title "Daily Glucose Summary for $title" font "Calibri,18"
+set xlabel "Time" offset 0,-0.25
+set ylabel "Blood glucose"
+set xtics left scale 0 tc rgb "#000000"
+set ytics 2    scale 0 tc rgb "#000000"
+set grid ytics lt 1 dt 3 lw 1 lc rgb "#202020" front
+
+set object 1 rect from graph 0, first $min_glucose to graph 1,first $max_glucose back fc rgb "#0072b2" fs solid 0.2 transparent border rgb "#a8a8a8"
+
+AVG = Mean$label
+AVG_LABEL = gprintf("Median glucose: %.2f", AVG)
+set object 2 rect at graph 0.9, graph 0.9 fc ls 2 fs transparent solid 0.7 front size char strlen(AVG_LABEL), char 3
+set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
+
+#plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( \$2 > $max_glucose ? 111 : ( \$2 < $min_glucose ? 110 : 1 ) ) with lines lw 3 lc variable , \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
+
+plot \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( $max_glucose ) with filledcurves above lc 111 fs solid 1.0, \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2:( $min_glucose ) with filledcurves below lc 110 fs solid 1.0, \$SmoothData$label using (strftime("%H:%M:%S", \$1)):2 with lines lw 3 lc 112, \$Data$label using 1:($graph_max-6):3 with labels font "Calibri,18" enhanced
+
+unset object 1
+unset object 2
+unset object 3
+unset label 2
+unset label 3
 );
-        if ( $count_graphs % $graphs_per_page == 0 && $count_graphs < $total_day_graphs ) {
-            push @data, qq(unset multiplot);
-            push @data, qq(set multiplot layout $graphs_per_page,1);
-            $page_number++;
-        }
+
+    if ( $count_graphs % $graphs_per_page == 0 && $count_graphs <= $total_day_graphs ) {
+        push @data, qq(unset multiplot);
+        push @data, qq(set multiplot layout $graphs_per_page,1) unless ($count_graphs == $total_day_graphs);
+        $page_number++;
     }
+
 }
+# End daily graph plot
 
 push @data, qq(
 unset multiplot
@@ -669,7 +689,7 @@ undefine \$DataMaxMinTable
 
 # run the data through gnuplot
 $gnuplot_data = join "\n", @data;
-#print $gnuplot_data;
+print $gnuplot_data;
 
 open( my $ofh, '>', $output )
     or die "Could not open file '$output' $!";
