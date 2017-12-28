@@ -22,12 +22,12 @@ from glucometerutils import exceptions
 class TestOTUltra2(parameterized.TestCase):
 
     def test_checksum(self):
-        checksum = otultra2._calculate_checksum(bytes('T', 'ascii'))
+        checksum = otultra2._calculate_checksum(b'T')
         self.assertEqual(0x0054, checksum)
 
     def test_checksum_full(self):
         checksum = otultra2._calculate_checksum(
-            bytes('T "SAT","08/03/13","22:12:00   "', 'ascii'))
+            b'T "SAT","08/03/13","22:12:00   "')
         self.assertEqual(0x0608, checksum)
 
     @parameterized.named_parameters(
