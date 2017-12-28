@@ -10,7 +10,7 @@ setup(
   description = 'Glucometer access utilities',
   author = 'Diego Elio Pettenò',
   author_email = 'flameeyes@flameeyes.eu',
-  url = 'https://www.flameeyes.eu/projects/glucometerutils',
+  url = 'https://www.flameeyes.eu/p/glucometerutils',
   download_url = 'https://www.flameeyes.eu/files/glucometerutils.tgz',
   keywords = ['glucometer', 'diabetes'],
   python_requires = '~=3.4',
