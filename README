@@ -1,23 +1,22 @@
 # Glucometer Utilities
 
-This utility I created for personal needs, as my glucometer's software
-can only print the software (to XPS) without a file export option.
+This repository includes a command line utility to interact with a number of
+blood sugar meters (glucometer) models from various manufacturers.
 
-While right now only supports the glucometers I own and for which I
-have the specification of the protocol, I've tried designing it so
-that it can be extended and used for other models and other brands as
-well.
+While support varies by device, the actions that may be available are as
+follows:
 
-If you have knowledge of a protocol of a glucometer you would have
-supported, please provide a reference, possibly by writing a
-specification and contribute it to
-https://github.com/Flameeyes/glucometer-protocols/.
+ * `info` shows the model, serial number, date and time, and configured glucose
+   unit of the device.
+ * `dump` export the recorded blood sugar or β-ketone readings from the device
+   in comma-separated values format.
+ * `datetime` reads or updates the date and time of the device clock.
+ * `zero` deletes all the recorded readings (only implemented for few devices).
 
 ## Supported devices
 
-Please see the following table for the driver for each device that is
-known and supported; the following table will provide further
-information on each of the devices.
+Please see the following table for the driver for each device that is known and
+supported.
 
 | Manufacturer | Model Name              | Driver             | Dependencies  |
 | ---          | ---                     | ---                | ---           |
@@ -37,6 +36,15 @@ information on each of the devices.
 
 † Untested.
 ‡ Optional dependency on Linux; required on other operating systems.
+
+To identify the supported features for each of the driver, query the `help`
+action:
+
+    glucometer.py --driver fslibre help
+
+If you have knowledge of a protocol of a glucometer you would have supported,
+please provide a reference, possibly by writing a specification and contribute
+it to https://github.com/Flameeyes/glucometer-protocols/.
 
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://github.com/rosjat/python-scsi
