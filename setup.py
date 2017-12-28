@@ -28,7 +28,7 @@ setup(
         ('lib/udev/rules', ['udev/69-glucometerutils.rules']),
     ],
     extras_require = {
-        'test': ['abseil-py'],
+        'test': ['absl-py'],
         # These are all the drivers' dependencies. Optional dependencies are
         # listed as mandatory for the feature.
         'otultra2': ['pyserial'],
