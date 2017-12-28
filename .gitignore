@@ -3,3 +3,8 @@
 /MANIFEST
 /dist/
 __pycache__/
+/bazel-bin
+/bazel-genfiles
+/bazel-glucometerutils
+/bazel-out
+/bazel-testlogs
