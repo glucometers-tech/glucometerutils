@@ -29,6 +29,17 @@ setup(
     ],
     extras_require = {
         'test': ['abseil-py'],
+        # These are all the drivers' dependencies. Optional dependencies are
+        # listed as mandatory for the feature.
+        'otultra2': ['pyserial'],
+        'otultraeasy': ['pyserial'],
+        'otverio2015': ['python-scsi'],
+        'fsinsulinx': ['hidapi'],
+        'fslibre': ['hidapi'],
+        'fsoptium': ['hidapi'],
+        'fsprecisionneo': ['hidapi'],
+        'accucheck_reports': [],
+        'sdcodefree': ['pyserial'],
     },
     entry_points = {
         'console_scripts': [

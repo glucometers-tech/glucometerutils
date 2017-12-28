@@ -13,6 +13,20 @@ follows:
  * `datetime` reads or updates the date and time of the device clock.
  * `zero` deletes all the recorded readings (only implemented for few devices).
 
+## Example Usage
+
+Most of the drivers require optional dependencies, and those are listed in the
+table below. If you do not want to install the dependencies manually, you should
+be able to set this up using `virtualenv` and `pip`:
+
+```shell
+$ python3 -m venv $(pwd)/glucometerutils-venv
+$ . glucometerutils-venv/bin/activate
+(glucometerutils-venv) $ DRIVER=myglucometer-driver  # see table below
+(glucometerutils-venv) $ pip install git+https://github.com/Flameeyes/glucometerutils.git#egg=project[${DRIVER}]
+(glucometerutils-venv) $ glucometer --driver ${DRIVER} help
+```
+
 ## Supported devices
 
 Please see the following table for the driver for each device that is known and
