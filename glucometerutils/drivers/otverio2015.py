@@ -76,9 +76,9 @@ _READ_RECORD_REQUEST_SUFFIX = b'\x00'
 _MEMORY_ERASE_REQUEST = b'\x04\x1a'
 
 _MEAL_CODES = {
-  0x00: common.NO_MEAL,
-  0x01: common.BEFORE_MEAL,
-  0x02: common.AFTER_MEAL,
+  0x00: common.Meal.NONE,
+  0x01: common.Meal.BEFORE,
+  0x02: common.Meal.AFTER,
 }
 
 def _extract_message(register):

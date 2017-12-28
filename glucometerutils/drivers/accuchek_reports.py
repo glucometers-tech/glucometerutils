@@ -117,11 +117,11 @@ class Device(object):
     if record[_AFTER_MEAL_CSV_KEY] and record[_BEFORE_MEAL_CSV_KEY]:
       raise InvalidResponse('Reading cannot be before and after meal.')
     elif record[_AFTER_MEAL_CSV_KEY]:
-      return common.AFTER_MEAL
+      return common.Meal.AFTER
     elif record[_BEFORE_MEAL_CSV_KEY]:
-      return common.BEFORE_MEAL
+      return common.Meal.BEFORE
     else:
-      return common.NO_MEAL
+      return common.Meal.NONE
 
   def get_readings(self):
     for record in self._get_records_reader():

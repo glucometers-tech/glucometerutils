@@ -17,9 +17,10 @@ class Unit(enum.Enum):
   MMOL_L = 'mmol/L'
 
 # Constants for meal information
-NO_MEAL = ''
-BEFORE_MEAL = 'Before Meal'
-AFTER_MEAL = 'After Meal'
+class Meal(enum.Enum):
+  NONE = ''
+  BEFORE = 'Before Meal'
+  AFTER = 'After Meal'
 
 # Constants for measure method
 BLOOD_SAMPLE = 'blood sample'
@@ -52,7 +53,7 @@ _ReadingBase = collections.namedtuple(
   '_ReadingBase', ['timestamp', 'value', 'comment', 'measure_method'])
 
 class GlucoseReading(_ReadingBase):
-  def __new__(cls, timestamp, value, meal=NO_MEAL, comment='',
+  def __new__(cls, timestamp, value, meal=Meal.NONE, comment='',
               measure_method=BLOOD_SAMPLE):
     """Constructor for the glucose reading object.
 
@@ -85,8 +86,8 @@ class GlucoseReading(_ReadingBase):
   def as_csv(self, unit):
     """Returns the reading as a formatted comma-separated value string."""
     return '"%s","%.2f","%s","%s","%s"' % (
-      self.timestamp, self.get_value_as(unit), self.meal, self.measure_method,
-      self.comment)
+      self.timestamp, self.get_value_as(unit), self.meal.value,
+      self.measure_method, self.comment)
 
 class KetoneReading(_ReadingBase):
   def __new__(cls, timestamp, value, comment='', **kwargs):

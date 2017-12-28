@@ -27,9 +27,9 @@ from glucometerutils.support import serial
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
-  'N': common.NO_MEAL,
-  'B': common.BEFORE_MEAL,
-  'A': common.AFTER_MEAL,
+  'N': common.Meal.NONE,
+  'B': common.Meal.BEFORE,
+  'A': common.Meal.AFTER,
 }
 
 _COMMENT_CODES = {

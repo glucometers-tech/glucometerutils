@@ -65,9 +65,9 @@ _ReadingRecord = collections.namedtuple(
 _STRUCT_READING = struct.Struct('>BBBBBBBHB')
 
 _MEAL_FLAG = {
-    0x00: common.NO_MEAL,
-    0x10: common.BEFORE_MEAL,
-    0x20: common.AFTER_MEAL
+    0x00: common.Meal.NONE,
+    0x10: common.Meal.BEFORE,
+    0x20: common.Meal.AFTER,
 }
 
 def parse_reading(msgdata):
