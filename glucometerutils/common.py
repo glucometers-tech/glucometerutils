@@ -23,8 +23,9 @@ class Meal(enum.Enum):
   AFTER = 'After Meal'
 
 # Constants for measure method
-BLOOD_SAMPLE = 'blood sample'
-CGM = 'CGM' # Continuous Glucose Monitoring
+class MeasurementMethod(enum.Enum):
+  BLOOD_SAMPLE = 'blood sample'
+  CGM = 'CGM' # Continuous Glucose Monitoring
 
 
 def convert_glucose_unit(value, from_unit, to_unit=None):
@@ -54,7 +55,7 @@ _ReadingBase = collections.namedtuple(
 
 class GlucoseReading(_ReadingBase):
   def __new__(cls, timestamp, value, meal=Meal.NONE, comment='',
-              measure_method=BLOOD_SAMPLE):
+              measure_method=MeasurementMethod.BLOOD_SAMPLE):
     """Constructor for the glucose reading object.
 
     Args:
@@ -87,7 +88,7 @@ class GlucoseReading(_ReadingBase):
     """Returns the reading as a formatted comma-separated value string."""
     return '"%s","%.2f","%s","%s","%s"' % (
       self.timestamp, self.get_value_as(unit), self.meal.value,
-      self.measure_method, self.comment)
+      self.measure_method.value, self.comment)
 
 class KetoneReading(_ReadingBase):
   def __new__(cls, timestamp, value, comment='', **kwargs):
@@ -104,7 +105,7 @@ class KetoneReading(_ReadingBase):
     """
     return super(KetoneReading, cls).__new__(
       cls, timestamp=timestamp, value=value, comment=comment,
-      measure_method=BLOOD_SAMPLE)
+      measure_method=MeasurementMethod.BLOOD_SAMPLE)
 
   def get_value_as(self, *args):
     """Returns the reading value in mmol/L."""
@@ -113,7 +114,7 @@ class KetoneReading(_ReadingBase):
   def as_csv(self, unit):
     """Returns the reading as a formatted comma-separated value string."""
     return '"%s","%.2f","%s","%s"' % (
-      self.timestamp, self.get_value_as(unit), self.measure_method,
+      self.timestamp, self.get_value_as(unit), self.measure_method.value,
       self.comment)
 
 

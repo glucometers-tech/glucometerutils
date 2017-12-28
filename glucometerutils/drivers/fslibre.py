@@ -126,17 +126,17 @@ def _parse_arresult(record):
 
     if parsed_record['reading-type'] == 2:
         comment_parts.append('(Scan)')
-        measure_method = common.CGM
+        measure_method = common.MeasurementMethod.CGM
         cls = common.GlucoseReading
         value = parsed_record['value']
     elif parsed_record['reading-type'] == 0:
         comment_parts.append('(Blood)')
-        measure_method = common.BLOOD_SAMPLE
+        measure_method = common.MeasurementMethod.BLOOD_SAMPLE
         cls = common.GlucoseReading
         value = parsed_record['value']
     elif parsed_record['reading-type'] == 1:
         comment_parts.append('(Ketone)')
-        measure_method = common.BLOOD_SAMPLE
+        measure_method = common.MeasurementMethod.BLOOD_SAMPLE
         cls = common.KetoneReading
         # automatically convert the raw value in mmol/L
         value = _convert_ketone_unit(parsed_record['value'])
@@ -226,7 +226,7 @@ class Device(freestyle.FreeStyleHidDevice):
                 _extract_timestamp(parsed_record),
                 parsed_record['value'],
                 comment='(Sensor)',
-                measure_method=common.CGM)
+                measure_method=common.MeasurementMethod.CGM)
 
         # Then get the results of explicit scans and blood tests (and other
         # events).
