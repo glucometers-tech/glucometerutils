@@ -12,6 +12,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 use IPC::Open3;
+use List::Util qw(sum);
 use Time::Piece;
 use Time::Seconds;
 use Data::Dumper;
@@ -173,8 +174,8 @@ foreach my $year ( sort keys %seen_weeks ) {
         delete $seen_weeks{$year}{$week} if ( scalar $seen_weeks{$year}{$week} < 96 );
     }
 }
-$total_day_graphs = scalar keys %seen_days;
-$total_week_graphs = scalar keys %seen_weeks;
+$total_day_graphs = scalar values %seen_days;
+$total_week_graphs = sum map { scalar keys %{$seen_weeks{$_}} } keys %seen_weeks;
 
 $intervals = calculate_max_min( 'lines' => \@filelines, 'format' => '%Y-%m-%dT%H:%M:%S' );
 
@@ -480,18 +481,18 @@ set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
 
 A1C = 0
 if (A1C == 0 && '$units' eq 'mg/dL') {
-    A1C = (MedianTotal + 46.7) / 28.7
+    A1C = (MeanTotal + 46.7) / 28.7
 }
 if (A1C == 0 && '$units' eq 'mmol/L') {
-    A1C = (MedianTotal + 2.59) / 1.59
+    A1C = (MeanTotal + 2.59) / 1.59
 }
 # mg/dL numbers tend to be higher than 35
 if (A1C == 0 && MedianTotal >= 35) {
-    A1C = (MedianTotal + 46.7) / 28.7
+    A1C = (MeanTotal + 46.7) / 28.7
 }
 # mmol/L numbers tend to be lower than 35
 if (A1C == 0 && MedianTotal < 35) {
-    A1C = (MedianTotal + 2.59) / 1.59
+    A1C = (MeanTotal + 2.59) / 1.59
 }
 
 A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
@@ -572,18 +573,18 @@ set label 2 AVG_LABEL at graph 0.9, graph 0.9 front center
 
 A1C = 0
 if (A1C == 0 && '$units' eq 'mg/dL') {
-    A1C = (MedianTotal$label + 46.7) / 28.7
+    A1C = (MeanTotal$label + 46.7) / 28.7
 }
 if (A1C == 0 && '$units' eq 'mmol/L') {
-    A1C = (MedianTotal$label + 2.59) / 1.59
+    A1C = (MeanTotal$label + 2.59) / 1.59
 }
 # mg/dL numbers tend to be higher than 35
 if (A1C == 0 && MedianTotal$label >= 35) {
-    A1C = (MedianTotal$label + 46.7) / 28.7
+    A1C = (MeanTotal$label + 46.7) / 28.7
 }
 # mmol/L numbers tend to be lower than 35
 if (A1C == 0 && MedianTotal$label < 35) {
-    A1C = (MedianTotal$label + 2.59) / 1.59
+    A1C = (MeanTotal$label + 2.59) / 1.59
 }
 
 A1C_LABEL = gprintf("Average A1c: %.1f%%", A1C)
@@ -689,7 +690,7 @@ undefine \$DataMaxMinTable
 
 # run the data through gnuplot
 $gnuplot_data = join "\n", @data;
-print $gnuplot_data;
+#print $gnuplot_data;
 
 open( my $ofh, '>', $output )
     or die "Could not open file '$output' $!";
