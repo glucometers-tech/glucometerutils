@@ -7,15 +7,14 @@ __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import collections
+import enum
 import textwrap
 
 from glucometerutils import exceptions
 
-# Constants for units
-UNIT_MGDL = 'mg/dL'
-UNIT_MMOLL = 'mmol/L'
-
-VALID_UNITS = [UNIT_MGDL, UNIT_MMOLL]
+class Unit(enum.Enum):
+  MG_DL = 'mg/dL'
+  MMOL_L = 'mmol/L'
 
 # Constants for meal information
 NO_MEAL = ''
@@ -41,17 +40,10 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
   Raises:
     exceptions.InvalidGlucoseUnit: If the parameters are incorrect.
   """
-  if from_unit not in VALID_UNITS:
-    raise exceptions.InvalidGlucoseUnit(from_unit)
-
   if from_unit == to_unit:
     return value
 
-  if to_unit is not None:
-    if to_unit not in VALID_UNITS:
-      raise exceptions.InvalidGlucoseUnit(to_unit)
-
-  if from_unit is UNIT_MGDL:
+  if from_unit is Unit.MG_DL:
     return round(value / 18.0, 2)
   else:
     return round(value * 18.0, 0)
@@ -86,9 +78,9 @@ class GlucoseReading(_ReadingBase):
     """Returns the reading value as the given unit.
 
     Args:
-      to_unit: (UNIT_MGDL|UNIT_MMOLL) The unit to return the value to.
+      to_unit: (Unit) The unit to return the value to.
     """
-    return convert_glucose_unit(self.value, UNIT_MGDL, to_unit)
+    return convert_glucose_unit(self.value, Unit.MG_DL, to_unit)
 
   def as_csv(self, unit):
     """Returns the reading as a formatted comma-separated value string."""
@@ -129,14 +121,14 @@ _MeterInfoBase = collections.namedtuple(
 
 class MeterInfo(_MeterInfoBase):
   def __new__(cls, model, serial_number='N/A', version_info=(),
-              native_unit=UNIT_MGDL):
+              native_unit=Unit.MG_DL):
     """Construct a meter information object.
 
     Args:
       model: (string) Human-readable model name, depending on driver.
       serial_number: (string) Optional serial number to identify the device.
       version_info: (list(string)) Optional hardware/software version information.
-      native_unit: (UNIT_MGDL|UNIT_MMOLL) Native unit of the device for display.
+      native_unit: (Unit) Native unit of the device for display.
     """
     return super(MeterInfo, cls).__new__(
       cls, model=model, serial_number=serial_number, version_info=version_info,

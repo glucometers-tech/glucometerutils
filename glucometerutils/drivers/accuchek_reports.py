@@ -26,8 +26,8 @@ from glucometerutils import common
 from glucometerutils import exceptions
 
 _UNIT_MAP = {
-  'mmol/l': common.UNIT_MMOLL,
-  'mg/dl': common.UNIT_MGDL,
+  'mmol/l': common.Unit.MMOL_L,
+  'mg/dl': common.Unit.MG_DL,
 }
 
 _DATE_CSV_KEY = 'Date'

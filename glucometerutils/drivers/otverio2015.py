@@ -243,9 +243,9 @@ class Device(object):
   def get_glucose_unit(self):
     unit_value = self._read_parameter(_PARAMETER_KEY_UNIT)
     if unit_value == b'\x00\x00\x00\x00':
-      return common.UNIT_MGDL
+      return common.Unit.MG_DL
     elif unit_value == b'\x01\x00\x00\x00':
-      return common.UNIT_MMOLL
+      return common.Unit.MMOL_L
     else:
       raise exceptions.InvalidGlucoseUnit('%r' % unit_value)
 

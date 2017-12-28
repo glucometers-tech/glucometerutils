@@ -19,31 +19,31 @@ class TestCommon(unittest.TestCase):
     def test_glucose_conversion(self):
         self.assertEqual(
             5.56, common.convert_glucose_unit(
-                100, common.UNIT_MGDL, common.UNIT_MMOLL))
+                100, common.Unit.MG_DL, common.Unit.MMOL_L))
 
         self.assertEqual(
             5.56, common.convert_glucose_unit(
-                100, common.UNIT_MGDL))
+                100, common.Unit.MG_DL))
 
         self.assertEqual(
             180, common.convert_glucose_unit(
-                10, common.UNIT_MMOLL, common.UNIT_MGDL))
+                10, common.Unit.MMOL_L, common.Unit.MG_DL))
 
         self.assertEqual(
             180, common.convert_glucose_unit(
-                10, common.UNIT_MMOLL))
+                10, common.Unit.MMOL_L))
 
         self.assertEqual(
             100, common.convert_glucose_unit(
-                100, common.UNIT_MGDL, common.UNIT_MGDL))
+                100, common.Unit.MG_DL, common.Unit.MG_DL))
 
         self.assertEqual(
             10, common.convert_glucose_unit(
-                10, common.UNIT_MMOLL, common.UNIT_MMOLL))
+                10, common.Unit.MMOL_L, common.Unit.MMOL_L))
 
         self.assertRaises(
             exceptions.InvalidGlucoseUnit,
-            common.convert_glucose_unit, common.UNIT_MMOLL, 'foo')
+            common.convert_glucose_unit, common.Unit.MMOL_L, 'foo')
 
 if __name__ == '__main__':
         unittest.main()

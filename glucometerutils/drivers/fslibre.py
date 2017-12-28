@@ -209,7 +209,7 @@ class Device(freestyle.FreeStyleHidDevice):
         """Returns the glucose unit of the device."""
         # TODO(Flameeyes): figure out how to identify the actual unit on the
         # device.
-        return common.UNIT_MGDL
+        return common.Unit.MG_DL
 
     def get_readings(self):
 

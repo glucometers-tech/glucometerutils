@@ -164,7 +164,7 @@ class Device(serial.SerialDevice):
 
     def get_glucose_unit(self):
         # Device does not provide information on glucose unit.
-        return common.UNIT_MGDL
+        return common.Unit.MG_DL
 
     def get_datetime(self):
         raise NotImplementedError

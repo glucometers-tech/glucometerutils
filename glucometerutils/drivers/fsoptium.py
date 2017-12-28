@@ -119,9 +119,9 @@ class Device(serial.SerialDevice):
       elif parsed_line[0] == 'Ver:':
         self.device_version_ = parsed_line[1]
         if parsed_line[2] == 'MMOL':
-          self.device_glucose_unit_ = common.UNIT_MMOLL
+          self.device_glucose_unit_ = common.Unit.MMOL_L
         else:  # I only have a mmol/l device, so I can't be sure.
-          self.device_glucose_unit_ = common.UNIT_MGDL
+          self.device_glucose_unit_ = common.Unit.MG_DL
       # There are more entries: Clock, Market, ROM and Usage, but we don't care
       # for those here.
       elif parsed_line[0] == 'CMD OK':
@@ -164,8 +164,8 @@ class Device(serial.SerialDevice):
     """Returns a constant representing the unit displayed by the meter.
 
     Returns:
-      common.UNIT_MGDL: if the glucometer displays in mg/dL
-      common.UNIT_MMOLL: if the glucometer displays in mmol/L
+      common.Unit.MG_DL: if the glucometer displays in mg/dL
+      common.Unit.MMOL_L: if the glucometer displays in mmol/L
     """
     return self.device_glucose_unit_
 

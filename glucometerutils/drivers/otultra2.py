@@ -262,8 +262,8 @@ class Device(serial.SerialDevice):
     """Returns a constant representing the unit displayed by the meter.
 
     Returns:
-      common.UNIT_MGDL: if the glucometer displays in mg/dL
-      common.UNIT_MMOLL: if the glucometer displays in mmol/L
+      common.Unit.MG_DL: if the glucometer displays in mg/dL
+      common.Unit.MMOL_L: if the glucometer displays in mmol/L
 
     Raises:
       exceptions.InvalidGlucoseUnit: if the unit is not recognized
@@ -279,9 +279,9 @@ class Device(serial.SerialDevice):
     unit = match.group(1)
 
     if unit == 'MG/DL ':
-      return common.UNIT_MGDL
+      return common.Unit.MG_DL
     elif unit == 'MMOL/L':
-      return common.UNIT_MMOLL
+      return common.Unit.MMOL_L
     else:
       raise exceptions.InvalidGlucoseUnit(string)
 

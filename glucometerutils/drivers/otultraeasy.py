@@ -295,9 +295,9 @@ class Device(serial.SerialDevice):
     response = self._read_response()
 
     if response.data[2] == 0:
-      return common.UNIT_MGDL
+      return common.Unit.MG_DL
     elif response.data[2] == 1:
-      return common.UNIT_MMOLL
+      return common.Unit.MMOL_L
     else:
       raise lifescan.MalformedCommand(
         'at position PM1 invalid value %02x for unit' % response.data[2])

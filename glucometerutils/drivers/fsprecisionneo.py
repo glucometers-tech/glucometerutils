@@ -66,7 +66,7 @@ class Device(freestyle.FreeStyleHidDevice):
 
     def get_glucose_unit(self):
         """Returns the glucose unit of the device."""
-        return common.UNIT_MGDL
+        return common.Unit.MG_DL
 
     def get_readings(self):
         """Iterate through the reading records in the device."""

@@ -48,7 +48,8 @@ def main():
   parser_dump = subparsers.add_parser(
     'dump', help='Dump the readings stored in the device.')
   parser_dump.add_argument(
-    '--unit', action='store', choices=common.VALID_UNITS,
+    '--unit', action='store',
+    choices=[unit.value for unit in common.Unit],
     help='Select the unit to use for the dumped data.')
   parser_dump.add_argument(
     '--sort-by', action='store', default='timestamp',
