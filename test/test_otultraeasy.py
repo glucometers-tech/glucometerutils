@@ -3,15 +3,14 @@
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import array
 import os
 import sys
 import unittest
-
-import mock
+from unittest import mock
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -28,17 +27,18 @@ class TestOTUltraMini(unittest.TestCase):
 
         self.device = otultraeasy.Device('mockdevice')
 
-    def testCrc(self):
+    def test_crc(self):
         self.assertEqual(
             0x41cd,
             lifescan.crc_ccitt(b'\x02\x06\x06\x03'))
 
+    def test_crc_array(self):
         cmd_array = array.array('B', b'\x02\x06\x08\x03')
         self.assertEqual(
             0x62C2,
             lifescan.crc_ccitt(cmd_array))
 
-    def testPacketUpdateChecksum(self):
+    def test_packet_update_checksum(self):
         packet = otultraeasy._Packet()
 
         packet.build_command('')
