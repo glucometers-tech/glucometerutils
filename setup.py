@@ -13,6 +13,7 @@ setup(
   url = 'https://www.flameeyes.eu/projects/glucometerutils',
   download_url = 'https://www.flameeyes.eu/files/glucometerutils.tgz',
   keywords = ['glucometer', 'diabetes'],
+  python_requires = '~=3.4',
   classifiers = [
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
