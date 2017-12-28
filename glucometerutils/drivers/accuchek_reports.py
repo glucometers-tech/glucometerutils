@@ -130,6 +130,8 @@ class Device(object):
 
       yield common.GlucoseReading(
         self._extract_datetime(record),
-        common.convert_glucose_unit(float(record[_RESULT_CSV_KEY]),
-                                    _UNIT_MAP[record[_UNIT_CSV_KEY]]),
+        common.convert_glucose_unit(
+          float(record[_RESULT_CSV_KEY]),
+          _UNIT_MAP[record[_UNIT_CSV_KEY]],
+          common.Unit.MG_DL),
         meal=self._extract_meal(record))

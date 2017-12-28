@@ -28,7 +28,7 @@ class MeasurementMethod(enum.Enum):
   CGM = 'CGM' # Continuous Glucose Monitoring
 
 
-def convert_glucose_unit(value, from_unit, to_unit=None):
+def convert_glucose_unit(value, from_unit, to_unit):
   """Convert the given value of glucose level between units.
 
   Args:
@@ -38,14 +38,14 @@ def convert_glucose_unit(value, from_unit, to_unit=None):
 
   Returns:
     The converted representation of the blood glucose level.
-
-  Raises:
-    exceptions.InvalidGlucoseUnit: If the parameters are incorrect.
   """
+  from_unit = Unit(from_unit)
+  to_unit = Unit(to_unit)
+
   if from_unit == to_unit:
     return value
 
-  if from_unit is Unit.MG_DL:
+  if from_unit == Unit.MG_DL:
     return round(value / 18.0, 2)
   else:
     return round(value * 18.0, 0)
