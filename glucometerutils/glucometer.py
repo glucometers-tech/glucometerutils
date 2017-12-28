@@ -145,6 +145,3 @@ def main():
     return 1
 
   device.disconnect()
-
-if __name__ == "__main__":
-    main()
