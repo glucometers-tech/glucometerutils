@@ -36,7 +36,7 @@ setup(
         'otverio2015': ['python-scsi'],
         'fsinsulinx': ['hidapi'],
         'fslibre': ['hidapi'],
-        'fsoptium': ['hidapi'],
+        'fsoptium': ['pyserial'],
         'fsprecisionneo': ['hidapi'],
         'accucheck_reports': [],
         'sdcodefree': ['pyserial'],
