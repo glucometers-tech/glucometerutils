@@ -32,21 +32,21 @@ $ . glucometerutils-venv/bin/activate
 Please see the following table for the driver for each device that is known and
 supported.
 
-| Manufacturer | Model Name              | Driver             | Dependencies  |
-| ---          | ---                     | ---                | ---           |
-| LifeScan     | OneTouch Ultra 2        | `otultra2`         | [pyserial]    |
-| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      | [pyserial]    |
-| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [pyserial]    |
-| LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [python-scsi] |
-| LifeScan     | OneTouch Select Plus    | `otverio2015`      | [python-scsi] |
-| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       | [hidapi]‡     |
-| Abbott       | FreeStyle Libre         | `fslibre`          | [hidapi]‡     |
-| Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]    |
-| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [hidapi]‡     |
-| Abbott       | FreeStyle Optium Neo    | `fsprecisionneo`   | [hidapi]‡     |
-| Abbott       | FreeStyle Optium Neo H  | `fsprecisionneo`   | [hidapi]‡     |
-| Roche        | Accu-Chek Mobile        | `accuchek_reports` |               |
-| SD Biosensor | SD CodeFree             | `sdcodefree`       | [pyserial]    |
+| Manufacturer | Model Name              | Driver             | Dependencies          |
+| ---          | ---                     | ---                | ---                   |
+| LifeScan     | OneTouch Ultra 2        | `otultra2`         | [pyserial]            |
+| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      | [pyserial]            |
+| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [pyserial]            |
+| LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [python-scsi]         |
+| LifeScan     | OneTouch Select Plus    | `otverio2015`      | [python-scsi]         |
+| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       | [construct] [hidapi]‡ |
+| Abbott       | FreeStyle Libre         | `fslibre`          | [construct] [hidapi]‡ |
+| Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]            |
+| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [construct] [hidapi]‡ |
+| Abbott       | FreeStyle Optium Neo    | `fsprecisionneo`   | [construct] [hidapi]‡ |
+| Abbott       | FreeStyle Optium Neo H  | `fsprecisionneo`   | [construct] [hidapi]‡ |
+| Roche        | Accu-Chek Mobile        | `accuchek_reports` |                       |
+| SD Biosensor | SD CodeFree             | `sdcodefree`       | [pyserial]            |
 
 † Untested.
 ‡ Optional dependency on Linux; required on other operating systems.
@@ -60,6 +60,7 @@ If you have knowledge of a protocol of a glucometer you would have supported,
 please provide a reference, possibly by writing a specification and contribute
 it to https://github.com/Flameeyes/glucometer-protocols/.
 
+[construct]: https://construct.readthedocs.io/en/latest/
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://github.com/rosjat/python-scsi
 [hidapi]: https://pypi.python.org/pypi/hidapi

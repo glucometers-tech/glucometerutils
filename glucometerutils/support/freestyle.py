@@ -15,7 +15,8 @@ import csv
 import datetime
 import logging
 import re
-import struct
+
+import construct
 
 from glucometerutils import exceptions
 from glucometerutils.support import hiddevice
@@ -24,7 +25,13 @@ from glucometerutils.support import hiddevice
 # protocol.
 _INIT_SEQUENCE = (0x04, 0x05, 0x15, 0x01)
 
-_STRUCT_PREAMBLE = struct.Struct('<BB')
+_LIFESCAN_MESSAGE = construct.Struct(
+    'hid_report' / construct.Const(construct.Byte, 0),
+    'message_type' / construct.Byte,
+    'command' / construct.Padded(
+        63,  # command can only be up to 62 bytes, but one is used for length.
+        construct.Prefixed(construct.Byte, construct.GreedyBytes)),
+)
 
 _TEXT_COMPLETION_RE = re.compile('CMD (?:OK|Fail!)')
 _TEXT_REPLY_FORMAT = re.compile(
@@ -93,12 +100,8 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
           message_type: (int) The first byte sent with the report to the device.
           command: (bytes) The command to send out the device.
         """
-        cmdlen = len(command)
-        assert cmdlen <= 62
-
-        # First byte in the written buffer is the report number.
-        usb_packet = b'\x00' + _STRUCT_PREAMBLE.pack(
-            message_type, cmdlen) + command + bytes(62 - cmdlen)
+        usb_packet = _LIFESCAN_MESSAGE.build(
+            {'message_type': message_type, 'command': command})
 
         self._write(usb_packet)
 
