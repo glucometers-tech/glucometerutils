@@ -149,4 +149,4 @@ class MeterInfo(_MeterInfoBase):
       Native Unit: {native_unit}
       """).format(model=self.model, serial_number=self.serial_number,
                   version_information_string=version_information_string,
-                  native_unit=self.native_unit)
+                  native_unit=self.native_unit.value)
