@@ -25,7 +25,7 @@ from glucometerutils.support import hiddevice
 # protocol.
 _INIT_SEQUENCE = (0x04, 0x05, 0x15, 0x01)
 
-_LIFESCAN_MESSAGE = construct.Struct(
+_FREESTYLE_MESSAGE = construct.Struct(
     'hid_report' / construct.Const(construct.Byte, 0),
     'message_type' / construct.Byte,
     'command' / construct.Padded(
@@ -100,7 +100,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
           message_type: (int) The first byte sent with the report to the device.
           command: (bytes) The command to send out the device.
         """
-        usb_packet = _LIFESCAN_MESSAGE.build(
+        usb_packet = _FREESTYLE_MESSAGE.build(
             {'message_type': message_type, 'command': command})
 
         self._write(usb_packet)
