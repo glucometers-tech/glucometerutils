@@ -1,0 +1,4 @@
+absl-py
+pytest
+pytest-timeout
+pyserial

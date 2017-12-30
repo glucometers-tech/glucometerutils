@@ -1,6 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
+
+
+with open('test-requirements.txt') as requirements:
+    test_required = requirements.read().splitlines()
+
+
+class PyTestCommand(TestCommand):
+
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main([])
+        sys.exit(errno)
+
 
 setup(
     name = 'glucometerutils',
@@ -27,8 +44,8 @@ setup(
     data_files = [
         ('lib/udev/rules', ['udev/69-glucometerutils.rules']),
     ],
+    tests_require = test_required,
     extras_require = {
-        'test': ['absl-py'],
         # These are all the drivers' dependencies. Optional dependencies are
         # listed as mandatory for the feature.
         'otultra2': ['pyserial'],
@@ -45,5 +62,8 @@ setup(
         'console_scripts': [
             'glucometer=glucometerutils.glucometer:main'
         ]
+    },
+    cmdclass = {
+        'test': PyTestCommand,
     },
 )

@@ -3,3 +3,4 @@
 /MANIFEST
 /dist/
 __pycache__/
+.cache
