@@ -1,0 +1,14 @@
+language: python
+
+python:
+  - 3.4
+  - 3.5
+  - 3.6
+
+install:
+  - pip install -r test-requirements.txt
+
+script:
+  - py.test
+  - python setup.py bdist_wheel
+  - pip install ./dist/glucometerutils-*.whl
