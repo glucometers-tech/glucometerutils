@@ -56,7 +56,7 @@ setup(
         'fsoptium': ['pyserial'],
         'fsprecisionneo': ['construct', 'hidapi'],
         'accucheck_reports': [],
-        'sdcodefree': ['pyserial'],
+        'sdcodefree': ['construct', 'pyserial'],
     },
     entry_points = {
         'console_scripts': [
