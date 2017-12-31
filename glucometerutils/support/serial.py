@@ -64,4 +64,4 @@ class SerialDevice(object):
             writeTimeout=None,
             bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            xonxoff=True, rtscts=False, dsrdtr=False)
+            xonxoff=False, rtscts=False, dsrdtr=False)
