@@ -102,7 +102,7 @@ _GLUCOSE_UNIT_RESPONSE = construct.Struct(
     construct.Padding(3),
 )
 
-_ZERO_LOG_REQUEST = construct.Const(b'\x05\x1A')
+_MEMORY_ERASE_REQUEST = construct.Const(b'\x05\x1A')
 
 _READING_COUNT_RESPONSE = construct.Struct(
     construct.Const(b'\x05\x0f'),
@@ -236,7 +236,7 @@ class Device(serial.SerialDevice):
         return response.timestamp
 
     def zero_log(self):
-        self._send_request(_ZERO_LOG_REQUEST, None)
+        self._send_request(_MEMORY_ERASE_REQUEST, None)
         self._read_response(_COMMAND_SUCCESS)
 
     def get_glucose_unit(self):
