@@ -133,8 +133,11 @@ class Device(serial.SerialDevice):
         self.buffered_reader_ = construct.Rebuffered(_PACKET, tailcutoff=1024)
 
     def connect(self):
-        self._send_packet(b'', disconnect=True)
-        self._read_ack()
+        try:
+            self._send_packet(b'', disconnect=True)
+            self._read_ack()
+        except construct.ConstructError as e:
+            raise lifescan.MalformedCommand(str(e))
 
     def disconnect(self):
         self.connect()
@@ -175,20 +178,26 @@ class Device(serial.SerialDevice):
         assert pkt.acknowledge
 
     def _send_request(self, request_format, *args):
-        request = request_format.build(*args)
-        self._send_packet(request, acknowledge=False, disconnect=False)
+        try:
+            request = request_format.build(*args)
+            self._send_packet(request, acknowledge=False, disconnect=False)
 
-        self.sent_counter_ = not self.sent_counter_
-        self._read_ack()
+            self.sent_counter_ = not self.sent_counter_
+            self._read_ack()
+        except construct.ConstructError as e:
+            raise lifescan.MalformedCommand(str(e))
 
     def _read_response(self, response_format):
-        pkt = self._read_packet()
-        assert not pkt.acknowledge
+        try:
+            pkt = self._read_packet()
+            assert not pkt.acknowledge
 
-        self.expect_receive_ = not self.expect_receive_
-        self._send_ack()
+            self.expect_receive_ = not self.expect_receive_
+            self._send_ack()
 
-        return response_format.parse(pkt.message)
+            return response_format.parse(pkt.message)
+        except construct.ConstructError as e:
+            raise lifescan.MalformedCommand(str(e))
 
     def get_meter_info(self):
         return common.MeterInfo(
