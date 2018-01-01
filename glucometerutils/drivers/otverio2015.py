@@ -245,16 +245,16 @@ class Device(object):
         self._send_request(
             3, _MEMORY_ERASE_REQUEST, None, _COMMAND_SUCCESS)
 
-    def _get_reading_count(self):
-        response = self._send_request(
-            3, _READ_RECORD_COUNT_REQUEST, None, _READ_RECORD_COUNT_RESPONSE)
-        return response.count
-
     def get_glucose_unit(self):
         response = self._send_request(
             4, _READ_PARAMETER_REQUEST, {'selector': 'unit'},
             _READ_UNIT_RESPONSE)
         return response.unit
+
+    def _get_reading_count(self):
+        response = self._send_request(
+            3, _READ_RECORD_COUNT_REQUEST, None, _READ_RECORD_COUNT_RESPONSE)
+        return response.count
 
     def _get_reading(self, record_id):
         response = self._send_request(
