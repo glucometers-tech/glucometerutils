@@ -3,7 +3,7 @@
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2013-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import os
@@ -22,10 +22,12 @@ from glucometerutils import exceptions
 class TestOTUltra2(parameterized.TestCase):
 
     def test_checksum(self):
+        # pylint: disable=protected-access
         checksum = otultra2._calculate_checksum(b'T')
         self.assertEqual(0x0054, checksum)
 
     def test_checksum_full(self):
+        # pylint: disable=protected-access
         checksum = otultra2._calculate_checksum(
             b'T "SAT","08/03/13","22:12:00   "')
         self.assertEqual(0x0608, checksum)

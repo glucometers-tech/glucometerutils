@@ -3,7 +3,7 @@
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2013-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import datetime
@@ -16,7 +16,6 @@ from absl.testing import parameterized
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from glucometerutils import common
-from glucometerutils import exceptions
 
 
 class TestGlucoseConversion(parameterized.TestCase):
@@ -55,7 +54,7 @@ class TestGlucoseConversion(parameterized.TestCase):
 
 class TestGlucoseReading(parameterized.TestCase):
 
-    TEST_DATETIME = datetime.datetime(2018, 1 ,1, 0, 30, 45)
+    TEST_DATETIME = datetime.datetime(2018, 1, 1, 0, 30, 45)
 
     def test_minimal(self):
         reading = common.GlucoseReading(self.TEST_DATETIME, 100)
@@ -127,4 +126,4 @@ class TestMeterInfo(parameterized.TestCase):
 
 
 if __name__ == '__main__':
-        unittest.main()
+    unittest.main()
