@@ -35,8 +35,8 @@ supported.
 | Manufacturer | Model Name              | Driver             | Dependencies           |
 | ---          | ---                     | ---                | ---                    |
 | LifeScan     | OneTouch Ultra 2        | `otultra2`         | [pyserial]             |
-| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      | [pyserial]             |
-| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [pyserial]             |
+| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      | [construct] [pyserial] |
+| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [construct] [pyserial] |
 | LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [python-scsi]          |
 | LifeScan     | OneTouch Select Plus    | `otverio2015`      | [python-scsi]          |
 | Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       | [construct] [hidapi]‡  |

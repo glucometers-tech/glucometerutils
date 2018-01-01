@@ -38,23 +38,6 @@ class TestOTUltraMini(unittest.TestCase):
             0x62C2,
             lifescan.crc_ccitt(cmd_array))
 
-    def test_packet_update_checksum(self):
-        packet = otultraeasy._Packet()
-
-        packet.build_command('')
-        packet.disconnect = True
-
-        packet.update_checksum()
-        self.assertEqual(
-            b'\x02\x06\x08\x03\xC2\x62',
-            packet.tobytes())
-
-        packet.validate_checksum()
-        packet.disconnect = False
-
-        with self.assertRaises(exceptions.InvalidChecksum):
-            packet.validate_checksum()
-
 
 if __name__ == '__main__':
     unittest.main()

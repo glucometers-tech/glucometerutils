@@ -49,7 +49,7 @@ setup(
         # These are all the drivers' dependencies. Optional dependencies are
         # listed as mandatory for the feature.
         'otultra2': ['pyserial'],
-        'otultraeasy': ['pyserial'],
+        'otultraeasy': ['construct', 'pyserial'],
         'otverio2015': ['python-scsi'],
         'fsinsulinx': ['construct', 'hidapi'],
         'fslibre': ['construct', 'hidapi'],
