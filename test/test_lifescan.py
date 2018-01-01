@@ -10,23 +10,12 @@ import array
 import os
 import sys
 import unittest
-from unittest import mock
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from glucometerutils.drivers import otultraeasy
 from glucometerutils.support import lifescan
-from glucometerutils import exceptions
 
-class TestOTUltraMini(unittest.TestCase):
-    def setUp(self):
-        self.addCleanup(mock.patch.stopall)
-
-        mock_serial = mock.patch('serial.Serial').start()
-        self.mock_readline = mock_serial.return_value.readline
-
-        self.device = otultraeasy.Device('mockdevice')
-
+class TestChecksum(unittest.TestCase):
     def test_crc(self):
         self.assertEqual(
             0x41cd,
