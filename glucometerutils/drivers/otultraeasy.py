@@ -177,25 +177,21 @@ class Device(serial.SerialDevice):
         pkt = self._read_packet()
         assert pkt.acknowledge
 
-    def _send_request(self, request_format, *args):
+    def _send_request(self, request_format, request_obj, response_format):
         try:
-            request = request_format.build(*args)
+            request = request_format.build(request_obj)
             self._send_packet(request, acknowledge=False, disconnect=False)
 
             self.sent_counter_ = not self.sent_counter_
             self._read_ack()
-        except construct.ConstructError as e:
-            raise lifescan.MalformedCommand(str(e))
 
-    def _read_response(self, response_format):
-        try:
-            pkt = self._read_packet()
-            assert not pkt.acknowledge
+            response_pkt = self._read_packet()
+            assert not response_pkt.acknowledge
 
             self.expect_receive_ = not self.expect_receive_
             self._send_ack()
 
-            return response_format.parse(pkt.message)
+            return response_format.parse(response_pkt.message)
         except construct.ConstructError as e:
             raise lifescan.MalformedCommand(str(e))
 
@@ -208,58 +204,56 @@ class Device(serial.SerialDevice):
             native_unit=self.get_glucose_unit())
 
     def get_version(self):
-        self._send_request(_VERSION_REQUEST, None)
-
-        response = self._read_response(_VERSION_RESPONSE)
+        response = self._send_request(
+            _VERSION_REQUEST, None, _VERSION_RESPONSE)
 
         return response.version
 
     def get_serial_number(self):
-        self._send_request(_SERIAL_NUMBER_REQUEST, None)
+        response = self._send_request(
+            _SERIAL_NUMBER_REQUEST, None, _SERIAL_NUMBER_RESPONSE)
 
-        response = self._read_response(_SERIAL_NUMBER_RESPONSE)
         return response.serial_number
 
     def get_datetime(self):
-        self._send_request(
-            _DATETIME_REQUEST, {'request_type': 'read'})
-        response = self._read_response(_DATETIME_RESPONSE)
+        response = self._send_request(
+            _DATETIME_REQUEST, {'request_type': 'read'},
+            _DATETIME_RESPONSE)
+
         return response.timestamp
 
     def set_datetime(self, date=datetime.datetime.now()):
-        self._send_request(_DATETIME_REQUEST, {
-            'request_type': 'write',
-            'timestamp': date,
-        })
+        response = self._send_request(
+            _DATETIME_REQUEST, {
+                'request_type': 'write',
+                'timestamp': date,
+            }, _DATETIME_RESPONSE)
 
-        response = self._read_response(_DATETIME_RESPONSE)
         return response.timestamp
 
     def zero_log(self):
-        self._send_request(_MEMORY_ERASE_REQUEST, None)
-        self._read_response(_COMMAND_SUCCESS)
+        self._send_request(_MEMORY_ERASE_REQUEST, None, _COMMAND_SUCCESS)
 
     def get_glucose_unit(self):
-        self._send_request(_GLUCOSE_UNIT_REQUEST, None)
-        response = self._read_response(_GLUCOSE_UNIT_RESPONSE)
+        response = self._send_request(
+            _GLUCOSE_UNIT_REQUEST, None, _GLUCOSE_UNIT_RESPONSE)
 
         return response.unit
 
+    def _get_reading_count(self):
+        response = self._send_request(
+            _READ_RECORD_REQUEST, {'record_id': _INVALID_RECORD},
+            _READING_COUNT_RESPONSE)
+        return response.count
+
     def _get_reading(self, record_id):
-        self._send_request(
-            _READ_RECORD_REQUEST, {'record_id': record_id})
-        return self._read_response(_READING_RESPONSE)
+        response = self._send_request(
+            _READ_RECORD_REQUEST, {'record_id': record_id}, _READING_RESPONSE)
+
+        return common.GlucoseReading(
+            response.timestamp, float(response.value))
 
     def get_readings(self):
-        self._send_request(
-            _READ_RECORD_REQUEST, {'record_id': _INVALID_RECORD})
-        count_response = self._read_response(_READING_COUNT_RESPONSE)
-
-        for record_id in range(count_response.count):
-            self._send_request(
-                _READ_RECORD_REQUEST, {'record_id': record_id})
-            reading = self._read_response(_READING_RESPONSE)
-
-            yield common.GlucoseReading(
-                reading.timestamp,
-                float(reading.value))
+        record_count = self._get_reading_count()
+        for record_id in range(record_count):
+            yield self._get_reading(record_id)
