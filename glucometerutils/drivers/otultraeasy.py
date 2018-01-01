@@ -25,17 +25,12 @@ import logging
 import construct
 
 from glucometerutils import common
+from glucometerutils.support import construct_extras
 from glucometerutils.support import lifescan
 from glucometerutils.support import serial
 
 
 _INVALID_RECORD = 501
-
-_EPOCH = datetime.datetime.utcfromtimestamp(0)
-
-def datetime_to_timestamp(date):
-    delta = date - _EPOCH
-    return int(delta.total_seconds())
 
 
 _PACKET = construct.Struct(
@@ -63,10 +58,6 @@ _PACKET = construct.Struct(
 )
 
 _COMMAND_SUCCESS = construct.Const(b'\x05\x06')
-_TIMESTAMP_ADAPTER = construct.ExprAdapter(
-    construct.Int32ul,
-    encoder=lambda obj, ctx: datetime_to_timestamp(obj),
-    decoder=lambda obj, ctx: datetime.datetime.fromtimestamp(obj))
 
 _VERSION_REQUEST = construct.Const(b'\x05\x0d\x02')
 
@@ -86,12 +77,14 @@ _SERIAL_NUMBER_RESPONSE = construct.Struct(
 _DATETIME_REQUEST = construct.Struct(
     construct.Const(b'\x05\x20'),  # 0x20 is the datetime
     'request_type' / construct.Enum(construct.Byte, write=0x01, read=0x02),
-    'timestamp' / construct.Default(_TIMESTAMP_ADAPTER, _EPOCH),
+    'timestamp' / construct.Default(
+        construct_extras.Timestamp(construct.Int32ul),
+        datetime.datetime(1970, 1, 1, 0, 0)),
 )
 
 _DATETIME_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / _TIMESTAMP_ADAPTER,
+    'timestamp' / construct_extras.Timestamp(construct.Int32ul),
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(
@@ -123,7 +116,7 @@ _READ_RECORD_REQUEST = construct.Struct(
 
 _READING_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / _TIMESTAMP_ADAPTER,
+    'timestamp' / construct_extras.Timestamp(construct.Int32ul),
     'value' / construct.Int32ul,
 )
 
