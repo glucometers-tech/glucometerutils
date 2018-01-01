@@ -50,7 +50,7 @@ setup(
         # listed as mandatory for the feature.
         'otultra2': ['pyserial'],
         'otultraeasy': ['construct', 'pyserial'],
-        'otverio2015': ['python-scsi'],
+        'otverio2015': ['construct', 'python-scsi'],
         'fsinsulinx': ['construct', 'hidapi'],
         'fslibre': ['construct', 'hidapi'],
         'fsoptium': ['pyserial'],

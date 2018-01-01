@@ -32,21 +32,21 @@ $ . glucometerutils-venv/bin/activate
 Please see the following table for the driver for each device that is known and
 supported.
 
-| Manufacturer | Model Name              | Driver             | Dependencies           |
-| ---          | ---                     | ---                | ---                    |
-| LifeScan     | OneTouch Ultra 2        | `otultra2`         | [pyserial]             |
-| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      | [construct] [pyserial] |
-| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [construct] [pyserial] |
-| LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [python-scsi]          |
-| LifeScan     | OneTouch Select Plus    | `otverio2015`      | [python-scsi]          |
-| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       | [construct] [hidapi]‡  |
-| Abbott       | FreeStyle Libre         | `fslibre`          | [construct] [hidapi]‡  |
-| Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]             |
-| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [construct] [hidapi]‡  |
-| Abbott       | FreeStyle Optium Neo    | `fsprecisionneo`   | [construct] [hidapi]‡  |
-| Abbott       | FreeStyle Optium Neo H  | `fsprecisionneo`   | [construct] [hidapi]‡  |
-| Roche        | Accu-Chek Mobile        | `accuchek_reports` |                        |
-| SD Biosensor | SD CodeFree             | `sdcodefree`       | [construct] [pyserial] |
+| Manufacturer | Model Name              | Driver             | Dependencies              |
+| ---          | ---                     | ---                | ---                       |
+| LifeScan     | OneTouch Ultra 2        | `otultra2`         | [pyserial]                |
+| LifeScan     | OneTouch Ultra Easy     | `otultraeasy`      | [construct] [pyserial]    |
+| LifeScan     | OneTouch Ultra Mini     | `otultraeasy`      | [construct] [pyserial]    |
+| LifeScan     | OneTouch Verio (USB)    | `otverio2015`      | [construct] [python-scsi] |
+| LifeScan     | OneTouch Select Plus    | `otverio2015`      | [construct] [python-scsi] |
+| Abbott       | FreeStyle InsuLinx†     | `fsinsulinx`       | [construct] [hidapi]‡     |
+| Abbott       | FreeStyle Libre         | `fslibre`          | [construct] [hidapi]‡     |
+| Abbott       | FreeStyle Optium        | `fsoptium`         | [pyserial]                |
+| Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [construct] [hidapi]‡     |
+| Abbott       | FreeStyle Optium Neo    | `fsprecisionneo`   | [construct] [hidapi]‡     |
+| Abbott       | FreeStyle Optium Neo H  | `fsprecisionneo`   | [construct] [hidapi]‡     |
+| Roche        | Accu-Chek Mobile        | `accuchek_reports` |                           |
+| SD Biosensor | SD CodeFree             | `sdcodefree`       | [construct] [pyserial]    |
 
 † Untested.
 ‡ Optional dependency on Linux; required on other operating systems.
