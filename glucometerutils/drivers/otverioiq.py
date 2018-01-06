@@ -29,15 +29,17 @@ _PACKET = lifescan_binary_protocol.LifeScanPacket(
 
 _COMMAND_SUCCESS = construct.Const(b'\x06')
 
-_VERSION_REQUEST = construct.Const(b'\x0d\x02')  # Untested
+_VERSION_REQUEST = construct.Const(b'\x0d\x01')
 
 _VERSION_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
     'version' / construct.PascalString(construct.Byte, encoding='ascii'),
+    # NULL-termination is not included in string length.
+    construct.Constant('\x00'),
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
-    b'\x0b\x00\x02')
+    b'\x0b\x01\x02')
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
