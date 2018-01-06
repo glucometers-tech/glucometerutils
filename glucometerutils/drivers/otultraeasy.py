@@ -137,10 +137,11 @@ class Device(serial.SerialDevice):
         # discard the checksum and copy
         pkt = raw_pkt.value
 
-        if not pkt.disconnect and pkt.sequence_number != self.expect_receive_:
+        if not pkt.link_control.disconnect and (
+                pkt.link_control.sequence_number != self.expect_receive_):
             raise lifescan.MalformedCommand(
                 'at position 2[0b] expected %02x, received %02x' % (
-                    self.expect_receive_, pkt.sequence_count))
+                    self.expect_receive_, pkt.link_connect.sequence_count))
 
         return pkt
 
@@ -149,7 +150,7 @@ class Device(serial.SerialDevice):
 
     def _read_ack(self):
         pkt = self._read_packet()
-        assert pkt.acknowledge
+        assert pkt.link_control.acknowledge
 
     def _send_request(self, request_format, request_obj, response_format):
         try:
@@ -160,7 +161,7 @@ class Device(serial.SerialDevice):
             self._read_ack()
 
             response_pkt = self._read_packet()
-            assert not response_pkt.acknowledge
+            assert not response_pkt.link_control.acknowledge
 
             self.expect_receive_ = not self.expect_receive_
             self._send_ack()
