@@ -54,6 +54,8 @@ def LifeScanPacket(command_prefix, include_link_control):
             construct.Int16ul, lifescan.crc_ccitt, construct.this.data),
     )
 
+COMMAND_SUCCESS = construct.Const(b'\x06')
+
 VERIO_TIMESTAMP = construct_extras.Timestamp(
     construct.Int32ul, epoch=946684800)  # 2010-01-01 00:00
 

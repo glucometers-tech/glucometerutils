@@ -45,8 +45,6 @@ _PACKET = construct.Padded(
     _REGISTER_SIZE, construct.Embedded(
         lifescan_binary_protocol.LifeScanPacket(0x03, False)))
 
-_COMMAND_SUCCESS = construct.Const(b'\x06')
-
 _QUERY_REQUEST = construct.Struct(
     construct.Const(b'\xe6\x02'),
     'selector' / construct.Enum(
@@ -54,7 +52,7 @@ _QUERY_REQUEST = construct.Struct(
 )
 
 _QUERY_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     # This should be an UTF-16L CString, but construct does not support it.
     'value' / construct.GreedyString(encoding='utf-16-le'),
 )
@@ -65,7 +63,7 @@ _READ_PARAMETER_REQUEST = construct.Struct(
 )
 
 _READ_UNIT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'unit' / lifescan_binary_protocol.GLUCOSE_UNIT,
     construct.Padding(3),
 )
@@ -73,7 +71,7 @@ _READ_UNIT_RESPONSE = construct.Struct(
 _READ_RTC_REQUEST = construct.Const(b'\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
 )
 
@@ -87,7 +85,7 @@ _MEMORY_ERASE_REQUEST = construct.Const(b'\x1a')
 _READ_RECORD_COUNT_REQUEST = construct.Const(b'\x27\x00')
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'count' / construct.Int16ul,
 )
 
@@ -104,7 +102,7 @@ _MEAL_FLAG = {
 }
 
 _READ_RECORD_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'inverse_counter' / construct.Int16ul,
     construct.Padding(1),
     'lifetime_counter' / construct.Int16ul,
@@ -210,7 +208,7 @@ class Device(object):
     def set_datetime(self, date=datetime.datetime.now()):
         self._send_request(
             3, _WRITE_RTC_REQUEST, {'timestamp': date},
-            _COMMAND_SUCCESS)
+            lifescan_binary_protocol.COMMAND_SUCCESS)
 
         # The device does not return the new datetime, so confirm by calling
         # READ RTC again.
@@ -218,7 +216,8 @@ class Device(object):
 
     def zero_log(self):
         self._send_request(
-            3, _MEMORY_ERASE_REQUEST, None, _COMMAND_SUCCESS)
+            3, _MEMORY_ERASE_REQUEST, None,
+            lifescan_binary_protocol.COMMAND_SUCCESS)
 
     def get_glucose_unit(self):
         response = self._send_request(

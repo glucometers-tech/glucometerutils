@@ -27,12 +27,10 @@ from glucometerutils.support import serial
 _PACKET = lifescan_binary_protocol.LifeScanPacket(
     0x03, True)
 
-_COMMAND_SUCCESS = construct.Const(b'\x06')
-
 _VERSION_REQUEST = construct.Const(b'\x0d\x01')
 
 _VERSION_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'version' / construct.PascalString(construct.Byte, encoding='ascii'),
     # NULL-termination is not included in string length.
     construct.Constant('\x00'),
@@ -42,14 +40,14 @@ _SERIAL_NUMBER_REQUEST = construct.Const(
     b'\x0b\x01\x02')
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'serial_number' / construct.CString(encoding='ascii'),
 )
 
 _READ_RTC_REQUEST = construct.Const(b'\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
 )
 
@@ -63,7 +61,7 @@ _GLUCOSE_UNIT_REQUEST = construct.Const(
 
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'unit' / lifescan_binary_protocol.GLUCOSE_UNIT,
     construct.Padding(3),
 )
@@ -73,7 +71,7 @@ _MEMORY_ERASE_REQUEST = construct.Const(b'\x1a')  # Untested
 _READ_RECORD_COUNT_REQUEST = construct.Const(b'\x27\x00')
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'count' / construct.Int16ul,
 )
 
@@ -83,7 +81,7 @@ _READ_RECORD_REQUEST = construct.Struct(
 )
 
 _READING_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
+    lifescan_binary_protocol.COMMAND_SUCCESS,
     'timestamp' / construct_extras.Timestamp(construct.Int32ul),
     'value' / construct.Int32ul,
     'control' / construct.Byte,  # Unknown value
@@ -172,7 +170,9 @@ class Device(serial.SerialDevice):
         return response.timestamp
 
     def zero_log(self):
-        self._send_request(_MEMORY_ERASE_REQUEST, None, _COMMAND_SUCCESS)
+        self._send_request(
+            _MEMORY_ERASE_REQUEST, None,
+            lifescan_binary_protocol.COMMAND_SUCCESS)
 
     def get_glucose_unit(self):
         response = self._send_request(
