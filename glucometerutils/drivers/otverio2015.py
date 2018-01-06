@@ -22,7 +22,7 @@ https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2016-2017, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2016-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import binascii
@@ -35,37 +35,16 @@ from pyscsi.pyscsi.scsi_device import SCSIDevice
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.support import construct_extras
 from glucometerutils.support import lifescan
+from glucometerutils.support import lifescan_binary_protocol
 
 # This device uses SCSI blocks as registers.
 _REGISTER_SIZE = 512
 
 _PACKET = construct.Padded(
-    512, construct.Struct(
-        construct.RawCopy(
-            construct.Embedded(
-                construct.Struct(
-                    construct.Const(b'\x02'),  # stx
-                    'length' / construct.Rebuild(
-                        construct.Int16ul, lambda ctx: len(ctx.message) + 6),
-                    'message' / construct.Bytes(
-                        length=lambda ctx: ctx.length - 6),
-                    construct.Const(b'\x03'),  # etx
-                ),
-            ),
-        ),
-        'checksum' / construct.Checksum(
-            construct.Int16ul, lifescan.crc_ccitt, construct.this.data),
-    ),
-)
+    _REGISTER_SIZE, construct.Embedded(lifescan_binary_protocol.PACKET))
 
 _COMMAND_SUCCESS = construct.Const(b'\x04\x06')
-
-# Device-specific timestamp. All timestamp reported by this device are seconds
-# since this date.
-_TIMESTAMP = construct_extras.Timestamp(
-    construct.Int32ul, epoch=946684800)  # 2010-01-01 00:00
 
 _QUERY_REQUEST = construct.Struct(
     construct.Const(b'\x04\xe6\x02'),
@@ -101,12 +80,12 @@ _READ_RTC_REQUEST = construct.Const(b'\x04\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / _TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
     construct.Const(b'\x04\x20\x01'),
-    'timestamp' / _TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
 )
 
 _MEMORY_ERASE_REQUEST = construct.Const(b'\x04\x1a')
@@ -135,7 +114,7 @@ _READ_RECORD_RESPONSE = construct.Struct(
     'inverse_counter' / construct.Int16ul,
     construct.Padding(1),
     'lifetime_counter' / construct.Int16ul,
-    'timestamp' / _TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
     'value' / construct.Int16ul,
     'meal' / construct.SymmetricMapping(
         construct.Byte, _MEAL_FLAG),
@@ -186,7 +165,10 @@ class Device(object):
         """
         try:
             request = request_format.build(request_obj)
-            request_raw = _PACKET.build({'value': {'message': request}})
+            request_raw = _PACKET.build({'value': {
+                'message': request,
+                'link_control': {},  # Verio does not use link_control.
+            }})
             logging.debug(
                 'Request sent: %s', binascii.hexlify(request_raw))
             self.scsi_.write10(lba, 1, request_raw)

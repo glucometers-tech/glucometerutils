@@ -15,7 +15,7 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 
 __author__ = 'Diego Elio Pettenò'
 __email__ = 'flameeyes@flameeyes.eu'
-__copyright__ = 'Copyright © 2014-2017, Diego Elio Pettenò'
+__copyright__ = 'Copyright © 2014-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import binascii
@@ -27,35 +27,11 @@ import construct
 from glucometerutils import common
 from glucometerutils.support import construct_extras
 from glucometerutils.support import lifescan
+from glucometerutils.support import lifescan_binary_protocol
 from glucometerutils.support import serial
 
 
 _INVALID_RECORD = 501
-
-
-_PACKET = construct.Struct(
-    construct.RawCopy(
-        construct.Embedded(
-            construct.Struct(
-                construct.Const(b'\x02'),  # stx
-                'length' / construct.Rebuild(
-                    construct.Byte, lambda ctx: len(ctx.message) + 6),
-                construct.EmbeddedBitStruct(
-                    construct.Padding(3),
-                    'more' / construct.Default(construct.Flag, False),
-                    'disconnect' / construct.Flag,
-                    'acknowledge' / construct.Flag,
-                    'expect_receive' / construct.Flag,
-                    'sequence_number' / construct.Flag,
-                ),
-                'message' / construct.Bytes(length=lambda ctx: ctx.length - 6),
-                construct.Const(b'\x03'),  # etx
-            ),
-        ),
-    ),
-    'checksum' / construct.Checksum(
-        construct.Int16ul, lifescan.crc_ccitt, construct.this.data),
-)
 
 _COMMAND_SUCCESS = construct.Const(b'\x05\x06')
 
@@ -130,7 +106,8 @@ class Device(serial.SerialDevice):
 
         self.sent_counter_ = False
         self.expect_receive_ = False
-        self.buffered_reader_ = construct.Rebuffered(_PACKET, tailcutoff=1024)
+        self.buffered_reader_ = construct.Rebuffered(
+            lifescan_binary_protocol.PACKET, tailcutoff=1024)
 
     def connect(self):
         try:
@@ -143,13 +120,15 @@ class Device(serial.SerialDevice):
         self.connect()
 
     def _send_packet(self, message, acknowledge=False, disconnect=False):
-        pkt = _PACKET.build(
+        pkt = lifescan_binary_protocol.PACKET.build(
             {'value': {
                 'message': message,
-                'sequence_number': self.sent_counter_,
-                'expect_receive': self.expect_receive_,
-                'acknowledge': acknowledge,
-                'disconnect': disconnect,
+                'link_control': {
+                    'sequence_number': self.sent_counter_,
+                    'expect_receive': self.expect_receive_,
+                    'acknowledge': acknowledge,
+                    'disconnect': disconnect,
+                },
             }})
         logging.debug('sending packet: %s', binascii.hexlify(pkt))
 
