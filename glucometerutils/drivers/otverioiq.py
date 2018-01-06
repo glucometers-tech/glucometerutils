@@ -25,7 +25,7 @@ from glucometerutils.support import lifescan_binary_protocol
 from glucometerutils.support import serial
 
 _PACKET = lifescan_binary_protocol.LifeScanPacket(
-    0x03, True)
+    0x03, False)
 
 _VERSION_REQUEST = construct.Const(b'\x0d\x01')
 
