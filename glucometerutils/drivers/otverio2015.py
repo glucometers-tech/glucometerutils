@@ -42,12 +42,13 @@ from glucometerutils.support import lifescan_binary_protocol
 _REGISTER_SIZE = 512
 
 _PACKET = construct.Padded(
-    _REGISTER_SIZE, construct.Embedded(lifescan_binary_protocol.PACKET))
+    _REGISTER_SIZE, construct.Embedded(
+        lifescan_binary_protocol.LifeScanPacket(0x03, False)))
 
-_COMMAND_SUCCESS = construct.Const(b'\x04\x06')
+_COMMAND_SUCCESS = construct.Const(b'\x06')
 
 _QUERY_REQUEST = construct.Struct(
-    construct.Const(b'\x04\xe6\x02'),
+    construct.Const(b'\xe6\x02'),
     'selector' / construct.Enum(
         construct.Byte, serial=0x00, model=0x01, software=0x02),
 )
@@ -59,18 +60,17 @@ _QUERY_RESPONSE = construct.Struct(
 )
 
 _READ_PARAMETER_REQUEST = construct.Struct(
-    construct.Const(b'\x04'),
     'selector' / construct.Enum(
         construct.Byte, unit=0x04),
 )
 
 _READ_UNIT_RESPONSE = construct.Struct(
-    construct.Const(b'\x03\x06'),  # different from _COMMAND_SUCCESS
+    _COMMAND_SUCCESS,
     'unit' / lifescan_binary_protocol.GLUCOSE_UNIT,
     construct.Padding(3),
 )
 
-_READ_RTC_REQUEST = construct.Const(b'\x04\x20\x02')
+_READ_RTC_REQUEST = construct.Const(b'\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -78,13 +78,13 @@ _READ_RTC_RESPONSE = construct.Struct(
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
-    construct.Const(b'\x04\x20\x01'),
+    construct.Const(b'\x20\x01'),
     'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
 )
 
-_MEMORY_ERASE_REQUEST = construct.Const(b'\x04\x1a')
+_MEMORY_ERASE_REQUEST = construct.Const(b'\x1a')
 
-_READ_RECORD_COUNT_REQUEST = construct.Const(b'\x04\x27\x00')
+_READ_RECORD_COUNT_REQUEST = construct.Const(b'\x27\x00')
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -92,7 +92,7 @@ _READ_RECORD_COUNT_RESPONSE = construct.Struct(
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b'\x04\x31\x02'),
+    construct.Const(b'\x31\x02'),
     'record_id' / construct.Int16ul,
     construct.Const(b'\x00'),
 )
@@ -161,7 +161,6 @@ class Device(object):
             request = request_format.build(request_obj)
             request_raw = _PACKET.build({'value': {
                 'message': request,
-                'link_control': {},  # Verio does not use link_control.
             }})
             logging.debug(
                 'Request sent: %s', binascii.hexlify(request_raw))

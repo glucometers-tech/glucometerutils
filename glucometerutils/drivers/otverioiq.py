@@ -24,9 +24,12 @@ from glucometerutils.support import lifescan
 from glucometerutils.support import lifescan_binary_protocol
 from glucometerutils.support import serial
 
-_COMMAND_SUCCESS = construct.Const(b'\x04\x06')
+_PACKET = lifescan_binary_protocol.LifeScanPacket(
+    0x03, True)
 
-_VERSION_REQUEST = construct.Const(b'\x04\x0d\x02')  # Untested
+_COMMAND_SUCCESS = construct.Const(b'\x06')
+
+_VERSION_REQUEST = construct.Const(b'\x0d\x02')  # Untested
 
 _VERSION_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -34,14 +37,14 @@ _VERSION_RESPONSE = construct.Struct(
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
-    b'\x04\x0b\x00\x02')
+    b'\x0b\x00\x02')
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
     'serial_number' / construct.CString(encoding='ascii'),
 )
 
-_READ_RTC_REQUEST = construct.Const(b'\x04\x20\x02')
+_READ_RTC_REQUEST = construct.Const(b'\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -49,12 +52,12 @@ _READ_RTC_RESPONSE = construct.Struct(
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
-    construct.Const(b'\x04\x20\x01'),
+    construct.Const(b'\x20\x01'),
     'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(
-    b'\x04\x09\x02\x02')
+    b'\x09\x02\x02')
 
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
@@ -63,9 +66,9 @@ _GLUCOSE_UNIT_RESPONSE = construct.Struct(
     construct.Padding(3),
 )
 
-_MEMORY_ERASE_REQUEST = construct.Const(b'\x04\x1a')  # Untested
+_MEMORY_ERASE_REQUEST = construct.Const(b'\x1a')  # Untested
 
-_READ_RECORD_COUNT_REQUEST = construct.Const(b'\x04\x27\x00')
+_READ_RECORD_COUNT_REQUEST = construct.Const(b'\x27\x00')
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -73,7 +76,7 @@ _READ_RECORD_COUNT_RESPONSE = construct.Struct(
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b'\x04\x21'),
+    construct.Const(b'\x21'),
     'record_id' / construct.Int16ul,
 )
 

@@ -18,36 +18,41 @@ from glucometerutils import common
 from glucometerutils.support import construct_extras
 from glucometerutils.support import lifescan
 
+_LINK_CONTROL = construct.BitStruct(
+    construct.Padding(3),
+    'more' / construct.Default(construct.Flag, False),
+    'disconnect' / construct.Default(construct.Flag, False),
+    'acknowledge' / construct.Default(construct.Flag, False),
+    'expect_receive' / construct.Default(construct.Flag, False),
+    'sequence_number' / construct.Default(construct.Flag, False),
+)
 
-PACKET = construct.Struct(
-    construct.RawCopy(
-        construct.Embedded(
-            construct.Struct(
-                construct.Const(b'\x02'),  # stx
-                'length' / construct.Rebuild(
-                    construct.Byte, lambda ctx: len(ctx.message) + 6),
-                # The following structure is only used by some of the devices.
-                'link_control' / construct.BitStruct(
-                    construct.Padding(3),
-                    'more' / construct.Default(
-                        construct.Flag, False),
-                    'disconnect' / construct.Default(
-                        construct.Flag, False),
-                    'acknowledge' / construct.Default(
-                        construct.Flag, False),
-                    'expect_receive' / construct.Default(
-                        construct.Flag, False),
-                    'sequence_number' / construct.Default(
-                        construct.Flag, False),
+def LifeScanPacket(command_prefix, include_link_control):
+    if include_link_control:
+        link_control_construct = _LINK_CONTROL
+    else:
+        link_control_construct = construct.Const(b'\x00')
+
+    command_prefix_construct = construct.Const(construct.Byte, command_prefix)
+
+    return construct.Struct(
+        construct.RawCopy(
+            construct.Embedded(
+                construct.Struct(
+                    construct.Const(b'\x02'),  # stx
+                    'length' / construct.Rebuild(
+                        construct.Byte, lambda ctx: len(ctx.message) + 7),
+                    'link_control' / link_control_construct,
+                    'command_prefix' / command_prefix_construct,
+                    'message' / construct.Bytes(
+                        length=lambda ctx: ctx.length - 7),
+                    construct.Const(b'\x03'),  # etx
                 ),
-                'message' / construct.Bytes(length=lambda ctx: ctx.length - 6),
-                construct.Const(b'\x03'),  # etx
             ),
         ),
-    ),
-    'checksum' / construct.Checksum(
-        construct.Int16ul, lifescan.crc_ccitt, construct.this.data),
-)
+        'checksum' / construct.Checksum(
+            construct.Int16ul, lifescan.crc_ccitt, construct.this.data),
+    )
 
 VERIO_TIMESTAMP = construct_extras.Timestamp(
     construct.Int32ul, epoch=946684800)  # 2010-01-01 00:00

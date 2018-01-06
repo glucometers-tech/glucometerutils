@@ -30,12 +30,14 @@ from glucometerutils.support import lifescan
 from glucometerutils.support import lifescan_binary_protocol
 from glucometerutils.support import serial
 
+_PACKET = lifescan_binary_protocol.LifeScanPacket(
+    0x05, True)
 
 _INVALID_RECORD = 501
 
-_COMMAND_SUCCESS = construct.Const(b'\x05\x06')
+_COMMAND_SUCCESS = construct.Const(b'\x06')
 
-_VERSION_REQUEST = construct.Const(b'\x05\x0d\x02')
+_VERSION_REQUEST = construct.Const(b'\x0d\x02')
 
 _VERSION_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -43,7 +45,7 @@ _VERSION_RESPONSE = construct.Struct(
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
-    b'\x05\x0B\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    b'\x0B\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
@@ -51,7 +53,7 @@ _SERIAL_NUMBER_RESPONSE = construct.Struct(
 )
 
 _DATETIME_REQUEST = construct.Struct(
-    construct.Const(b'\x05\x20'),  # 0x20 is the datetime
+    construct.Const(b'\x20'),  # 0x20 is the datetime
     'request_type' / construct.Enum(construct.Byte, write=0x01, read=0x02),
     'timestamp' / construct.Default(
         construct_extras.Timestamp(construct.Int32ul),
@@ -64,7 +66,7 @@ _DATETIME_RESPONSE = construct.Struct(
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(
-    b'\x05\x09\x02\x09\x00\x00\x00\x00')
+    b'\x09\x02\x09\x00\x00\x00\x00')
 
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
@@ -73,15 +75,15 @@ _GLUCOSE_UNIT_RESPONSE = construct.Struct(
     construct.Padding(3),
 )
 
-_MEMORY_ERASE_REQUEST = construct.Const(b'\x05\x1A')
+_MEMORY_ERASE_REQUEST = construct.Const(b'\x1A')
 
 _READING_COUNT_RESPONSE = construct.Struct(
-    construct.Const(b'\x05\x0f'),
+    construct.Const(b'\x0f'),
     'count' / construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b'\x05\x1f'),
+    construct.Const(b'\x1f'),
     'record_id' / construct.Int16ul,
 )
 
@@ -102,7 +104,7 @@ class Device(serial.SerialDevice):
         self.sent_counter_ = False
         self.expect_receive_ = False
         self.buffered_reader_ = construct.Rebuffered(
-            lifescan_binary_protocol.PACKET, tailcutoff=1024)
+            _PACKET, tailcutoff=1024)
 
     def connect(self):
         try:
@@ -115,7 +117,7 @@ class Device(serial.SerialDevice):
         self.connect()
 
     def _send_packet(self, message, acknowledge=False, disconnect=False):
-        pkt = lifescan_binary_protocol.PACKET.build(
+        pkt = _PACKET.build(
             {'value': {
                 'message': message,
                 'link_control': {
