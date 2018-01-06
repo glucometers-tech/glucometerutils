@@ -66,15 +66,10 @@ _DATETIME_RESPONSE = construct.Struct(
 _GLUCOSE_UNIT_REQUEST = construct.Const(
     b'\x05\x09\x02\x09\x00\x00\x00\x00')
 
-_GLUCOSE_MAPPING = {
-    common.Unit.MG_DL: 0x00,
-    common.Unit.MMOL_L: 0x01,
-}
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'unit' / construct.SymmetricMapping(
-        construct.Byte, _GLUCOSE_MAPPING),
+    'unit' / lifescan_binary_protocol.GLUCOSE_UNIT,
     construct.Padding(3),
 )
 

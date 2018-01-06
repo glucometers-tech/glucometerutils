@@ -14,6 +14,7 @@ __license__ = 'MIT'
 
 import construct
 
+from glucometerutils import common
 from glucometerutils.support import construct_extras
 from glucometerutils.support import lifescan
 
@@ -50,3 +51,11 @@ PACKET = construct.Struct(
 
 VERIO_TIMESTAMP = construct_extras.Timestamp(
     construct.Int32ul, epoch=946684800)  # 2010-01-01 00:00
+
+_GLUCOSE_UNIT_MAPPING_TABLE = {
+    common.Unit.MG_DL: 0x00,
+    common.Unit.MMOL_L: 0x01,
+}
+
+GLUCOSE_UNIT = construct.SymmetricMapping(
+    construct.Byte, _GLUCOSE_UNIT_MAPPING_TABLE)

@@ -64,15 +64,9 @@ _READ_PARAMETER_REQUEST = construct.Struct(
         construct.Byte, unit=0x04),
 )
 
-_GLUCOSE_MAPPING = {
-    common.Unit.MG_DL: 0x00,
-    common.Unit.MMOL_L: 0x01,
-}
-
 _READ_UNIT_RESPONSE = construct.Struct(
     construct.Const(b'\x03\x06'),  # different from _COMMAND_SUCCESS
-    'unit' / construct.SymmetricMapping(
-        construct.Byte, _GLUCOSE_MAPPING),
+    'unit' / lifescan_binary_protocol.GLUCOSE_UNIT,
     construct.Padding(3),
 )
 
