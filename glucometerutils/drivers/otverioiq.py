@@ -172,9 +172,11 @@ class Device(serial.SerialDevice):
         response = self._send_request(
             _WRITE_RTC_REQUEST, {
                 'timestamp': date,
-            }, _READ_RTC_RESPONSE)
+            }, lifescan_binary_protocol.COMMAND_SUCCESS)
 
-        return response.timestamp
+        # The device does not return the new datetime, so confirm by calling
+        # READ RTC again.
+        return self.get_datetime()
 
     def zero_log(self):
         self._send_request(
