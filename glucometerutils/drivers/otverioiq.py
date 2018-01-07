@@ -33,7 +33,7 @@ _VERSION_RESPONSE = construct.Struct(
     lifescan_binary_protocol.COMMAND_SUCCESS,
     'version' / construct.PascalString(construct.Byte, encoding='ascii'),
     # NULL-termination is not included in string length.
-    construct.Constant('\x00'),
+    construct.Const('\x00'),
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
@@ -105,8 +105,7 @@ class Device(serial.SerialDevice):
 
     def __init__(self, device):
         super(Device, self).__init__(device)
-        self.buffered_reader_ = construct.Rebuffered(
-            lifescan_binary_protocol.PACKET, tailcutoff=1024)
+        self.buffered_reader_ = construct.Rebuffered(_PACKET, tailcutoff=1024)
 
     def connect(self):
         pass
@@ -115,10 +114,9 @@ class Device(serial.SerialDevice):
         pass
 
     def _send_packet(self, message):
-        pkt = lifescan_binary_protocol.PACKET.build(
+        pkt = _PACKET.build(
             {'value': {
-                'message': request,
-                'link_control': {},  # Verio does not use link_control.
+                'message': message,
             }})
         logging.debug('sending packet: %s', binascii.hexlify(pkt))
 
