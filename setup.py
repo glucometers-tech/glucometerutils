@@ -51,6 +51,7 @@ setup(
         'otultra2': ['pyserial'],
         'otultraeasy': ['construct', 'pyserial'],
         'otverio2015': ['construct', 'python-scsi'],
+        'otverioiq': ['construct', 'pyserial'],
         'fsinsulinx': ['construct', 'hidapi'],
         'fslibre': ['construct', 'hidapi'],
         'fsoptium': ['pyserial'],
