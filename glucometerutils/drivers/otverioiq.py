@@ -66,7 +66,7 @@ _GLUCOSE_UNIT_RESPONSE = construct.Struct(
     construct.Padding(3),
 )
 
-_MEMORY_ERASE_REQUEST = construct.Const(b'\x1a')  # Untested
+_MEMORY_ERASE_REQUEST = construct.Const(b'\x1a')
 
 _READ_RECORD_COUNT_REQUEST = construct.Const(b'\x27\x00')
 
