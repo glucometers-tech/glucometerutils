@@ -94,7 +94,7 @@ _READING_RESPONSE = construct.Struct(
     construct.Padding(1),  # unknown
     'meal' / construct.SymmetricMapping(
         construct.Byte, _MEAL_FLAG),
-    cosntruct.Padding(2),  # unknown
+    construct.Padding(2),  # unknown
 )
 
 
