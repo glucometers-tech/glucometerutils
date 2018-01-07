@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """Driver for LifeScan OneTouch Verio IQ devices.
 
-Currently work in progress, untested.
+Supported features:
+    - get readings, including pre-/post-meal notes;
+    - use the glucose unit preset on the device by default;
+    - get and set date and time;
+    - get serial number and software version;
+    - memory reset (caution!)
 
-Expected device path: /dev/ttyUSB0 or similar serial port device. Device should
-be auto-detected if not provided.
+Expected device path: /dev/ttyUSB0 or similar serial port device. Device will be
+auto-detected.
+
 """
 
 __author__ = 'Diego Elio Pettenò'
