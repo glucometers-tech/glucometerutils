@@ -88,10 +88,9 @@ _MEAL_FLAG = {
 
 _READING_RESPONSE = construct.Struct(
     lifescan_binary_protocol.COMMAND_SUCCESS,
-    'timestamp' / construct_extras.Timestamp(construct.Int32ul),
-    'value' / construct.Int32ul,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'value' / construct.Int16ul,
     'control_test' / construct.Flag,
-    construct.Padding(1),  # unknown
     'meal' / construct.SymmetricMapping(
         construct.Byte, _MEAL_FLAG),
     construct.Padding(2),  # unknown
@@ -190,8 +189,7 @@ class Device(serial.SerialDevice):
 
     def _get_reading_count(self):
         response = self._send_request(
-            _READ_RECORD_REQUEST, {'record_id': _INVALID_RECORD},
-            _READING_COUNT_RESPONSE)
+            _READ_RECORD_COUNT_REQUEST, None, _READ_RECORD_COUNT_RESPONSE)
         return response.count
 
     def _get_reading(self, record_id):
