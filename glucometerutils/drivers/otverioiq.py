@@ -33,7 +33,7 @@ _VERSION_RESPONSE = construct.Struct(
     lifescan_binary_protocol.COMMAND_SUCCESS,
     'version' / construct.PascalString(construct.Byte, encoding='ascii'),
     # NULL-termination is not included in string length.
-    construct.Const('\x00'),
+    construct.Const(b'\x00'),
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
@@ -99,7 +99,7 @@ _READING_RESPONSE = construct.Struct(
 
 
 class Device(serial.SerialDevice):
-    BAUDRATE = 9600
+    BAUDRATE = 38400
     DEFAULT_CABLE_ID = '10c4:85a7'  # Specific ID for embedded cp210x
     TIMEOUT = 0.5
 
@@ -165,7 +165,7 @@ class Device(serial.SerialDevice):
 
     def get_datetime(self):
         response = self._send_request(
-            _READ_RTC_REQUEST, _READ_RTC_RESPONSE)
+            _READ_RTC_REQUEST, None, _READ_RTC_RESPONSE)
 
         return response.timestamp
 
