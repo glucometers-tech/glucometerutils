@@ -80,11 +80,21 @@ _READ_RECORD_REQUEST = construct.Struct(
     'record_id' / construct.Int16ul,
 )
 
+_MEAL_FLAG = {
+    common.Meal.NONE: 0x00,
+    common.Meal.BEFORE: 0x01,
+    common.Meal.AFTER: 0x02,
+}
+
 _READING_RESPONSE = construct.Struct(
     lifescan_binary_protocol.COMMAND_SUCCESS,
     'timestamp' / construct_extras.Timestamp(construct.Int32ul),
     'value' / construct.Int32ul,
-    'control' / construct.Byte,  # Unknown value
+    'control_test' / construct.Flag,
+    construct.Padding(1),  # unknown
+    'meal' / construct.SymmetricMapping(
+        construct.Byte, _MEAL_FLAG),
+    cosntruct.Padding(2),  # unknown
 )
 
 
@@ -190,10 +200,16 @@ class Device(serial.SerialDevice):
         response = self._send_request(
             _READ_RECORD_REQUEST, {'record_id': record_id}, _READING_RESPONSE)
 
+        if response.control_test:
+            logging.debug('control solution test, ignoring.')
+            return None
+
         return common.GlucoseReading(
-            response.timestamp, float(response.value))
+            response.timestamp, float(response.value), meal=response.meal)
 
     def get_readings(self):
         record_count = self._get_reading_count()
         for record_id in range(record_count):
-            yield self._get_reading(record_id)
+            reading = self._get_reading(record_id)
+            if reading:
+                yield reading
