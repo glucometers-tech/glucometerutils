@@ -46,6 +46,7 @@ supported.
 | Abbott       | FreeStyle Precision Neo | `fsprecisionneo`   | [construct] [hidapi]‡     |
 | Abbott       | FreeStyle Optium Neo    | `fsprecisionneo`   | [construct] [hidapi]‡     |
 | Abbott       | FreeStyle Optium Neo H  | `fsprecisionneo`   | [construct] [hidapi]‡     |
+| Bayer        | Contour USB             | `bacontour`        | [construct] [hidapi]‡     |
 | Roche        | Accu-Chek Mobile        | `accuchek_reports` |                           |
 | SD Biosensor | SD CodeFree             | `sdcodefree`       | [construct] [pyserial]    |
 
