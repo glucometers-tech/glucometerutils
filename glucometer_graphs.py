@@ -82,8 +82,11 @@ def main():
   for row in rows:
     row = parse_entry(row, args.icons)
 
+  ''' Ensure that the rows are sorted by date '''
+  rows = sorted(rows, key=lambda row: row.get('date'), reverse=False)
+
   ''' Fill in gaps that might exist in the data, in order to smooth the curves and fills '''
-  ''' We're using 8 minute gaps in order to have more accurate fills '''
+  ''' We're using 10 minute gaps in order to have more accurate fills '''
   rows = fill_gaps(rows, interval=dt.timedelta(minutes=10))
 
   ''' If we're on the default values for units, highs and lows, check that the average
@@ -126,7 +129,10 @@ def main():
   with FigurePDF(args.output_file) as pdf:
 
     ''' Overall averages for all data by hour of the day '''
-    title = 'Overall Average Glucose Summary'
+    start    = rows[0].get('date')
+    end      = rows[-1].get('date')
+    period   = start.strftime('%A, %-d %B %Y') + ' to ' + end.strftime('%A, %-d %B %Y')
+    title    = 'Overall Average Glucose Summary for ' + period
 
     data = {}
     for row in rows:
@@ -291,7 +297,7 @@ def main():
       ''' Draw graph with a spline tranform and labels '''
       generate_plot(data,
           ax=ax,
-          transforms={'spline':True, 'label':True, 'avgglucose':g_median, 'avga1c':a_median},
+          transforms={'spline':True, 'label':True, 'avgglucose':g_median},
           args=args,
           color=BLUE,
           )
