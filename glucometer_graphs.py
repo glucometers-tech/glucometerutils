@@ -157,16 +157,15 @@ def main():
     figure.set_tight_layout({'pad':3})
 
     ''' Draw the target range '''
-    ax.axhspan(args.low, args.high, facecolor='#0072b2', edgecolor='#a8a8a8', alpha=0.1, zorder=5)
+    ax.axhspan(args.low, args.high, facecolor='#0072b2', edgecolor='#a8a8a8', alpha=0.1, zorder=15)
 
-    ''' The maxmin curve (maximum and minimum values for each 15 minute
+    ''' The maxmin fill (maximum and minimum values for each 15 minute
         period of the data set, by day) '''
     generate_plot(intervaldata,
          ax=ax,
-         transforms={'spline':False, 'maxmin':True},
+         transforms={'spline':True, 'maxmin':True},
          args=args,
          color='#979797',
-         alpha=0.5,
     )
 
     ''' The graph with a bezier curve applied, and a boundary transform to change line colour
@@ -234,15 +233,14 @@ def main():
         figure.set_tight_layout({'pad':3})
 
         ''' Draw the target range '''
-        ax.axhspan(args.low, args.high, facecolor='#0072b2', edgecolor='#a8a8a8', alpha=0.1, zorder=5)
+        ax.axhspan(args.low, args.high, facecolor='#0072b2', edgecolor='#a8a8a8', alpha=0.1, zorder=15)
 
-        ''' The maxmined curve of maximum and minimum values '''
+        ''' The maxmin fill of maximum and minimum values '''
         generate_plot(intervaldata,
             ax=ax,
-            transforms={'spline':False, 'maxmin':True, 'avga1c':a_median},
+            transforms={'spline':True, 'maxmin':True, 'avga1c':a_median},
             args=args,
             color='#979797',
-            alpha=0.5,
         )
 
         ''' The graph with a bezier curve applied, and a boundary transform to change line colour
@@ -288,7 +286,7 @@ def main():
       figure.set_tight_layout({'pad':3})
 
       ''' Draw the target range '''
-      ax.axhspan(args.low, args.high, facecolor='#0072b2', edgecolor='#a8a8a8', alpha=0.2, zorder=5)
+      ax.axhspan(args.low, args.high, facecolor='#0072b2', edgecolor='#a8a8a8', alpha=0.2, zorder=15)
 
       ''' Draw graph with a spline tranform and labels '''
       generate_plot(data,
@@ -358,7 +356,7 @@ def generate_plot(data, ax=None, transforms={}, args=[], **plot_args):
   ''' Formatting for axis labels, using date calculations from above '''
   ax.set_xlabel('Time', fontsize=9)
   ax.set_xbound(firstminute, lastminute)
-  ax.grid(axis='x', color = '#f0f0f0', zorder=1)
+  ax.grid(axis='x', color = '#f0f0f0', zorder=5)
   ax.set_xticks(xtimes)
   ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
   ax.xaxis.set_ticks_position('none')
@@ -367,7 +365,7 @@ def generate_plot(data, ax=None, transforms={}, args=[], **plot_args):
 
   ax.set_ylabel('Blood Glucose (' + args.units + ')', fontsize=9)
   ax.set_ybound(args.graph_min, args.graph_max)
-  ax.grid(axis='y', color = '#d0d0d0', linestyle = (1,(0.5,2)), zorder=1)
+  ax.grid(axis='y', color = '#d0d0d0', linestyle = (1,(0.5,2)), zorder=5)
   ax.set_yticks([a for a in range(int(args.graph_min), int(args.graph_max), int(y_tick_freq))])
   ax.yaxis.set_major_formatter(mticker.FormatStrFormatter("%d"))
   ax.yaxis.set_ticks_position('none')
@@ -430,13 +428,13 @@ def generate_plot(data, ax=None, transforms={}, args=[], **plot_args):
 
       ax.annotate(gmtext, fontsize=9, xy=(0.95, 0.85),
           xycoords='axes fraction', verticalalignment='top', horizontalalignment='right',
-          zorder=40, bbox=dict(facecolor=GREEN, edgecolor='#009e73', alpha=0.7, pad=8),
+          zorder=60, bbox=dict(facecolor=GREEN, edgecolor='#009e73', alpha=0.7, pad=8),
           )
     if transform == 'avga1c' and isinstance(transforms.get(transform), (int, float)):
       ax.annotate('Median HbA1c: %.1f%%' % round(transforms.get('avga1c'), 1), fontsize=9,
           xy=(0.05, 0.85), xycoords='axes fraction',
           verticalalignment='top', horizontalalignment='left',
-          zorder=40, bbox=dict(facecolor=BOXYELLOW, edgecolor='#e69f00', alpha=0.7, pad=8),
+          zorder=60, bbox=dict(facecolor=BOXYELLOW, edgecolor='#e69f00', alpha=0.7, pad=8),
           )
 
     if args.units == UNIT_MMOLL:
@@ -465,7 +463,7 @@ def generate_plot(data, ax=None, transforms={}, args=[], **plot_args):
               symbol += '\N{GREEN APPLE}'
           symbol += '$'
           ax.annotate(symbol, xy=(x_pos, args.graph_max-y_offset),
-              rotation=45, zorder=25, fontsize=10,
+              rotation=45, zorder=40, fontsize=10,
               fontproperties=args.customfont,
             )
 
@@ -477,7 +475,7 @@ def generate_plot(data, ax=None, transforms={}, args=[], **plot_args):
       p = np.array([x, y]).T.reshape(-1, 1, 2)
       segments = np.concatenate([p[:-1], p[1:]], axis=1)
       ''' Colour the line according to the values in norm and the colours in cmap '''
-      lc = LineCollection(segments, cmap=cmap, norm=norm)
+      lc = LineCollection(segments, cmap=cmap, norm=norm, alpha=1, zorder=30)
       lc.set_array(y)
 
 
@@ -486,16 +484,16 @@ def generate_plot(data, ax=None, transforms={}, args=[], **plot_args):
 
   elif 'fill' in transforms and transforms.get('fill') is True:
     z = np.clip(y, None, args.high)
-    ax.fill_between(x, y, z, interpolate=True, facecolor=YELLOW, alpha=0.7, zorder=12, **plot_args)
+    ax.fill_between(x, y, z, interpolate=True, facecolor=YELLOW, alpha=0.7, zorder=20, **plot_args)
 
     z = np.clip(y, args.low, None)
-    ax.fill_between(x, y, z, interpolate=True, facecolor=RED, alpha=0.7, zorder=12, **plot_args)
+    ax.fill_between(x, y, z, interpolate=True, facecolor=RED, alpha=0.7, zorder=20, **plot_args)
 
   elif maxmin:
-    ax.fill_between(x, y, z, interpolate=True, zorder=10, **plot_args)
+    ax.fill_between(x, y, z, interpolate=True, alpha=0.5, zorder=10, **plot_args)
 
   else:
-    ax.plot(x, y, '-', zorder=20, **plot_args)
+    ax.plot(x, y, '-', alpha=1, zorder=30, **plot_args)
 
   return ax
 
