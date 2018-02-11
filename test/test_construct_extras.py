@@ -51,7 +51,7 @@ class TestTimestamp(unittest.TestCase):
             _TEST_DATE2)
 
     def test_build_custom_epoch_negative_failure(self):
-        with self.assertRaises(construct.core.FieldError):
+        with self.assertRaises(construct.core.FormatFieldError):
             construct_extras.Timestamp(
                 construct.Int32ul, epoch=_NEW_EPOCH).build(_TEST_DATE1)
 
