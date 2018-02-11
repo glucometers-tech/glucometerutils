@@ -1,5 +1,5 @@
 absl-py
-construct
+construct>=2.8,<2.9
 pytest
 pytest-timeout
 pyserial

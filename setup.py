@@ -49,15 +49,15 @@ setup(
         # These are all the drivers' dependencies. Optional dependencies are
         # listed as mandatory for the feature.
         'otultra2': ['pyserial'],
-        'otultraeasy': ['construct', 'pyserial'],
-        'otverio2015': ['construct', 'python-scsi'],
-        'otverioiq': ['construct', 'pyserial'],
-        'fsinsulinx': ['construct', 'hidapi'],
-        'fslibre': ['construct', 'hidapi'],
+        'otultraeasy': ['construct>=2.8,<2.9', 'pyserial'],
+        'otverio2015': ['construct>=2.8,<2.9', 'python-scsi'],
+        'otverioiq': ['construct>=2.8,<2.9', 'pyserial'],
+        'fsinsulinx': ['construct>=2.8,<2.9', 'hidapi'],
+        'fslibre': ['construct>=2.8,<2.9', 'hidapi'],
         'fsoptium': ['pyserial'],
-        'fsprecisionneo': ['construct', 'hidapi'],
+        'fsprecisionneo': ['construct>=2.8,<2.9', 'hidapi'],
         'accucheck_reports': [],
-        'sdcodefree': ['construct', 'pyserial'],
+        'sdcodefree': ['construct>=2.8,<2.9', 'pyserial'],
     },
     entry_points = {
         'console_scripts': [
