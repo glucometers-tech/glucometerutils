@@ -33,7 +33,7 @@ def LifeScanPacket(command_prefix, include_link_control):
     else:
         link_control_construct = construct.Const(b'\x00')
 
-    command_prefix_construct = construct.Const(construct.Byte, command_prefix)
+    command_prefix_construct = construct.Const(command_prefix, construct.Byte)
 
     return construct.Struct(
         construct.RawCopy(
