@@ -120,16 +120,16 @@ class Device(serial.SerialDevice):
 
     def _send_packet(self, message):
         pkt = _PACKET.build(
-            {'value': {
+            {'data': {'value': {
                 'message': message,
-            }})
+            }}})
         logging.debug('sending packet: %s', binascii.hexlify(pkt))
 
         self.serial_.write(pkt)
         self.serial_.flush()
 
     def _read_packet(self):
-        raw_pkt = self.buffered_reader_.parse_stream(self.serial_)
+        raw_pkt = self.buffered_reader_.parse_stream(self.serial_).data
         logging.debug('received packet: %r', raw_pkt)
 
         # discard the checksum and copy

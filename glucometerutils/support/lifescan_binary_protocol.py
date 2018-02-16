@@ -36,8 +36,7 @@ def LifeScanPacket(command_prefix, include_link_control):
     command_prefix_construct = construct.Const(command_prefix, construct.Byte)
 
     return construct.Struct(
-        construct.RawCopy(
-            construct.Embedded(
+        'data' / construct.RawCopy(
                 construct.Struct(
                     construct.Const(b'\x02'),  # stx
                     'length' / construct.Rebuild(
@@ -48,10 +47,9 @@ def LifeScanPacket(command_prefix, include_link_control):
                         length=lambda ctx: ctx.length - 7),
                     construct.Const(b'\x03'),  # etx
                 ),
-            ),
         ),
         'checksum' / construct.Checksum(
-            construct.Int16ul, lifescan.crc_ccitt, construct.this.data),
+            construct.Int16ul, lifescan.crc_ccitt, construct.this.data.data),
     )
 
 COMMAND_SUCCESS = construct.Const(b'\x06')
