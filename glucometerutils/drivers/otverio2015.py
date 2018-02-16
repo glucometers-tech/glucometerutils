@@ -42,8 +42,8 @@ from glucometerutils.support import lifescan_binary_protocol
 _REGISTER_SIZE = 512
 
 _PACKET = construct.Padded(
-    _REGISTER_SIZE, construct.Embedded(
-        lifescan_binary_protocol.LifeScanPacket(0x03, False)))
+    _REGISTER_SIZE,
+        lifescan_binary_protocol.LifeScanPacket(0x03, False))
 
 _QUERY_REQUEST = construct.Struct(
     construct.Const(b'\xe6\x02'),
@@ -157,9 +157,9 @@ class Device(object):
         """
         try:
             request = request_format.build(request_obj)
-            request_raw = _PACKET.build({'value': {
+            request_raw = _PACKET.build({'data': {'value': {
                 'message': request,
-            }})
+            }}})
             logging.debug(
                 'Request sent: %s', binascii.hexlify(request_raw))
             self.scsi_.write10(lba, 1, request_raw)
@@ -167,7 +167,7 @@ class Device(object):
             response_raw = self.scsi_.read10(lba, 1)
             logging.debug(
                 'Response received: %s', binascii.hexlify(response_raw.datain))
-            response_pkt = _PACKET.parse(response_raw.datain)
+            response_pkt = _PACKET.parse(response_raw.datain).data
             logging.debug('Response packet: %r', response_pkt)
 
             response = response_format.parse(response_pkt.value.message)
