@@ -40,7 +40,7 @@ class Direction(enum.Enum):
     Out = 0x10
 
 _PACKET = construct.Struct(
-    'stx' / construct.Const(construct.Byte, 0x53),
+    'stx' / construct.Const(0x53, construct.Byte),
     'direction' / construct.SymmetricMapping(
         construct.Byte,
         {e: e.value for e in Direction}),
@@ -49,13 +49,14 @@ _PACKET = construct.Struct(
     'message' / construct.Bytes(length=lambda ctx: ctx.length - 2),
     'checksum' / construct.Checksum(
         construct.Byte, xor_checksum, construct.this.message),
-    'etx' / construct.Const(construct.Byte, 0xAA)
+    'etx' / construct.Const(0xAA, construct.Byte)
 )
 
 _FIRST_MESSAGE = construct.Struct(
-    construct.Const(construct.Byte, 0x30),
+    construct.Const(0x30, construct.Byte),
     'count' / construct.Int16ub,
-    construct.Const(construct.Byte, 0xAA)[19])
+    construct.Const(0xAA, construct.Byte)[19],
+)
 
 _CHALLENGE_PACKET_FULL = b'\x53\x20\x04\x10\x30\x20\xAA'
 _RESPONSE_MESSAGE = b'\x10\x40'

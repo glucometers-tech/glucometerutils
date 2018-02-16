@@ -23,11 +23,11 @@ class Timestamp(construct.Adapter):
         super(Timestamp, self).__init__(subcon)
         self.epoch = epoch
 
-    def _encode(self, obj, context):
+    def _encode(self, obj, context, path):
         assert isinstance(obj, datetime.datetime)
         epoch_date = datetime.datetime.utcfromtimestamp(self.epoch)
         delta = obj - epoch_date
         return int(delta.total_seconds())
 
-    def _decode(self, obj, context):
+    def _decode(self, obj, context, path):
         return datetime.datetime.utcfromtimestamp(obj + self.epoch)
