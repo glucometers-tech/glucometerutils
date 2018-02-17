@@ -55,7 +55,7 @@ def LifeScanPacket(command_prefix, include_link_control):
 COMMAND_SUCCESS = construct.Const(b'\x06')
 
 VERIO_TIMESTAMP = construct_extras.Timestamp(
-    construct.Int32ul, epoch=946684800)  # 2010-01-01 00:00
+    construct.Int32ul, epoch=946684800)  # 2000-01-01 (not 2010)
 
 _GLUCOSE_UNIT_MAPPING_TABLE = {
     common.Unit.MG_DL: 0x00,
