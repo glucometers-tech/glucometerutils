@@ -41,7 +41,7 @@ class Direction(enum.Enum):
 
 _PACKET = construct.Struct(
     'stx' / construct.Const(0x53, construct.Byte),
-    'direction' / construct.SymmetricMapping(
+    'direction' / construct.Mapping(
         construct.Byte,
         {e: e.value for e in Direction}),
     'length' / construct.Rebuild(
@@ -82,7 +82,7 @@ _READING = construct.Struct(
     'hour' / construct.Byte,
     'minute' / construct.Byte,
     'value' / construct.Int16ub,
-    'meal' / construct.SymmetricMapping(
+    'meal' / construct.Mapping(
         construct.Byte, _MEAL_FLAG),
     construct.Byte[7],
 )

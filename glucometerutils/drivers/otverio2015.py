@@ -108,7 +108,7 @@ _READ_RECORD_RESPONSE = construct.Struct(
     'lifetime_counter' / construct.Int16ul,
     'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
     'value' / construct.Int16ul,
-    'meal' / construct.SymmetricMapping(
+    'meal' / construct.Mapping(
         construct.Byte, _MEAL_FLAG),
     construct.Padding(4),
 )
