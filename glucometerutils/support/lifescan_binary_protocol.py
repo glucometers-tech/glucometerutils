@@ -62,5 +62,5 @@ _GLUCOSE_UNIT_MAPPING_TABLE = {
     common.Unit.MMOL_L: 0x01,
 }
 
-GLUCOSE_UNIT = construct.SymmetricMapping(
+GLUCOSE_UNIT = construct.Mapping(
     construct.Byte, _GLUCOSE_UNIT_MAPPING_TABLE)
