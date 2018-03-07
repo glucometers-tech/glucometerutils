@@ -40,11 +40,11 @@ def LifeScanPacket(command_prefix, include_link_control):
                 construct.Struct(
                     construct.Const(b'\x02'),  # stx
                     'length' / construct.Rebuild(
-                        construct.Byte, lambda ctx: len(ctx.message) + 7),
+                        construct.Byte, lambda this: len(this.message) + 7),
                     'link_control' / link_control_construct,
                     'command_prefix' / command_prefix_construct,
                     'message' / construct.Bytes(
-                        length=lambda ctx: ctx.length - 7),
+                        lambda this: len(this.message)),
                     construct.Const(b'\x03'),  # etx
                 ),
         ),
