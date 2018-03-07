@@ -45,8 +45,8 @@ _PACKET = construct.Struct(
         construct.Byte,
         {e: e.value for e in Direction}),
     'length' / construct.Rebuild(
-        construct.Byte, lambda ctx: len(ctx.message) + 2),
-    'message' / construct.Bytes(length=lambda ctx: ctx.length - 2),
+        construct.Byte, lambda this: len(this.message) + 2),
+    'message' / construct.Bytes(lambda this: len(this.message)),
     'checksum' / construct.Checksum(
         construct.Byte, xor_checksum, construct.this.message),
     'etx' / construct.Const(0xAA, construct.Byte)
