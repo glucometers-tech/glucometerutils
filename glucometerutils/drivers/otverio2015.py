@@ -53,8 +53,7 @@ _QUERY_REQUEST = construct.Struct(
 
 _QUERY_RESPONSE = construct.Struct(
     lifescan_binary_protocol.COMMAND_SUCCESS,
-    # This should be an UTF-16L CString, but construct does not support it.
-    'value' / construct.GreedyString(encoding='utf-16-le'),
+    'value' / construct.CString(encoding='utf-16-le'),
 )
 
 _READ_PARAMETER_REQUEST = construct.Struct(
