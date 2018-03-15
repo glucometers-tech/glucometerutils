@@ -79,6 +79,21 @@ def main():
   with open(args.input_file, 'r', newline='') as f:
      rows = from_csv(f)
 
+  ''' Skip ketone entries '''
+  rketones = re.compile('Ketone', flags=re.IGNORECASE);
+  for row in rows:
+    if rketones.search(row.get('measure_method')):
+      rows.remove(row);
+    elif rketones.search(row.get('comment')):
+      rows.remove(row);
+
+  ''' Skip finger stick test entries '''
+  rfinger = re.compile('Blood', flags=re.IGNORECASE);
+  if not args.fingerstick:
+    for row in rows:
+      if rfinger.search(row.get('comment')):
+        rows.remove(row);
+
   for row in rows:
     row = parse_entry(row, args.icons)
 
@@ -531,35 +546,39 @@ def parse_entry(data, icons, fmt='%Y-%m-%d %H:%M:%S'):
     rrelevant    = re.compile('(Food|Rapid-acting insulin|Long-acting insulin)(?: \((.*?)\))', flags=re.IGNORECASE)
     rduplicate   = re.compile('^(I\$\^\{\d+\S?)(\}.*)$')
     commentparts = {}
-    for part in data.get('comment').split('; '):
-      relevant   = rrelevant.search(part)
-      if relevant is not None:
-        ctype  = relevant.group(1)
-        cvalue = relevant.group(2)
+    if data.get('comment') is not None:
+      for part in data.get('comment').split('; '):
+        relevant   = rrelevant.search(part)
+        if relevant is not None:
+          ctype  = relevant.group(1)
+          cvalue = relevant.group(2)
 
-        ''' Convert floating point-style strings (2.0) to integer-style strings (2) '''
-        try:
-          cvalue = int(float(cvalue))
-        except:
-          pass
-        cvalue = str(cvalue)
+          ''' Convert floating point-style strings (2.0) to integer-style strings (2) '''
+          try:
+            if int(float(cvalue)) == float(cvalue):
+              cvalue = int(float(cvalue))
+            else:
+              cvalue = float(cvalue)
+          except:
+            pass
+          cvalue = str(cvalue)
 
-        if re.search('Rapid', ctype) is not None:
-          cvalue += 'R'
-        if re.search('Long', ctype) is not None:
-          cvalue += 'L'
+          if re.search('Rapid', ctype) is not None:
+            cvalue += 'R'
+          if re.search('Long', ctype) is not None:
+            cvalue += 'L'
 
-        ctype = re.sub('Rapid-acting insulin', 'Insulin', ctype, flags=re.IGNORECASE)
-        ctype = re.sub('Long-acting insulin',  'Insulin', ctype, flags=re.IGNORECASE)
+          ctype = re.sub('Rapid-acting insulin', 'Insulin', ctype, flags=re.IGNORECASE)
+          ctype = re.sub('Long-acting insulin',  'Insulin', ctype, flags=re.IGNORECASE)
 
-        if ctype in commentparts:
-          commentparts[ctype] = commentparts[ctype] + '/' + cvalue
-        else:
-          commentparts[ctype] = cvalue
+          if ctype in commentparts:
+            commentparts[ctype] = commentparts[ctype] + '/' + cvalue
+          else:
+            commentparts[ctype] = cvalue
 
-    data['comment'] = commentparts
-  else:
-    data['comment'] = {}
+      data['comment'] = commentparts
+    else:
+      data['comment'] = {}
 
   ''' Convert timestamp to ISO8601 (by default, at least), and store datetime object '''
   try:
@@ -784,6 +803,9 @@ def parse_arguments():
   parser.add_argument(
     '--icons', action='store_true', required=False, default=True,
     help=('Print food and injection indicators (default: true).'))
+  parser.add_argument(
+    '--fingerstick', action='store_true', required=False, default=True,
+    help=('Include manual finger stick results (default: true).'))
 
   parser.add_argument(
     '--units', action='store', required=False, type=str,
