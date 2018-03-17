@@ -103,11 +103,15 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         usb_packet = _FREESTYLE_MESSAGE.build(
             {'message_type': message_type, 'command': command})
 
+        logging.debug('Sending packet: %r', usb_packet)
+
         self._write(usb_packet)
 
     def _read_response(self):
         """Read the response from the device and extracts it."""
         usb_packet = self._read()
+
+        logging.debug('Read packet: %r', usb_packet)
 
         assert usb_packet
         message_type = usb_packet[0]
