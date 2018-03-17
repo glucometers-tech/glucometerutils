@@ -90,10 +90,14 @@ class Device(serial.SerialDevice):
 
   def _send_command(self, command):
     cmd_bytes = bytes('$%s\r\n' % command, 'ascii')
+    logging.debug('Sending command: %r', cmd_bytes)
+
     self.serial_.write(cmd_bytes)
     self.serial_.flush()
 
     response = self.serial_.readlines()
+
+    logging.debug('Received response: %r', response)
 
     # We always want to decode the output, and remove stray \r\n. Any failure in
     # decoding means the output is invalid anyway.
