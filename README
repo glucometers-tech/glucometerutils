@@ -23,7 +23,7 @@ be able to set this up using `virtualenv` and `pip`:
 $ python3 -m venv $(pwd)/glucometerutils-venv
 $ . glucometerutils-venv/bin/activate
 (glucometerutils-venv) $ DRIVER=myglucometer-driver  # see table below
-(glucometerutils-venv) $ pip install git+https://github.com/Flameeyes/glucometerutils.git#egg=project[${DRIVER}]
+(glucometerutils-venv) $ pip install "git+https://github.com/Flameeyes/glucometerutils.git#egg=project[${DRIVER}]"
 (glucometerutils-venv) $ glucometer --driver ${DRIVER} help
 ```
 
