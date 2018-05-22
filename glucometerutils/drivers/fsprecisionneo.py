@@ -84,7 +84,7 @@ class Device(freestyle.FreeStyleHidDevice):
             values = []
             for v in record:
                 if v == "HI":
-                    v = 999
+                    v = float("inf")
                 values.append(int(v))
             raw_reading = _NeoReading._make(values[:len(_NeoReading._fields)])
 
