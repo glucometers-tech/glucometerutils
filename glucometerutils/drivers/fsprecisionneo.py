@@ -81,7 +81,11 @@ class Device(freestyle.FreeStyleHidDevice):
 
             # Build a _reading object by parsing each of the entries in the raw
             # record
-            values = [int(v) for v in record]
+            values = []
+            for v in record:
+                if v == "HI":
+                    v = 999
+                values.append(int(v))
             raw_reading = _NeoReading._make(values[:len(_NeoReading._fields)])
 
             timestamp = datetime.datetime(
