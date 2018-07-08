@@ -44,7 +44,7 @@ def LifeScanPacket(command_prefix, include_link_control):
                     'link_control' / link_control_construct,
                     'command_prefix' / command_prefix_construct,
                     'message' / construct.Bytes(
-                        lambda this: len(this.message)),
+                        lambda this: this.length - 7),
                     construct.Const(b'\x03'),  # etx
                 ),
         ),
