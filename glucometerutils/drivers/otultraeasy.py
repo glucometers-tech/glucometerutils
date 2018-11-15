@@ -92,6 +92,19 @@ _READING_RESPONSE = construct.Struct(
     'value' / construct.Int32ul,
 )
 
+def _make_packet(
+        message, sequence_number, expect_receive, acknowledge, disconnect):
+    return _PACKET.build(
+        {'data': {'value': {
+            'message': message,
+            'link_control': {
+                'sequence_number': sequence_number,
+                'expect_receive': expect_receive,
+                'acknowledge': acknowledge,
+                'disconnect': disconnect,
+            },
+        }}})
+
 class Device(serial.SerialDevice):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = '067b:2303'  # Generic PL2303 cable.
@@ -116,16 +129,12 @@ class Device(serial.SerialDevice):
         self.connect()
 
     def _send_packet(self, message, acknowledge=False, disconnect=False):
-        pkt = _PACKET.build(
-            {'data': {'value': {
-                'message': message,
-                'link_control': {
-                    'sequence_number': self.sent_counter_,
-                    'expect_receive': self.expect_receive_,
-                    'acknowledge': acknowledge,
-                    'disconnect': disconnect,
-                },
-            }}})
+        pkt = _make_packet(
+            message,
+            self.sent_counter_,
+            self.expect_receive_,
+            acknowledge,
+            disconnect)
         logging.debug('sending packet: %s', binascii.hexlify(pkt))
 
         self.serial_.write(pkt)
