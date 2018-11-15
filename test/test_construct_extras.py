@@ -6,14 +6,12 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
+# pylint: disable=protected-access,missing-docstring
+
 import datetime
-import os
-import sys
-import unittest
 
+from absl.testing import absltest
 import construct
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from glucometerutils.support import construct_extras
 
@@ -24,7 +22,7 @@ _TEST_DATE3 = datetime.datetime(1970, 1, 1, 0, 0)
 
 _NEW_EPOCH = 31536000  # datetime.datetime(1971, 1, 1, 0, 0)
 
-class TestTimestamp(unittest.TestCase):
+class TestTimestamp(absltest.TestCase):
 
     def test_build_unix_epoch(self):
         self.assertEqual(
@@ -69,7 +67,3 @@ class TestTimestamp(unittest.TestCase):
     def test_invalid_value(self):
         with self.assertRaises(AssertionError):
             construct_extras.Timestamp(construct.Int32ul).build('foo')
-
-
-if __name__ == '__main__':
-    unittest.main()

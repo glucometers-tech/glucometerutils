@@ -6,14 +6,11 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
+# pylint: disable=protected-access,missing-docstring
+
 import datetime
-import os
-import sys
-import unittest
 
 from absl.testing import parameterized
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from glucometerutils import common
 
@@ -123,7 +120,3 @@ class TestMeterInfo(parameterized.TestCase):
     def test_meter_info(self, kwargs_dict, expected_fragment):
         info = common.MeterInfo(self.id(), **kwargs_dict)
         self.assertIn(expected_fragment, str(info))
-
-
-if __name__ == '__main__':
-    unittest.main()

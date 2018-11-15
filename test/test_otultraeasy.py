@@ -25,6 +25,3 @@ class ConstructTest(absltest.TestCase):
             b'\x02\x09\x03\x05\x0d\x02\x03\x08\x9f',
             otultraeasy._make_packet(
                 b'\x05\x0d\x02', True, True, False, False))
-
-if __name__ == '__main__':
-    absltest.main()

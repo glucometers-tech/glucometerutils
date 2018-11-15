@@ -6,28 +6,24 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 
-import os
-import sys
-import unittest
+# pylint: disable=protected-access,missing-docstring
+
 from unittest import mock
 
 from absl.testing import parameterized
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from glucometerutils.drivers import otultra2
 from glucometerutils.support import lifescan
 from glucometerutils import exceptions
 
+
 class TestOTUltra2(parameterized.TestCase):
 
     def test_checksum(self):
-        # pylint: disable=protected-access
         checksum = otultra2._calculate_checksum(b'T')
         self.assertEqual(0x0054, checksum)
 
     def test_checksum_full(self):
-        # pylint: disable=protected-access
         checksum = otultra2._calculate_checksum(
             b'T "SAT","08/03/13","22:12:00   "')
         self.assertEqual(0x0608, checksum)
@@ -48,6 +44,3 @@ class TestOTUltra2(parameterized.TestCase):
             device = otultra2.Device('mockdevice')
             with self.assertRaises(expected_exception):
                 device.get_serial_number()
-
-if __name__ == '__main__':
-    unittest.main()

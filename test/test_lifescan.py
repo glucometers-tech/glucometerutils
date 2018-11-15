@@ -6,16 +6,16 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
-import array
-import os
-import sys
-import unittest
+# pylint: disable=protected-access,missing-docstring
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import array
+
+from absl.testing import absltest
 
 from glucometerutils.support import lifescan
 
-class TestChecksum(unittest.TestCase):
+
+class TestChecksum(absltest.TestCase):
     def test_crc(self):
         self.assertEqual(
             0x41cd,
@@ -26,7 +26,3 @@ class TestChecksum(unittest.TestCase):
         self.assertEqual(
             0x62C2,
             lifescan.crc_ccitt(cmd_array))
-
-
-if __name__ == '__main__':
-    unittest.main()
