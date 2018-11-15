@@ -30,28 +30,29 @@ from glucometerutils.support import lifescan
 from glucometerutils.support import lifescan_binary_protocol
 from glucometerutils.support import serial
 
-_PACKET = lifescan_binary_protocol.LifeScanPacket(
-    0x05, True)
+_PACKET = lifescan_binary_protocol.LifeScanPacket(True)
 
 _INVALID_RECORD = 501
 
-_VERSION_REQUEST = construct.Const(b'\x0d\x02')
+_COMMAND_SUCCESS = construct.Const(b'\x05\x06')
+
+_VERSION_REQUEST = construct.Const(b'\x05\x0d\x02')
 
 _VERSION_RESPONSE = construct.Struct(
-    lifescan_binary_protocol.COMMAND_SUCCESS,
+    _COMMAND_SUCCESS,
     'version' / construct.PascalString(construct.Byte, encoding='ascii'),
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
-    b'\x0B\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    b'\x05\x0B\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
-    lifescan_binary_protocol.COMMAND_SUCCESS,
+    _COMMAND_SUCCESS,
     'serial_number' / construct.GreedyString(encoding='ascii'),
 )
 
 _DATETIME_REQUEST = construct.Struct(
-    construct.Const(b'\x20'),  # 0x20 is the datetime
+    construct.Const(b'\x05\x20'),  # 0x20 is the datetime
     'request_type' / construct.Enum(construct.Byte, write=0x01, read=0x02),
     'timestamp' / construct.Default(
         construct_extras.Timestamp(construct.Int32ul),
@@ -59,21 +60,21 @@ _DATETIME_REQUEST = construct.Struct(
 )
 
 _DATETIME_RESPONSE = construct.Struct(
-    lifescan_binary_protocol.COMMAND_SUCCESS,
+    _COMMAND_SUCCESS,
     'timestamp' / construct_extras.Timestamp(construct.Int32ul),
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(
-    b'\x09\x02\x09\x00\x00\x00\x00')
+    b'\x05\x09\x02\x09\x00\x00\x00\x00')
 
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
-    lifescan_binary_protocol.COMMAND_SUCCESS,
+    _COMMAND_SUCCESS,
     'unit' / lifescan_binary_protocol.GLUCOSE_UNIT,
     construct.Padding(3),
 )
 
-_MEMORY_ERASE_REQUEST = construct.Const(b'\x1A')
+_MEMORY_ERASE_REQUEST = construct.Const(b'\x05\x1A')
 
 _READING_COUNT_RESPONSE = construct.Struct(
     construct.Const(b'\x0f'),
@@ -81,12 +82,12 @@ _READING_COUNT_RESPONSE = construct.Struct(
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b'\x1f'),
+    construct.Const(b'\x05\x1f'),
     'record_id' / construct.Int16ul,
 )
 
 _READING_RESPONSE = construct.Struct(
-    lifescan_binary_protocol.COMMAND_SUCCESS,
+    _COMMAND_SUCCESS,
     'timestamp' / construct_extras.Timestamp(construct.Int32ul),
     'value' / construct.Int32ul,
 )
@@ -209,7 +210,7 @@ class Device(serial.SerialDevice):
     def zero_log(self):
         self._send_request(
             _MEMORY_ERASE_REQUEST, None,
-            lifescan_binary_protocol.COMMAND_SUCCESS)
+            _COMMAND_SUCCESS)
 
     def get_glucose_unit(self):
         response = self._send_request(

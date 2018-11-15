@@ -27,32 +27,27 @@ _LINK_CONTROL = construct.BitStruct(
     'sequence_number' / construct.Default(construct.Flag, False),
 )
 
-def LifeScanPacket(command_prefix, include_link_control):
+def LifeScanPacket(include_link_control):
     if include_link_control:
         link_control_construct = _LINK_CONTROL
     else:
         link_control_construct = construct.Const(b'\x00')
-
-    command_prefix_construct = construct.Const(command_prefix, construct.Byte)
 
     return construct.Struct(
         'data' / construct.RawCopy(
                 construct.Struct(
                     construct.Const(b'\x02'),  # stx
                     'length' / construct.Rebuild(
-                        construct.Byte, lambda this: len(this.message) + 7),
+                        construct.Byte, lambda this: len(this.message) + 6),
                     'link_control' / link_control_construct,
-                    'command_prefix' / command_prefix_construct,
                     'message' / construct.Bytes(
-                        lambda this: this.length - 7),
+                        lambda this: this.length - 6),
                     construct.Const(b'\x03'),  # etx
                 ),
         ),
         'checksum' / construct.Checksum(
             construct.Int16ul, lifescan.crc_ccitt, construct.this.data.data),
     )
-
-COMMAND_SUCCESS = construct.Const(b'\x06')
 
 VERIO_TIMESTAMP = construct_extras.Timestamp(
     construct.Int32ul, epoch=946684800)  # 2000-01-01 (not 2010)
