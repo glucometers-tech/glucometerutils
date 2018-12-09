@@ -99,13 +99,16 @@ class Device(serial.SerialDevice):
         return pkt.message
 
     def wait_and_ready(self):
-        challenge = self.serial_.read(1)
 
-        # The first packet read may have a prefixed zero, it might be a bug in
-        # the cp210x driver or device, but discard it if found.
-        if challenge == b'\0':
-            logging.debug('spurious null byte received')
-            challege = self.serial_.read(1)
+        challenge = b'\0'
+        while challenge == b'\0':
+            challenge = self.serial_.read(1)
+
+            # The first packet read may have a prefixed zero, it might be a bug
+            # in the cp210x driver or device, but discard it if found.
+            if challenge == b'\0':
+                logging.debug('spurious null byte received')
+                continue
             if challenge != b'\x53':
                 raise exceptions.ConnectionFailed(
                     message='Unexpected starting bytes %r' % challenge)
