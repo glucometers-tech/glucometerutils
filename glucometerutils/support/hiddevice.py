@@ -10,7 +10,7 @@ import logging
 import os
 
 try:
-    from typing import Optional, Text
+    from typing import BinaryIO, Optional, Text
 except:
     pass
 
@@ -62,16 +62,16 @@ class HidDevice(object):
 
         # If the user passed a device, try opening it.
         if device:
-            self.handle_ = open(device, 'w+b')
-            self.handle_mode_ = 'hidraw'
+            self.handle_ = open(device, 'w+b')  # type: Optional[BinaryIO]
         else:
+            self.handle_ = None
             logging.info(
                 'No --device parameter provided, using hidapi library.')
             try:
                 import hid
-                self.handle_ = hid.device()
-                self.handle_.open(self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
-                self.handle_mode_ = 'hidapi'
+                self.hidapi_handle_ = hid.device()
+                self.hidapi_handle_.open(
+                    self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
             except ImportError:
                 raise exceptions.ConnectionFailed(
                     message='Missing requied "hidapi" module.')
@@ -83,7 +83,12 @@ class HidDevice(object):
         # type: (bytes) -> None
         """Writes a report to the HID handle."""
 
-        if self.handle_.write(report) < 0:
+        if self.handle_:
+            written = self.handle_.write(report)
+        else:
+            written = self.hidapi_handle_.write(report)
+
+        if written < 0:
             raise exceptions.CommandError()
 
     def _read(self, size=64):
@@ -93,7 +98,8 @@ class HidDevice(object):
         This is important as it handles the one incompatible interface between
         hidraw devices and hidapi handles.
         """
-        if self.handle_mode_ == 'hidraw' or self.TIMEOUT_MS is None:
+        if self.handle_:
             return bytes(self.handle_.read(size))
         else:
-            return bytes(self.handle_.read(size, timeout_ms=self.TIMEOUT_MS))
+            return bytes(self.hidapi_handle_.read(
+                size, timeout_ms=self.TIMEOUT_MS))
