@@ -11,13 +11,13 @@ import os
 
 try:
     from typing import BinaryIO, Optional, Text
-except:
+except ImportError:
     pass
 
 from glucometerutils import exceptions
 
 
-class HidDevice(object):
+class HidDevice:
     """A device speaking USB HID protocol driver base.
 
     This class does not implement an actual driver by itself, but provides an
@@ -100,6 +100,6 @@ class HidDevice(object):
         """
         if self.handle_:
             return bytes(self.handle_.read(size))
-        else:
-            return bytes(self.hidapi_handle_.read(
-                size, timeout_ms=self.TIMEOUT_MS))
+
+        return bytes(self.hidapi_handle_.read(
+            size, timeout_ms=self.TIMEOUT_MS))

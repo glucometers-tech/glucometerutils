@@ -6,19 +6,16 @@ __email__ = 'flameeyes@flameeyes.eu'
 __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
 __license__ = 'MIT'
 
-import collections
 import datetime
 import enum
 import textwrap
 
 try:
     from typing import Sequence, Text
-except:
+except ImportError:
     pass
 
 import attr
-
-from glucometerutils import exceptions
 
 class Unit(enum.Enum):
     MG_DL = 'mg/dL'
@@ -56,8 +53,8 @@ def convert_glucose_unit(value, from_unit, to_unit):
 
     if from_unit == Unit.MG_DL:
         return round(value / 18.0, 2)
-    else:
-        return round(value * 18.0, 0)
+
+    return round(value * 18.0, 0)
 
 @attr.s
 class GlucoseReading:

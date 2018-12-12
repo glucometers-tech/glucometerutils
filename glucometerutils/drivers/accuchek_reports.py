@@ -26,8 +26,8 @@ from glucometerutils import common
 from glucometerutils import exceptions
 
 _UNIT_MAP = {
-  'mmol/l': common.Unit.MMOL_L,
-  'mg/dl': common.Unit.MG_DL,
+    'mmol/l': common.Unit.MMOL_L,
+    'mg/dl': common.Unit.MG_DL,
 }
 
 _DATE_CSV_KEY = 'Date'
@@ -47,17 +47,18 @@ _TIME_FORMAT = '%H:%M'
 
 _DATETIME_FORMAT = ' '.join((_DATE_FORMAT, _TIME_FORMAT))
 
-class Device(object):
+class Device:
     def __init__(self, device):
         if not device or not os.path.isdir(device):
             raise exceptions.CommandLineError(
-              '--device parameter is required, should point to mount path for the '
-              'meter.')
+                '--device parameter is required, should point to mount path '
+                'for the meter.')
 
-        report_files = glob.glob(os.path.join(device, '*', 'Reports', '*.csv'))
+        reports_path = os.path.join(device, '*', 'Reports', '*.csv')
+        report_files = glob.glob(reports_path)
         if not report_files:
             raise exceptions.ConnectionFailed(
-              'No report file found in path "%s".' % reports_path)
+                'No report file found in path "%s".' % reports_path)
 
         self.report_file = report_files[0]
 
@@ -68,23 +69,28 @@ class Device(object):
         next(self.report)
 
         return csv.DictReader(
-          self.report, delimiter=';', skipinitialspace=True, quoting=csv.QUOTE_NONE)
+            self.report,
+            delimiter=';',
+            skipinitialspace=True,
+            quoting=csv.QUOTE_NONE)
 
     def connect(self):
-        self.report = open(self.report_file, 'r', newline='\r\n', encoding='utf-8')
+        self.report = open(
+            self.report_file, 'r', newline='\r\n', encoding='utf-8')
 
     def disconnect(self):
         self.report.close()
 
     def get_meter_info(self):
         return common.MeterInfo(
-          '%s glucometer' % self.get_model(),
-          serial_number=self.get_serial_number(),
-          native_unit=self.get_glucose_unit())
+            '%s glucometer' % self.get_model(),
+            serial_number=self.get_serial_number(),
+            native_unit=self.get_glucose_unit())
 
     def get_model(self):
         # $device/MODEL/Reports/*.csv
-        return os.path.basename(os.path.dirname(os.path.dirname(self.report_file)))
+        return os.path.basename(
+            os.path.dirname(os.path.dirname(self.report_file)))
 
     def get_serial_number(self):
         self.report.seek(0)
@@ -99,23 +105,24 @@ class Device(object):
         return _UNIT_MAP[record[_UNIT_CSV_KEY]]
 
     def get_datetime(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def set_datetime(self, date=None):
-        raise NotImplemented
+        raise NotImplementedError
 
     def zero_log(self):
-        raise NotImplemented
+        raise NotImplementedError
 
-    def _extract_datetime(self, record):
+    def _extract_datetime(self, record):  # pylint: disable=no-self-use
         # Date and time are in separate column, but we want to parse them
         # together.
         date_and_time = ' '.join((record[_DATE_CSV_KEY], record[_TIME_CSV_KEY]))
         return datetime.datetime.strptime(date_and_time, _DATETIME_FORMAT)
 
-    def _extract_meal(self, record):
+    def _extract_meal(self, record):  # pylint: disable=no-self-use
         if record[_AFTER_MEAL_CSV_KEY] and record[_BEFORE_MEAL_CSV_KEY]:
-            raise InvalidResponse('Reading cannot be before and after meal.')
+            raise exceptions.InvalidResponse(
+                'Reading cannot be before and after meal.')
         elif record[_AFTER_MEAL_CSV_KEY]:
             return common.Meal.AFTER
         elif record[_BEFORE_MEAL_CSV_KEY]:
@@ -129,9 +136,9 @@ class Device(object):
                 continue
 
             yield common.GlucoseReading(
-              self._extract_datetime(record),
-              common.convert_glucose_unit(
-                float(record[_RESULT_CSV_KEY]),
-                _UNIT_MAP[record[_UNIT_CSV_KEY]],
-                common.Unit.MG_DL),
-              meal=self._extract_meal(record))
+                self._extract_datetime(record),
+                common.convert_glucose_unit(
+                    float(record[_RESULT_CSV_KEY]),
+                    _UNIT_MAP[record[_UNIT_CSV_KEY]],
+                    common.Unit.MG_DL),
+                meal=self._extract_meal(record))

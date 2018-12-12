@@ -43,7 +43,7 @@ _REGISTER_SIZE = 512
 
 _PACKET = construct.Padded(
     _REGISTER_SIZE,
-        lifescan_binary_protocol.LifeScanPacket(False))
+    lifescan_binary_protocol.LifeScanPacket(False))
 
 _COMMAND_SUCCESS = construct.Const(b'\x03\x06')
 
@@ -115,7 +115,7 @@ _READ_RECORD_RESPONSE = construct.Struct(
     construct.Padding(4),
 )
 
-class Device(object):
+class Device:
     def __init__(self, device):
         if not device:
             raise exceptions.CommandLineError(
@@ -135,7 +135,7 @@ class Device(object):
             raise exceptions.ConnectionFailed(
                 'Device %s is not a LifeScan glucometer.' % self.device_name_)
 
-    def disconnect(self):
+    def disconnect(self):  # pylint: disable=no-self-use
         return
 
     def _send_request(self, lba, request_format, request_obj, response_format):

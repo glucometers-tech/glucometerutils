@@ -27,7 +27,7 @@ _LINK_CONTROL = construct.BitStruct(
     'sequence_number' / construct.Default(construct.Flag, False),
 )
 
-def LifeScanPacket(include_link_control):
+def LifeScanPacket(include_link_control):  # pylint: disable=invalid-name
     # type: (bool) -> construct.Struct
     if include_link_control:
         link_control_construct = _LINK_CONTROL
@@ -36,15 +36,15 @@ def LifeScanPacket(include_link_control):
 
     return construct.Struct(
         'data' / construct.RawCopy(
-                construct.Struct(
-                    construct.Const(b'\x02'),  # stx
-                    'length' / construct.Rebuild(
-                        construct.Byte, lambda this: len(this.message) + 6),
-                    'link_control' / link_control_construct,
-                    'message' / construct.Bytes(
-                        lambda this: this.length - 6),
-                    construct.Const(b'\x03'),  # etx
-                ),
+            construct.Struct(
+                construct.Const(b'\x02'),  # stx
+                'length' / construct.Rebuild(
+                    construct.Byte, lambda this: len(this.message) + 6),
+                'link_control' / link_control_construct,
+                'message' / construct.Bytes(
+                    lambda this: this.length - 6),
+                construct.Const(b'\x03'),  # etx
+            ),
         ),
         'checksum' / construct.Checksum(
             construct.Int16ul, lifescan.crc_ccitt, construct.this.data.data),

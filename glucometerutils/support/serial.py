@@ -11,7 +11,7 @@ import logging
 
 try:
     from typing import Optional, Text
-except:
+except ImportError:
     pass
 
 import serial
@@ -19,7 +19,7 @@ import serial
 from glucometerutils import exceptions
 
 
-class SerialDevice(object):
+class SerialDevice:
     """A Serial-connected glucometer driver base.
 
     This class does not implement an actual driver by itself, but provides an

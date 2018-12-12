@@ -176,7 +176,7 @@ class Device(serial.SerialDevice):
         return response.timestamp
 
     def set_datetime(self, date=datetime.datetime.now()):
-        response = self._send_request(
+        self._send_request(
             _WRITE_RTC_REQUEST, {
                 'timestamp': date,
             }, _COMMAND_SUCCESS)

@@ -55,7 +55,7 @@ class Device(freestyle.FreeStyleHidDevice):
                 'Software version: ' + self._get_version(),),
             native_unit=self.get_glucose_unit())
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self):  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
         return common.Unit.MG_DL
 

@@ -139,7 +139,7 @@ class Device(serial.SerialDevice):
         logging.debug('sending packet: %s', binascii.hexlify(pkt))
         self.serial_.write(pkt)
 
-    def connect(self):
+    def connect(self):  # pylint: disable=no-self-use
         print("Please connect and turn on the device.")
 
     def disconnect(self):
@@ -148,20 +148,20 @@ class Device(serial.SerialDevice):
         if response != _DISCONNECTED_MESSAGE:
             raise exceptions.InvalidResponse(response=response)
 
-    def get_meter_info(self):
+    def get_meter_info(self):  # pylint: disable=no-self-use
         return common.MeterInfo('SD CodeFree glucometer')
 
-    def get_version(self):
+    def get_version(self):  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_serial_number(self):
+    def get_serial_number(self):  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self):  # pylint: disable=no-self-use
         # Device does not provide information on glucose unit.
         return common.Unit.MG_DL
 
-    def get_datetime(self):
+    def get_datetime(self):  # pylint: disable=no-self-use
         raise NotImplementedError
 
     def set_datetime(self, date=datetime.datetime.now()):
@@ -189,10 +189,11 @@ class Device(serial.SerialDevice):
             self.send_message(_FETCH_MESSAGE)
             message = self.read_message()
 
-            r = _READING.parse(message)
-            logging.debug('received reading: %r', r)
+            reading = _READING.parse(message)
+            logging.debug('received reading: %r', reading)
 
             yield common.GlucoseReading(
                 datetime.datetime(
-                    2000 + r.year, r.month, r.day, r.hour, r.minute),
-                r.value, meal=r.meal)
+                    2000 + reading.year, reading.month,
+                    reading.day, reading.hour, reading.minute),
+                reading.value, meal=reading.meal)

@@ -12,19 +12,21 @@ from glucometerutils import exceptions
 class MissingChecksum(exceptions.InvalidResponse):
     """The response misses the expected 4-digits checksum."""
     def __init__(self, response):
-        self.message = 'Response is missing checksum: %s' % response
+        super(MissingChecksum, self).__init__(
+            'Response is missing checksum: %s' % response)
 
 
 class InvalidSerialNumber(exceptions.Error):
     """The serial number is not as expected."""
     def __init__(self, serial_number):
-        self.message = 'Serial number %s is invalid.' % serial_number
+        super(InvalidSerialNumber, self).__init__(
+            'Serial number %s is invalid.' % serial_number)
 
 
 class MalformedCommand(exceptions.InvalidResponse):
     def __init__(self, message):
-        exceptions.InvalidResponse.__init__(
-          self, 'Malformed command: %s' % message)
+        super(MalformedCommand, self).__init__(
+            'Malformed command: %s' % message)
 
 
 def crc_ccitt(data):
@@ -49,4 +51,4 @@ def crc_ccitt(data):
         crc ^= (((crc << 8) & 0xffff) << 4) & 0xffff
         crc ^= (crc & 0xff) << 5
 
-    return (crc & 0xffff)
+    return crc & 0xffff

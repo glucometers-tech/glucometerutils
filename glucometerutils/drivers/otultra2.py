@@ -17,7 +17,6 @@ __copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import datetime
-import logging
 import re
 
 from glucometerutils import common
@@ -27,32 +26,32 @@ from glucometerutils.support import serial
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
-  'N': common.Meal.NONE,
-  'B': common.Meal.BEFORE,
-  'A': common.Meal.AFTER,
+    'N': common.Meal.NONE,
+    'B': common.Meal.BEFORE,
+    'A': common.Meal.AFTER,
 }
 
 _COMMENT_CODES = {
-  '00': '',  # would be 'No Comment'
-  '01': 'Not Enough Food',
-  '02': 'Too Much Food',
-  '03': 'Mild Exercise',
-  '04': 'Hard Exercise',
-  '05': 'Medication',
-  '06': 'Stress',
-  '07': 'Illness',
-  '08': 'Feel Hypo',
-  '09': 'Menses',
-  '10': 'Vacation',
-  '11': 'Other',
+    '00': '',  # would be 'No Comment'
+    '01': 'Not Enough Food',
+    '02': 'Too Much Food',
+    '03': 'Mild Exercise',
+    '04': 'Hard Exercise',
+    '05': 'Medication',
+    '06': 'Stress',
+    '07': 'Illness',
+    '08': 'Feel Hypo',
+    '09': 'Menses',
+    '10': 'Vacation',
+    '11': 'Other',
 }
 
 _DUMP_HEADER_RE = re.compile(
-  r'P ([0-9]{3}),"[0-9A-Z]{9}","(?:MG/DL |MMOL/L)"')
+    r'P ([0-9]{3}),"[0-9A-Z]{9}","(?:MG/DL |MMOL/L)"')
 _DUMP_LINE_RE = re.compile(
-  r'P (?P<datetime>"[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),'
-  r'"(?P<control>[C ]) (?P<value>[0-9]{3})(?P<parityerror>[\? ])",'
-  r'"(?P<meal>[NBA])","(?P<comment>0[0-9]|1[01])", 00')
+    r'P (?P<datetime>"[A-Z]{3}","[0-9/]{8}","[0-9:]{8}   "),'
+    r'"(?P<control>[C ]) (?P<value>[0-9]{3})(?P<parityerror>[\? ])",'
+    r'"(?P<meal>[NBA])","(?P<comment>0[0-9]|1[01])", 00')
 
 _RESPONSE_MATCH = re.compile(r'^(.+) ([0-9A-F]{4})\r$')
 
@@ -94,7 +93,7 @@ def _validate_and_strip_checksum(line):
     try:
         checksum_given = int(checksum_string, 16)
         checksum_calculated = _calculate_checksum(
-          bytes(response, 'ascii'))
+            bytes(response, 'ascii'))
 
         if checksum_given != checksum_calculated:
             raise exceptions.InvalidChecksum(checksum_given,
@@ -105,7 +104,8 @@ def _validate_and_strip_checksum(line):
     return response
 
 _DATETIME_RE = re.compile(
-  r'^"[A-Z]{3}","([0-9]{2}/[0-9]{2}/[0-9]{2})","([0-9]{2}:[0-9]{2}:[0-9]{2})   "$')
+    r'^"[A-Z]{3}",'
+    r'"([0-9]{2}/[0-9]{2}/[0-9]{2})","([0-9]{2}:[0-9]{2}:[0-9]{2})   "$')
 
 
 def _parse_datetime(response):
@@ -136,10 +136,10 @@ class Device(serial.SerialDevice):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = '067b:2303'  # Generic PL2303 cable.
 
-    def connect(self):
+    def connect(self):  # pylint: disable=no-self-use
         return
 
-    def disconnect(self):
+    def disconnect(self):  # pylint: disable=no-self-use
         return
 
     def _send_command(self, cmd):
@@ -159,7 +159,8 @@ class Device(serial.SerialDevice):
           cmd: command and parameters to send (without newline)
 
         Returns:
-          A single line of text that the glucometer responds, without the checksum.
+          A single line of text that the glucometer responds, without the
+          checksum.
         """
         self._send_command(cmd)
 
@@ -173,11 +174,11 @@ class Device(serial.SerialDevice):
           A common.MeterInfo object.
         """
         return common.MeterInfo(
-          'OneTouch Ultra 2 glucometer',
-          serial_number=self.get_serial_number(),
-          version_info=(
-            'Software version: ' + self.get_version(),),
-          native_unit=self.get_glucose_unit())
+            'OneTouch Ultra 2 glucometer',
+            serial_number=self.get_serial_number(),
+            version_info=(
+                'Software version: ' + self.get_version(),),
+            native_unit=self.get_glucose_unit())
 
     def get_version(self):
         """Returns an identifier of the firmware version of the glucometer.
@@ -215,8 +216,8 @@ class Device(serial.SerialDevice):
 
         serial_number = match.group(1)
 
-        # 'Y' at the far right of the serial number is the indication of a OneTouch
-        # Ultra2 device, as per specs.
+        # 'Y' at the far right of the serial number is the indication of a
+        # OneTouch Ultra2 device, as per specs.
         if serial_number[-1] != 'Y':
             raise lifescan.InvalidSerialNumber(serial_number)
 
@@ -242,15 +243,15 @@ class Device(serial.SerialDevice):
           A datetime object built according to the returned response.
         """
         response = self._send_oneliner_command(
-          'DMT' + date.strftime('%m/%d/%y %H:%M:%S'))
+            'DMT' + date.strftime('%m/%d/%y %H:%M:%S'))
 
         return _parse_datetime(response[2:])
 
     def zero_log(self):
         """Zeros out the data log of the device.
 
-        This function will clear the memory of the device deleting all the readings
-        in an irrecoverable way.
+        This function will clear the memory of the device deleting all the
+        readings in an irrecoverable way.
         """
         response = self._send_oneliner_command('DMZ')
         if response != 'Z':
@@ -268,10 +269,10 @@ class Device(serial.SerialDevice):
         Raises:
           exceptions.InvalidGlucoseUnit: if the unit is not recognized
 
-        OneTouch meters will always dump data in mg/dL because that's their internal
-        storage. They will then provide a separate method to read the unit used for
-        display. This is not settable by the user in all modern meters.
-
+        OneTouch meters will always dump data in mg/dL because that's their
+        internal storage. They will then provide a separate method to read the
+        unit used for display. This is not settable by the user in all modern
+        meters.
         """
         response = self._send_oneliner_command('DMSU?')
 
@@ -280,10 +281,11 @@ class Device(serial.SerialDevice):
 
         if unit == 'MG/DL ':
             return common.Unit.MG_DL
-        elif unit == 'MMOL/L':
+
+        if unit == 'MMOL/L':
             return common.Unit.MMOL_L
-        else:
-            raise exceptions.InvalidGlucoseUnit(string)
+
+        raise exceptions.InvalidGlucoseUnit(response)
 
     def get_readings(self):
         """Iterates over the reading values stored in the glucometer.
@@ -292,12 +294,12 @@ class Device(serial.SerialDevice):
           unit: The glucose unit to use for the output.
 
         Yields:
-          A tuple (date, value) of the readings in the glucometer. The value is a
-          floating point in the unit specified; if no unit is specified, the default
-          unit in the glucometer will be used.
+          A GlucoseReading object representing the read value.
 
         Raises:
-          exceptions.InvalidResponse: if the response does not match what expected.
+          exceptions.InvalidResponse: if the response does not match what
+          expected.
+
         """
         self._send_command('DMP')
         data = self.serial_.readlines()
@@ -323,7 +325,7 @@ class Device(serial.SerialDevice):
             meal = _MEAL_CODES[line_data['meal']]
             comment = _COMMENT_CODES[line_data['comment']]
 
-            # OneTouch2 always returns the data in mg/dL even if the glucometer is set
-            # to mmol/L, so there is no conversion required.
+            # OneTouch2 always returns the data in mg/dL even if the glucometer
+            # is set to mmol/L, so there is no conversion required.
             yield common.GlucoseReading(
-              date, float(line_data['value']), meal=meal, comment=comment)
+                date, float(line_data['value']), meal=meal, comment=comment)

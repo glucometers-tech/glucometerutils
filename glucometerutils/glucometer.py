@@ -19,58 +19,59 @@ from glucometerutils import exceptions
 def main():
     if sys.version_info < (3, 4):
         raise Exception(
-          'Unsupported Python version, please use at least Python 3.4')
+            'Unsupported Python version, please use at least Python 3.4')
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="action")
 
     parser.add_argument(
-      '--driver', action='store', required=True,
-      help='Select the driver to use for connecting to the glucometer.')
+        '--driver', action='store', required=True,
+        help='Select the driver to use for connecting to the glucometer.')
     parser.add_argument(
-      '--device', action='store', required=False,
-      help=('Select the path to the glucometer device. Some devices require this '
-            'argument, others will try autodetection.'))
+        '--device', action='store', required=False,
+        help=('Select the path to the glucometer device. Some devices require '
+              'this argument, others will try autodetection.'))
 
     parser.add_argument(
-      '--vlog', action='store', required=False, type=int,
-      help=('Python logging level. See the levels at '
-            'https://docs.python.org/3/library/logging.html#logging-levels'))
+        '--vlog', action='store', required=False, type=int,
+        help=('Python logging level. See the levels at '
+              'https://docs.python.org/3/library/logging.html#logging-levels'))
 
     subparsers.add_parser(
-      'help', help=('Display a description of the driver, including supported '
-                    'features and known quirks.'))
+        'help', help=('Display a description of the driver, including '
+                      'supported features and known quirks.'))
     subparsers.add_parser(
-      'info', help='Display information about the meter.')
+        'info', help='Display information about the meter.')
     subparsers.add_parser(
-      'zero', help='Zero out the data log of the meter.')
+        'zero', help='Zero out the data log of the meter.')
 
     parser_dump = subparsers.add_parser(
-      'dump', help='Dump the readings stored in the device.')
+        'dump', help='Dump the readings stored in the device.')
     parser_dump.add_argument(
-      '--unit', action='store',
-      choices=[unit.value for unit in common.Unit],
-      help='Select the unit to use for the dumped data.')
+        '--unit', action='store',
+        choices=[unit.value for unit in common.Unit],
+        help='Select the unit to use for the dumped data.')
     parser_dump.add_argument(
-      '--with-ketone', action='store_true', default=False,
-      help='Enable ketone reading if available on the glucometer.')
+        '--with-ketone', action='store_true', default=False,
+        help='Enable ketone reading if available on the glucometer.')
 
     parser_date = subparsers.add_parser(
-      'datetime', help='Reads or sets the date and time of the glucometer.')
+        'datetime', help='Reads or sets the date and time of the glucometer.')
     parser_date.add_argument(
-      '--set', action='store', nargs='?', const='now', default=None,
-      help='Set the date rather than just reading it from the device.')
+        '--set', action='store', nargs='?', const='now', default=None,
+        help='Set the date rather than just reading it from the device.')
 
     args = parser.parse_args()
 
     logging.basicConfig(level=args.vlog)
 
     try:
-        driver = importlib.import_module('glucometerutils.drivers.' + args.driver)
+        driver = importlib.import_module(
+            'glucometerutils.drivers.' + args.driver)
     except ImportError as e:
         logging.error(
-          'Error importing driver "%s", please check your --driver parameter:\n%s',
-          args.driver, e)
+            'Error importing driver "%s", please check your --driver '
+            'parameter:\n%s', args.driver, e)
         return 1
 
     # This check needs to happen before we try to initialize the device, as the
@@ -91,7 +92,7 @@ def main():
             except NotImplementedError:
                 time_str = 'N/A'
             print("{device_info}Time: {time}".format(
-              device_info=str(device_info), time=time_str))
+                device_info=str(device_info), time=time_str))
         elif args.action == 'dump':
             unit = args.unit
             if unit is None:
@@ -114,7 +115,8 @@ def main():
                     new_date = date_parser.parse(args.set)
                 except ImportError:
                     logging.error(
-                      'Unable to import module "dateutil", please install it.')
+                        'Unable to import module "dateutil", '
+                        'please install it.')
                     return 1
                 except ValueError:
                     logging.error('%s: not a valid date', args.set)
@@ -137,3 +139,4 @@ def main():
         return 1
 
     device.disconnect()
+    return 0

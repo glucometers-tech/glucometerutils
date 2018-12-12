@@ -205,7 +205,7 @@ class Device(freestyle.FreeStyleHidDevice):
         """Overridden function as the command is not compatible."""
         return self._send_text_command(b'$sn?').rstrip('\r\n')
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self):  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
         # TODO(Flameeyes): figure out how to identify the actual unit on the
         # device.

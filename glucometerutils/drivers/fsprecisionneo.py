@@ -64,7 +64,7 @@ class Device(freestyle.FreeStyleHidDevice):
                 'Software version: ' + self._get_version(),),
             native_unit=self.get_glucose_unit())
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self):  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
         return common.Unit.MG_DL
 
@@ -82,10 +82,10 @@ class Device(freestyle.FreeStyleHidDevice):
             # Build a _reading object by parsing each of the entries in the raw
             # record
             values = []
-            for v in record:
-                if v == "HI":
-                    v = float("inf")
-                values.append(int(v))
+            for value in record:
+                if value == "HI":
+                    value = float("inf")
+                values.append(int(value))
             raw_reading = _NeoReading._make(values[:len(_NeoReading._fields)])
 
             timestamp = datetime.datetime(

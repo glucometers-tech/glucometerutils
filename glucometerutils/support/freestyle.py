@@ -18,7 +18,7 @@ import re
 
 try:
     from typing import Iterator, List, Text, Tuple
-except:
+except ImportError:
     pass
 
 import construct
@@ -110,8 +110,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         usb_packet = _FREESTYLE_MESSAGE.build(
             {'message_type': message_type, 'command': command})
 
-        logging.debug('Sending packet: %r', usb_packet
-)
+        logging.debug('Sending packet: %r', usb_packet)
         self._write(usb_packet)
 
     def _read_response(self):

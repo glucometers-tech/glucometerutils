@@ -1,0 +1,12 @@
+[MESSAGE CONTROL]
+disable=
+	duplicate-code,
+	too-few-public-methods,
+	too-many-branches,
+	too-many-locals,
+	too-many-nested-blocks,
+	too-many-return-statements,
+	too-many-statements,
+
+[BASIC]
+good-names = i, j, k, e, _
