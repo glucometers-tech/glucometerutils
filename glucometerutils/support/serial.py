@@ -10,7 +10,7 @@ __license__ = 'MIT'
 import logging
 
 try:
-    from typing import Text
+    from typing import Optional, Text
 except:
     pass
 
@@ -51,6 +51,7 @@ class SerialDevice(object):
     TIMEOUT = 1  # type: float
 
     def __init__(self, device):
+        # type: (Optional[Text]) -> None
         assert self.BAUDRATE is not None
 
         if not device and self.DEFAULT_CABLE_ID:

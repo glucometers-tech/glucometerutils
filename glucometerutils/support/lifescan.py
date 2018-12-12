@@ -28,6 +28,7 @@ class MalformedCommand(exceptions.InvalidResponse):
 
 
 def crc_ccitt(data):
+  # type: (bytes) -> int
   """Calculate the CRC-16-CCITT with LifeScan's common seed.
 
   Args:

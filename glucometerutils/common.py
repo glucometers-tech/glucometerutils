@@ -12,7 +12,7 @@ import enum
 import textwrap
 
 try:
-    from typing import Text
+    from typing import Sequence, Text
 except:
     pass
 
@@ -37,6 +37,7 @@ class MeasurementMethod(enum.Enum):
 
 
 def convert_glucose_unit(value, from_unit, to_unit):
+    # type: (float, Unit, Unit) -> float
     """Convert the given value of glucose level between units.
 
     Args:
@@ -72,6 +73,7 @@ class GlucoseReading:
             MeasurementMethod)) # type: MeasurementMethod
 
     def get_value_as(self, to_unit):
+        # type: (Unit) -> float
         """Returns the reading value as the given unit.
 
         Args:
@@ -80,6 +82,7 @@ class GlucoseReading:
         return convert_glucose_unit(self.value, Unit.MG_DL, to_unit)
 
     def as_csv(self, unit):
+        # type: (Unit) -> Text
         """Returns the reading as a formatted comma-separated value string."""
         return '"%s","%.2f","%s","%s","%s"' % (
             self.timestamp, self.get_value_as(unit), self.meal.value,
@@ -112,11 +115,11 @@ class MeterInfo:
         the device. It can include hardware and software version.
       native_unit: One of the Unit values to identify the meter native unit.
     """
-    model = attr.ib()
-    serial_number = attr.ib(default='N/A')
-    version_info = attr.ib(default=())
+    model = attr.ib()  # Text
+    serial_number = attr.ib(default='N/A')  # Text
+    version_info = attr.ib(default=())  # Sequence[Text]
     native_unit = attr.ib(
-        default=Unit.MG_DL, validator=attr.validators.in_(Unit))
+        default=Unit.MG_DL, validator=attr.validators.in_(Unit))  # Unit
 
     def __str__(self):
         version_information_string = 'N/A'

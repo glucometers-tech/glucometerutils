@@ -16,6 +16,11 @@ import datetime
 import logging
 import re
 
+try:
+    from typing import Iterator, List, Text, Tuple
+except:
+    pass
+
 import construct
 
 from glucometerutils import exceptions
@@ -44,6 +49,7 @@ _MULTIRECORDS_FORMAT = re.compile(
 
 
 def _verify_checksum(message, expected_checksum_hex):
+    # type: (Text, Text) -> None
     """Calculate the simple checksum of the message and compare with expected.
 
     Args:
@@ -94,6 +100,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         pass
 
     def _send_command(self, message_type, command):
+        # type: (int, bytes) -> None
         """Send a raw command to the device.
 
         Args:
@@ -108,6 +115,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         self._write(usb_packet)
 
     def _read_response(self):
+        # type: () -> Tuple[int, bytes]
         """Read the response from the device and extracts it."""
         usb_packet = self._read()
 
@@ -128,6 +136,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         return (message_type, bytes(message_content))
 
     def _send_text_command(self, command):
+        # type: (bytes) -> Text
         """Send a command to the device that expects a text reply."""
         self._send_command(self.TEXT_CMD, command)
 
@@ -162,14 +171,17 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
     # protocol, but not many. Only provide here those that do seep to change
     # between them.
     def _get_version(self):
+        # type: () -> Text
         """Return the software version of the device."""
         return self._send_text_command(b'$swver?').rstrip('\r\n')
 
     def get_serial_number(self):
+        # type: () -> Text
         """Returns the serial number of the device."""
         return self._send_text_command(b'$serlnum?').rstrip('\r\n')
 
     def get_datetime(self):
+        # type: () -> datetime.datetime
         """Gets the date and time as reported by the device.
 
         This is one of the few commands that appear common to many of the
@@ -185,6 +197,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         return datetime.datetime(year + 2000, month, day, hour, minute)
 
     def set_datetime(self, date=datetime.datetime.now()):
+        # type: (datetime.datetime) -> datetime.datetime
         """Sets the date and time of the device."""
 
         # The format used by the FreeStyle devices is not composable based on
@@ -205,6 +218,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         raise NotImplementedError
 
     def _get_multirecord(self, command):
+        # type: (bytes) -> Iterator[List[Text]]
         """Queries for, and returns, "multirecords" results.
 
         Multirecords are used for querying events, readings, history and similar

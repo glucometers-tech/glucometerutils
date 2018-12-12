@@ -28,6 +28,7 @@ _LINK_CONTROL = construct.BitStruct(
 )
 
 def LifeScanPacket(include_link_control):
+    # type: (bool) -> construct.Struct
     if include_link_control:
         link_control_construct = _LINK_CONTROL
     else:

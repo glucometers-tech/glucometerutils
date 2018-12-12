@@ -10,7 +10,7 @@ import logging
 import os
 
 try:
-    from typing import Optional
+    from typing import Optional, Text
 except:
     pass
 
@@ -48,6 +48,7 @@ class HidDevice(object):
     TIMEOUT_MS = None  # type: Optional[int]
 
     def __init__(self, device):
+        # type: (Optional[Text]) -> None
         if None in (self.USB_VENDOR_ID, self.USB_PRODUCT_ID) and not device:
             raise exceptions.CommandLineError(
                 '--device parameter is required, should point to a /dev/hidraw '
@@ -79,12 +80,14 @@ class HidDevice(object):
                     message='Unable to connect to meter: %s.' % e)
 
     def _write(self, report):
+        # type: (bytes) -> None
         """Writes a report to the HID handle."""
 
         if self.handle_.write(report) < 0:
             raise exceptions.CommandError()
 
     def _read(self, size=64):
+        # type: (int) -> bytes
         """Read a report from the HID handle.
 
         This is important as it handles the one incompatible interface between
