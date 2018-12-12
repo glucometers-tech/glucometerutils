@@ -52,10 +52,6 @@ def main():
     choices=[unit.value for unit in common.Unit],
     help='Select the unit to use for the dumped data.')
   parser_dump.add_argument(
-    '--sort-by', action='store', default='timestamp',
-    choices=common._ReadingBase._fields,
-    help='Field to order the dumped data by.')
-  parser_dump.add_argument(
     '--with-ketone', action='store_true', default=False,
     help='Enable ketone reading if available on the glucometer.')
 
@@ -107,11 +103,7 @@ def main():
         readings = (reading for reading in readings
                     if not isinstance(reading, common.KetoneReading))
 
-      if args.sort_by is not None:
-        readings = sorted(
-          readings, key=lambda reading: getattr(reading, args.sort_by))
-
-      for reading in readings:
+      for reading in sorted(readings, key=lambda r: r.timestamp):
         print(reading.as_csv(unit))
     elif args.action == 'datetime':
       if args.set == 'now':
