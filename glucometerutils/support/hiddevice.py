@@ -9,6 +9,11 @@ __license__ = 'MIT'
 import logging
 import os
 
+try:
+    from typing import Optional
+except:
+    pass
+
 from glucometerutils import exceptions
 
 
@@ -33,14 +38,14 @@ class HidDevice(object):
 
     Optional parameters available:
 
-      TIMEOUT_MS: (int, default: NOne) the read timeout in milliseconds, used
+      TIMEOUT_MS: (int, default: None) the read timeout in milliseconds, used
         for hidapi reads only. If -1, hidapi will be provided no timeout.
     """
 
-    USB_VENDOR_ID = None
-    USB_PRODUCT_ID = None
+    USB_VENDOR_ID = None  # type: int
+    USB_PRODUCT_ID = None  # type: int
 
-    TIMEOUT_MS = None
+    TIMEOUT_MS = None  # type: Optional[int]
 
     def __init__(self, device):
         if None in (self.USB_VENDOR_ID, self.USB_PRODUCT_ID) and not device:

@@ -9,6 +9,11 @@ __license__ = 'MIT'
 
 import logging
 
+try:
+    from typing import Text
+except:
+    pass
+
 import serial
 
 from glucometerutils import exceptions
@@ -40,10 +45,10 @@ class SerialDevice(object):
 
     """
 
-    BAUDRATE = None
-    DEFAULT_CABLE_ID = None
+    BAUDRATE = None  # type: int
+    DEFAULT_CABLE_ID = None  # type: Text
 
-    TIMEOUT = 1
+    TIMEOUT = 1  # type: float
 
     def __init__(self, device):
         assert self.BAUDRATE is not None

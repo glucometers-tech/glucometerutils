@@ -77,8 +77,8 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
     TEXT_CMD = 0x60
     TEXT_REPLY_CMD = 0x60
 
-    USB_VENDOR_ID = 0x1a61  # Abbott Diabetes Care
-    USB_PRODUCT_ID = None
+    USB_VENDOR_ID = 0x1a61  # type: int  # Abbott Diabetes Care
+    USB_PRODUCT_ID = None  # type: int
 
     def connect(self):
         """Open connection to the device, starting the knocking sequence."""
@@ -103,8 +103,8 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         usb_packet = _FREESTYLE_MESSAGE.build(
             {'message_type': message_type, 'command': command})
 
-        logging.debug('Sending packet: %r', usb_packet)
-
+        logging.debug('Sending packet: %r', usb_packet
+)
         self._write(usb_packet)
 
     def _read_response(self):
