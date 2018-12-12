@@ -44,6 +44,9 @@ setup(
     data_files = [
         ('lib/udev/rules', ['udev/69-glucometerutils.rules']),
     ],
+    install_require = [
+        'attrs',
+    ],
     tests_require = test_required,
     extras_require = {
         # These are all the drivers' dependencies. Optional dependencies are

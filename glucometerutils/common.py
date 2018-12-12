@@ -10,6 +10,8 @@ import collections
 import enum
 import textwrap
 
+import attr
+
 from glucometerutils import exceptions
 
 class Unit(enum.Enum):
@@ -117,24 +119,22 @@ class KetoneReading(_ReadingBase):
       self.timestamp, self.get_value_as(unit), self.measure_method.value,
       self.comment)
 
+@attr.s
+class MeterInfo:
+  """General information aobut the meter, such as model, serial number and unit.
 
-_MeterInfoBase = collections.namedtuple(
-  '_MeterInfoBase', ['model', 'serial_number', 'version_info', 'native_unit'])
-
-class MeterInfo(_MeterInfoBase):
-  def __new__(cls, model, serial_number='N/A', version_info=(),
-              native_unit=Unit.MG_DL):
-    """Construct a meter information object.
-
-    Args:
-      model: (string) Human-readable model name, depending on driver.
-      serial_number: (string) Optional serial number to identify the device.
-      version_info: (list(string)) Optional hardware/software version information.
-      native_unit: (Unit) Native unit of the device for display.
-    """
-    return super(MeterInfo, cls).__new__(
-      cls, model=model, serial_number=serial_number, version_info=version_info,
-      native_unit=native_unit)
+  Attributes:
+    model: Human readable model name, chosen by the driver.
+    serial_number: Serial number identified for the reader (or N/A if not
+      available in the protocol.)
+    version_info: List of strings with any version information available about
+      the device. It can include hardware and software version.
+    native_unite: One of the Unit values to identify the meter native unit.
+  """
+  model = attr.ib()
+  serial_number = attr.ib(default='N/A')
+  version_info = attr.ib(default=())
+  native_unit = attr.ib(default=Unit.MG_DL, validator=attr.validators.in_(Unit))
 
   def __str__(self):
     version_information_string = 'N/A'
