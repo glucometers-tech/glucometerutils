@@ -54,7 +54,7 @@ _QUERY_REQUEST = construct.Struct(
 )
 
 _QUERY_RESPONSE = construct.Struct(
-    lifescan_binary_protocol.COMMAND_SUCCESS,
+    construct.Const(b'\x03'),
     'value' / construct.CString(encoding='utf-16-le'),
 )
 
