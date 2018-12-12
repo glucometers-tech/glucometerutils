@@ -9,47 +9,43 @@ __license__ = 'MIT'
 class Error(Exception):
     """Base class for the errors."""
 
-    def __str__(self):
-        return self.message
-
 
 class CommandLineError(Error):
     """Error with commandline parameters provided."""
-
-    def __init__(self, message=''):
-        self.message = message
 
 
 class ConnectionFailed(Error):
     """It was not possible to connect to the meter."""
 
     def __init__(self, message='Unable to connect to the meter.'):
-        self.message = message
+        super(ConnectionFailed, self).__init__(message=message)
 
 
 class CommandError(Error):
     """It was not possible to send a command to the device."""
 
     def __init__(self, message="Unable to send command to device."):
-        self.message = message
+        super(CommandError, self).__init__(message=message)
 
 
 class InvalidResponse(Error):
     """The response received from the meter was not understood"""
 
     def __init__(self, response):
-        self.message = 'Invalid response received:\n%s' % response
+        super(InvalidResponse, self).__init__(
+            'Invalid response received:\n%s' % response)
 
 
 class InvalidChecksum(InvalidResponse):
-    def __init__(self, expected, gotten):
-        self.message = (
-          'Response checksum not matching: %08x expected, %08x gotten' %
-          (expected, gotten))
+    def __init__(self, expected, received):
+        super(InvalidChecksum, self).__init__(
+            'Response checksum not matching: %08x expected, %08x received' %
+            (expected, received))
 
 
 class InvalidGlucoseUnit(Error):
     """Unable to parse the given glucose unit"""
 
     def __init__(self, unit):
-        self.message = 'Invalid glucose unit received:\n%s' % unit
+        super(InvalidGlucoseUnit, self).__init__(
+            'Invalid glucose unit received:\n%s' % unit)
