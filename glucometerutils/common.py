@@ -7,8 +7,14 @@ __copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
 __license__ = 'MIT'
 
 import collections
+import datetime
 import enum
 import textwrap
+
+try:
+    from typing import Text
+except:
+    pass
 
 import attr
 
@@ -52,31 +58,17 @@ def convert_glucose_unit(value, from_unit, to_unit):
   else:
     return round(value * 18.0, 0)
 
-_ReadingBase = collections.namedtuple(
-  '_ReadingBase', ['timestamp', 'value', 'comment', 'measure_method'])
+@attr.s
+class GlucoseReading:
 
-class GlucoseReading(_ReadingBase):
-  def __new__(cls, timestamp, value, meal=Meal.NONE, comment='',
-              measure_method=MeasurementMethod.BLOOD_SAMPLE):
-    """Constructor for the glucose reading object.
-
-    Args:
-      timestamp: (datetime) Timestamp of the reading as reported by the meter.
-      value: (float) Value of the reading, in mg/dL.
-      meal: (string) Meal-relativeness as reported by the reader, if any.
-      comment: (string) Comment reported by the reader, if any.
-      measure_method: (string) Measure method as reported by the reader if any,
-        assuming blood sample otherwise.
-
-    The value is stored in mg/dL, even though this is not the standard value,
-    because at least most of the LifeScan devices report the raw data in this
-    format.
-    """
-    instance = super(GlucoseReading, cls).__new__(
-      cls, timestamp=timestamp, value=value, comment=comment,
-      measure_method=measure_method)
-    setattr(instance, 'meal', meal)
-    return instance
+  timestamp = attr.ib()  # type: datetime.datetime
+  value = attr.ib()  # type: float
+  meal = attr.ib(
+    default=Meal.NONE, validator=attr.validators.in_(Meal))  # type: Meal
+  comment = attr.ib(default='')  # type: Text
+  measure_method = attr.ib(
+    default=MeasurementMethod.BLOOD_SAMPLE,
+    validator=attr.validators.in_(MeasurementMethod)) # type: MeasurementMethod
 
   def get_value_as(self, to_unit):
     """Returns the reading value as the given unit.
@@ -92,31 +84,19 @@ class GlucoseReading(_ReadingBase):
       self.timestamp, self.get_value_as(unit), self.meal.value,
       self.measure_method.value, self.comment)
 
-class KetoneReading(_ReadingBase):
-  def __new__(cls, timestamp, value, comment='', **kwargs):
-    """Constructor for the ketone reading object.
+@attr.s
+class KetoneReading:
 
-    Args:
-      timestamp: (datetime) Timestamp of the reading as reported by the meter.
-      value: (float) Value of the reading, in mmol/L.
-      comment: (string) Comment reported by the reader, if any.
-
-    The value is stored in mg/dL, even though this is not the standard value,
-    because at least most of the LifeScan devices report the raw data in this
-    format.
-    """
-    return super(KetoneReading, cls).__new__(
-      cls, timestamp=timestamp, value=value, comment=comment,
-      measure_method=MeasurementMethod.BLOOD_SAMPLE)
-
-  def get_value_as(self, *args):
-    """Returns the reading value in mmol/L."""
-    return self.value
+  timestamp = attr.ib()  # type: datetime.datetime
+  value = attr.ib()  # type: float
+  comment = attr.ib(default='')  # type: Text
 
   def as_csv(self, unit):
     """Returns the reading as a formatted comma-separated value string."""
+    del unit  # Unused for Ketone readings.
+
     return '"%s","%.2f","%s","%s"' % (
-      self.timestamp, self.get_value_as(unit), self.measure_method.value,
+      self.timestamp, self.value, MeasurementMethod.BLOOD_SAMPLE,
       self.comment)
 
 @attr.s
