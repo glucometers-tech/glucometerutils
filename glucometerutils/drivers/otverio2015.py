@@ -54,7 +54,7 @@ _QUERY_REQUEST = construct.Struct(
 )
 
 _QUERY_RESPONSE = construct.Struct(
-    construct.Const(b'\x03'),
+    construct.Const(b'\x03\x06'),
     'value' / construct.CString(encoding='utf-16-le'),
 )
 
@@ -183,10 +183,7 @@ class Device:
         response = self._send_request(
             3, _QUERY_REQUEST, {'selector': selector}, _QUERY_RESPONSE)
 
-        # Unfortunately the CString implementation in construct does not support
-        # multi-byte encodings, so we need to discard the terminating null byte
-        # ourself.
-        return response.value[:-1]
+        return response.value
 
     def get_meter_info(self):
         return common.MeterInfo(
