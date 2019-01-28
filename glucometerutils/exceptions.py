@@ -18,14 +18,14 @@ class ConnectionFailed(Error):
     """It was not possible to connect to the meter."""
 
     def __init__(self, message='Unable to connect to the meter.'):
-        super(ConnectionFailed, self).__init__(message=message)
+        super(ConnectionFailed, self).__init__(message)
 
 
 class CommandError(Error):
     """It was not possible to send a command to the device."""
 
     def __init__(self, message="Unable to send command to device."):
-        super(CommandError, self).__init__(message=message)
+        super(CommandError, self).__init__(message)
 
 
 class InvalidResponse(Error):
