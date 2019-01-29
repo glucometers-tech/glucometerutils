@@ -38,14 +38,14 @@ class HidDevice:
 
     Optional parameters available:
 
-      TIMEOUT_MS: (int, default: None) the read timeout in milliseconds, used
-        for hidapi reads only. If -1, hidapi will be provided no timeout.
+      TIMEOUT_MS: (int, default: 0) the read timeout in milliseconds, used
+        for hidapi reads only. If < 1, hidapi will be provided no timeout.
     """
 
     USB_VENDOR_ID = None  # type: int
     USB_PRODUCT_ID = None  # type: int
 
-    TIMEOUT_MS = None  # type: Optional[int]
+    TIMEOUT_MS = 0  # type: int
 
     def __init__(self, device):
         # type: (Optional[Text]) -> None
