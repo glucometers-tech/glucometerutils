@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for LifeScan OneTouch Verio (2015) and Select Plus devices.
 
 Verio 2015 devices can be recognized by microUSB connectors.
@@ -19,11 +21,6 @@ Further information on the device protocol can be found at
 https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
 
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2016-2018, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import binascii
 import datetime

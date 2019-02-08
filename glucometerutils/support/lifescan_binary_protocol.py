@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Support module for the LifeScan binary protocol.
 
 A number of LifeScan devices use a semi-compatible binary protocol to talk host
@@ -6,11 +8,6 @@ and device, which is (vastly) compatible.
 
 This module implements an interface to send and receive these messages.
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2014-2018, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import construct
 

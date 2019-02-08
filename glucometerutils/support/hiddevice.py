@@ -1,10 +1,8 @@
+# -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Common routines and base driver class for HID-based meters.
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import logging
 import os

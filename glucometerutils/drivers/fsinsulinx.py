@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for FreeStyle InsuLinx devices.
 
 Supported features:
@@ -13,11 +15,6 @@ WARNING: currently untested! Based off reverse engineering notes provided by
 Xavier Claessens.
 
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import collections
 import datetime

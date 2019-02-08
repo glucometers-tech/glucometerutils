@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Extra classes for Construct."""
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2018, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import datetime
 

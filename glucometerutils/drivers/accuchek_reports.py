@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for Accu-Chek Mobile devices with reports mode.
 
 Supported features:
@@ -11,11 +13,6 @@ Expected device path: /mnt/ACCUCHEK, the mountpoint of the block device.
 The Accu-Chek Mobile meters should be set to "Reports" mode.
 
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2016, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import csv
 import datetime

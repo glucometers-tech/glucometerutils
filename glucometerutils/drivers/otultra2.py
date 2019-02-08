@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for LifeScan OneTouch Ultra 2 devices.
 
 Supported features:
@@ -10,11 +12,6 @@ Supported features:
 
 Expected device path: /dev/ttyUSB0 or similar serial port device.
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import datetime
 import re

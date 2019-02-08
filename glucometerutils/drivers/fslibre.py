@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for FreeStyle Libre devices.
 
 Supported features:
@@ -14,11 +16,6 @@ Further information on the device protocol can be found at
 https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre
 
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import datetime
 

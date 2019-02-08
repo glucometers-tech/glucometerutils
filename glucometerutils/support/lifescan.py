@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Common utility functions for LifeScan meters."""
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 from glucometerutils import exceptions
 

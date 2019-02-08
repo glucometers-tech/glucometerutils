@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Utility to manage glucometers' data."""
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import argparse
 import importlib

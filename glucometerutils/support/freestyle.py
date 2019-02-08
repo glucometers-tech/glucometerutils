@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Common routines to implement the FreeStyle common protocol.
 
 Protocol documentation available at
 https://flameeyes.github.io/glucometer-protocols/abbott/shared-hid-protocol.html
 
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import csv
 import datetime

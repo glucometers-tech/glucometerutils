@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Tests for the LifeScan OneTouch Ultra Mini driver."""
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 # pylint: disable=protected-access,missing-docstring
 

@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Common exceptions for glucometerutils."""
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2013, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 class Error(Exception):
     """Base class for the errors."""

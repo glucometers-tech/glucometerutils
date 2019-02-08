@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Tests for the common routines."""
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2013-2018, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 # pylint: disable=protected-access,missing-docstring
 

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for SD CodeFree devices by SD Biosensor.
 
 For SD Biosensor glucometers using the serial interface.
@@ -12,12 +14,6 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 IMPORTANT NOTE: the glucometer can be connected before starting the program, but
 it has to be turned on when the program asks you to.
 """
-
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import binascii
 import datetime

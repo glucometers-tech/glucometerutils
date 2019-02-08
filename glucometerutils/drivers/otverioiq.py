@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for LifeScan OneTouch Verio IQ devices.
 
 Supported features:
@@ -12,11 +14,6 @@ Expected device path: /dev/ttyUSB0 or similar serial port device. Device will be
 auto-detected.
 
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2018, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import binascii
 import datetime

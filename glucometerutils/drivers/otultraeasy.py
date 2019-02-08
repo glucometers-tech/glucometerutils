@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
 """Driver for LifeScan OneTouch Ultra Easy devices.
 
 Also supports OneTouch Ultra Mini devices (different name, same device).
@@ -12,11 +14,6 @@ Supported features:
 
 Expected device path: /dev/ttyUSB0 or similar serial port device.
 """
-
-__author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.com'
-__copyright__ = 'Copyright © 2014-2018, Diego Elio Pettenò'
-__license__ = 'MIT'
 
 import binascii
 import datetime
