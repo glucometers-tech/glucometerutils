@@ -2,7 +2,7 @@
 """Tests for the common routines."""
 
 __author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.eu'
+__email__ = 'flameeyes@flameeyes.com'
 __copyright__ = 'Copyright © 2013-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 

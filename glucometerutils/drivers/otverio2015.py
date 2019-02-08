@@ -21,7 +21,7 @@ https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
 """
 
 __author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.eu'
+__email__ = 'flameeyes@flameeyes.com'
 __copyright__ = 'Copyright © 2016-2018, Diego Elio Pettenò'
 __license__ = 'MIT'
 

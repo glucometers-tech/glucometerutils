@@ -15,7 +15,7 @@ it has to be turned on when the program asks you to.
 
 
 __author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.eu'
+__email__ = 'flameeyes@flameeyes.com'
 __copyright__ = 'Copyright © 2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 

@@ -2,7 +2,7 @@
 """Tests for the LifeScan OneTouch Ultra Mini driver."""
 
 __author__ = 'Diego Elio Pettenò'
-__email__ = 'flameeyes@flameeyes.eu'
+__email__ = 'flameeyes@flameeyes.com'
 __copyright__ = 'Copyright © 2013-2017, Diego Elio Pettenò'
 __license__ = 'MIT'
 
