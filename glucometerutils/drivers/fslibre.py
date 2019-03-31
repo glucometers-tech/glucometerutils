@@ -93,8 +93,15 @@ def _extract_timestamp(parsed_record):
 
 
 def _convert_ketone_unit(raw_value):
-    """Convert raw ketone value as read in the device to its value in mmol/L."""
-    return int((raw_value + 1) / 2.) / 10.
+    """Convert raw ketone value as read in the device to its value in mmol/L.
+
+    As per
+    https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre.html
+    this is actually not using any mg/dL→mmol/L conversion, but rather the same
+    as the meter uses for blood glucose.
+
+    """
+    return raw_value // 18
 
 
 def _parse_arresult(record):
