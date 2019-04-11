@@ -28,6 +28,7 @@ class Meal(enum.Enum):
 class MeasurementMethod(enum.Enum):
     BLOOD_SAMPLE = 'blood sample'
     CGM = 'CGM' # Continuous Glucose Monitoring
+    TIME = 'time'
 
 
 def convert_glucose_unit(value, from_unit, to_unit):
@@ -96,6 +97,22 @@ class KetoneReading:
         return '"%s","%.2f","%s","%s"' % (
             self.timestamp, self.value, MeasurementMethod.BLOOD_SAMPLE,
             self.comment)
+
+@attr.s
+class TimeAdjustment:
+    timestamp = attr.ib()  # type: datetime.datetime
+    old_timestamp = attr.ib()  # type: datetime.datetime
+    measure_method = attr.ib(
+        default=MeasurementMethod.TIME,
+        validator=attr.validators.in_(
+            MeasurementMethod))  # type: MeasurementMethod
+
+    def as_csv(self, unit):
+        del unit
+        return '"%s","","%s","%s"' % (
+            self.timestamp, self.measure_method.value, self.old_timestamp
+        )
+
 
 @attr.s
 class MeterInfo:

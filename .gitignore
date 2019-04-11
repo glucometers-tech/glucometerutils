@@ -7,3 +7,5 @@
 /dist/
 __pycache__/
 build
+.idea/
+*venv/

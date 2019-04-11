@@ -57,6 +57,15 @@ _ARRESULT_TYPE2_ENTRY_MAP = (
     (28, 'errors'),
 )
 
+_ARRESULT_TYPE5_ENTRY_MAP = (
+    (9, 'old_month'),
+    (10, 'old_day'),
+    (11, 'old_year'),
+    (12, 'old_hour'),
+    (13, 'old_minute'),
+    (14, 'old_second'),
+)
+
 # Fields only valid when rapid-acting-flag is "1"
 _ARRESULT_RAPID_INSULIN_ENTRY_MAP = (
     (43, 'double-rapid-acting-insulin'),
@@ -77,19 +86,19 @@ def _parse_record(record, entry_map):
         return {}
 
 
-def _extract_timestamp(parsed_record):
+def _extract_timestamp(parsed_record, prefix=''):
     """Extract the timestamp from a parsed record.
 
     This leverages the fact that all the records have the same base structure.
     """
 
     return datetime.datetime(
-        parsed_record['year'] + 2000,
-        parsed_record['month'],
-        parsed_record['day'],
-        parsed_record['hour'],
-        parsed_record['minute'],
-        parsed_record['second'])
+        parsed_record[prefix + 'year'] + 2000,
+        parsed_record[prefix + 'month'],
+        parsed_record[prefix + 'day'],
+        parsed_record[prefix + 'hour'],
+        parsed_record[prefix + 'minute'],
+        parsed_record[prefix + 'second'])
 
 
 def _convert_ketone_unit(raw_value):
@@ -110,10 +119,18 @@ def _parse_arresult(record):
     parsed_record = _parse_record(record, _BASE_ENTRY_MAP)
 
     # There are other record types, but we don't currently need to expose these.
-    if not parsed_record or parsed_record['type'] != 2:
+    if not parsed_record:
+        return None
+    elif parsed_record['type'] == 2:
+        parsed_record.update(_parse_record(record, _ARRESULT_TYPE2_ENTRY_MAP))
+    elif parsed_record['type'] == 5:
+        parsed_record.update(_parse_record(record, _ARRESULT_TYPE5_ENTRY_MAP))
+        return common.TimeAdjustment(
+            _extract_timestamp(parsed_record),
+            _extract_timestamp(parsed_record, 'old_'))
+    else:
         return None
 
-    parsed_record.update(_parse_record(record, _ARRESULT_TYPE2_ENTRY_MAP))
 
     # Check right away if we have rapid insulin
     if parsed_record['rapid-acting-flag']:
