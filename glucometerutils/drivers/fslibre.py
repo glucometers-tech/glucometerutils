@@ -57,7 +57,7 @@ _ARRESULT_TYPE2_ENTRY_MAP = (
     (28, 'errors'),
 )
 
-_ARRESULT_TYPE5_ENTRY_MAP = (
+_ARRESULT_TIME_ADJUSTMENT_ENTRY_MAP = (
     (9, 'old_month'),
     (10, 'old_day'),
     (11, 'old_year'),
@@ -124,7 +124,7 @@ def _parse_arresult(record):
     elif parsed_record['type'] == 2:
         parsed_record.update(_parse_record(record, _ARRESULT_TYPE2_ENTRY_MAP))
     elif parsed_record['type'] == 5:
-        parsed_record.update(_parse_record(record, _ARRESULT_TYPE5_ENTRY_MAP))
+        parsed_record.update(_parse_record(record, _ARRESULT_TIME_ADJUSTMENT_ENTRY_MAP))
         return common.TimeAdjustment(
             _extract_timestamp(parsed_record),
             _extract_timestamp(parsed_record, 'old_'))
