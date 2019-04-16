@@ -26,6 +26,7 @@ from glucometerutils.support import freestyle
 # Fields of the records returned by both $history and $arresult?
 # Tuple of pairs of idx and field name
 _BASE_ENTRY_MAP = (
+    (0, 'device_id'),
     (1, 'type'),
     (2, 'month'),
     (3, 'day'),
@@ -116,7 +117,8 @@ def _parse_arresult(record):
         parsed_record.update(_parse_record(record, _ARRESULT_TIME_ADJUSTMENT_ENTRY_MAP))
         return common.TimeAdjustment(
             _extract_timestamp(parsed_record),
-            _extract_timestamp(parsed_record, 'old_'))
+            _extract_timestamp(parsed_record, 'old_'),
+            device_id=parsed_record['device_id'])
     else:
         return None
 
@@ -195,7 +197,8 @@ def _parse_arresult(record):
         _extract_timestamp(parsed_record),
         value,
         comment='; '.join(comment_parts),
-        measure_method=measure_method)
+        measure_method=measure_method,
+        device_id=parsed_record['device_id'])
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
@@ -237,7 +240,9 @@ class Device(freestyle.FreeStyleHidDevice):
                 _extract_timestamp(parsed_record),
                 parsed_record['value'],
                 comment='(Sensor)',
-                measure_method=common.MeasurementMethod.CGM)
+                measure_method=common.MeasurementMethod.CGM,
+                device_id=parsed_record['device_id']
+            )
 
         # Then get the results of explicit scans and blood tests (and other
         # events).
