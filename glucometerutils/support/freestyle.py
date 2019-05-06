@@ -28,7 +28,7 @@ from glucometerutils.support import hiddevice
 _INIT_SEQUENCE = (0x04, 0x05, 0x15, 0x01)
 
 _FREESTYLE_MESSAGE = construct.Struct(
-    'hid_report' / construct.Const(0, construct.Byte),
+    'hid_report' / construct.Const(construct.Byte, 0),
     'message_type' / construct.Byte,
     'command' / construct.Padded(
         63,  # command can only be up to 62 bytes, but one is used for length.
