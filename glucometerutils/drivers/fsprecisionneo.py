@@ -89,4 +89,10 @@ class Device(freestyle.FreeStyleHidDevice):
                 raw_reading.year + 2000, raw_reading.month, raw_reading.day,
                 raw_reading.hour, raw_reading.minute)
 
-            yield cls(timestamp, raw_reading.value)
+            if record and record[0] == _TYPE_KETONE_READING:
+                value = freestyle.convert_ketone_unit(raw_reading.value)
+            else:
+                value = raw_reading.value
+
+            yield cls(timestamp, value)
+
