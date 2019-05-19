@@ -95,7 +95,7 @@ class KetoneReading:
         del unit  # Unused for Ketone readings.
 
         return '"%s","%.2f","%s","%s"' % (
-            self.timestamp, self.value, MeasurementMethod.BLOOD_SAMPLE,
+            self.timestamp, self.value, MeasurementMethod.BLOOD_SAMPLE.value,
             self.comment)
 
 @attr.s
