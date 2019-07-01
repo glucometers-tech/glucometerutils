@@ -86,9 +86,9 @@ def main():
         if args.action == 'info':
             try:
                 time_str = device.get_datetime()
-            except ValueError:
-                time_str = 'N/A' #handles value error exception for when time format found isn't expected
-            except NotImplementedError:
+            except exceptions.InvalidDateTime:
+                time_str = 'INVALID'
+            except NotImplementedError, ValueError:  # Catch any leftover ValueError
                 time_str = 'N/A'
             print("{device_info}Time: {time}".format(
                 device_info=str(device_info), time=time_str))

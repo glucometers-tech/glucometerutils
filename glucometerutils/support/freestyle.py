@@ -200,7 +200,13 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         month, day, year = (int(x) for x in date.split(','))
         hour, minute = (int(x) for x in time.split(','))
 
-        return datetime.datetime(year + 2000, month, day, hour, minute)
+        # At least Precision Neo devices can have an invalid date (bad RTC?),
+        # and report 255 for each field, which is not valid for
+        # datetime.datetime().
+        try:
+            return datetime.datetime(year + 2000, month, day, hour, minute)
+        except ValueError:
+            raise exceptions.InvalidDateTime()
 
     def set_datetime(self, date=datetime.datetime.now()):
         # type: (datetime.datetime) -> datetime.datetime

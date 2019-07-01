@@ -46,3 +46,11 @@ class InvalidGlucoseUnit(Error):
     def __init__(self, unit):
         super(InvalidGlucoseUnit, self).__init__(
             'Invalid glucose unit received:\n%s' % unit)
+
+
+class InvalidDateTime(Error):
+    """The device has an invalid date/time setting."""
+
+    def __init__(self):
+        super(InvalidDateTime, self).__init__(
+            'Invalid date and time for device')
