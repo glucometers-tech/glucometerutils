@@ -88,7 +88,8 @@ def main():
                 time_str = device.get_datetime()
             except exceptions.InvalidDateTime:
                 time_str = 'INVALID'
-            except NotImplementedError, ValueError:  # Catch any leftover ValueError
+            # Also catch any leftover ValueErrors.
+            except (NotImplementedError, ValueError):
                 time_str = 'N/A'
             print("{device_info}Time: {time}".format(
                 device_info=str(device_info), time=time_str))
