@@ -126,11 +126,11 @@ class MeterInfo:
         the device. It can include hardware and software version.
       native_unit: One of the Unit values to identify the meter native unit.
     """
-    model = attr.ib()  # Text
-    serial_number = attr.ib(default='N/A')  # Text
-    version_info = attr.ib(default=())  # Sequence[Text]
+    model = attr.ib()  # type: Text
+    serial_number = attr.ib(default='N/A')  # type: Text
+    version_info = attr.ib(default=())  # type: Sequence[Text]
     native_unit = attr.ib(
-        default=Unit.MG_DL, validator=attr.validators.in_(Unit))  # Unit
+        default=Unit.MG_DL, validator=attr.validators.in_(Unit))  # type: Unit
 
     def __str__(self):
         version_information_string = 'N/A'
