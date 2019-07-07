@@ -14,7 +14,7 @@ import logging
 import re
 
 try:
-    from typing import Iterator, List, Text, Tuple
+    from typing import Iterator, List, Optional, Text, Tuple
 except ImportError:
     pass
 
@@ -185,6 +185,13 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         # type: () -> Text
         """Returns the serial number of the device."""
         return self._send_text_command(b'$serlnum?').rstrip('\r\n')
+
+    def get_patient_name(self):
+        # type: () -> Optional[Text]
+        patient_name = self._send_text_command(b'$ptname?').rstrip('\r\n')
+        if not patient_name:
+            return None
+        return patient_name
 
     def get_datetime(self):
         # type: () -> datetime.datetime

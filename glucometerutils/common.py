@@ -8,7 +8,7 @@ import enum
 import textwrap
 
 try:
-    from typing import Sequence, Text
+    from typing import Optional, Sequence, Text
 except ImportError:
     pass
 
@@ -131,6 +131,7 @@ class MeterInfo:
     version_info = attr.ib(default=())  # type: Sequence[Text]
     native_unit = attr.ib(
         default=Unit.MG_DL, validator=attr.validators.in_(Unit))  # type: Unit
+    patient_name = attr.ib(default=None)  # type: Optional[Text]
 
     def __str__(self):
         version_information_string = 'N/A'
@@ -138,7 +139,7 @@ class MeterInfo:
             version_information_string = '\n    '.join(
                 self.version_info).strip()
 
-        return textwrap.dedent("""\
+        base_output = textwrap.dedent("""\
             {model}
             Serial Number: {serial_number}
             Version Information:
@@ -147,3 +148,9 @@ class MeterInfo:
         """).format(model=self.model, serial_number=self.serial_number,
                     version_information_string=version_information_string,
                     native_unit=self.native_unit.value)
+
+        if self.patient_name != None:
+            base_output += 'Patient Name: {patient_name}\n'.format(
+                patient_name=self.patient_name)
+
+        return base_output

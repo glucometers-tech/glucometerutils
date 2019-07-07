@@ -208,7 +208,8 @@ class Device(freestyle.FreeStyleHidDevice):
             serial_number=self.get_serial_number(),
             version_info=(
                 'Software version: ' + self._get_version(),),
-            native_unit=self.get_glucose_unit())
+            native_unit=self.get_glucose_unit(),
+            patient_name=self.get_patient_name())
 
     def get_serial_number(self):
         """Overridden function as the command is not compatible."""
