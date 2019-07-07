@@ -58,6 +58,12 @@ def main():
         '--set', action='store', nargs='?', const='now', default=None,
         help='Set the date rather than just reading it from the device.')
 
+    parser_patient = subparsers.add_parser(
+        'patient', help='Reads or sets the patient information.')
+    parser_patient.add_argument(
+        '--set_name', action='store', required=False,
+        help='Set the patient name, if the meter supports it.')
+
     args = parser.parse_args()
 
     logging.basicConfig(level=args.vlog)
@@ -124,6 +130,22 @@ def main():
                 print(device.set_datetime(new_date))
             else:
                 print(device.get_datetime())
+        elif args.action == 'patient':
+            if args.set_name != None:
+                try:
+                    device.set_patient_name(args.set_name)
+                except NotImplementedError:
+                    print(
+                        'The glucometer does not support setting patient name.')
+            try:
+                patient_name = device.get_patient_name()
+                if patient_name is None:
+                    patient_name = '[N/A]'
+                print('Patient Name: {patient_name}'.format(
+                    patient_name=patient_name))
+            except NotImplementedError:
+                print(
+                    'The glucometer does not support retrieving patient name.')
         elif args.action == 'zero':
             confirm = input('Delete the device data log? (y/N) ')
             if confirm.lower() in ['y', 'ye', 'yes']:

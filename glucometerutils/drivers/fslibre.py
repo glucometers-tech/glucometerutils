@@ -6,7 +6,8 @@
 Supported features:
     - get readings (sensor, flash and blood glucose), including comments;
     - get and set date and time;
-    - get serial number and software version.
+    - get serial number and software version;
+    - get and set patient name.
 
 Expected device path: /dev/hidraw9 or similar HID device. Optional when using
 HIDAPI.

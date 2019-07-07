@@ -193,6 +193,15 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
             return None
         return patient_name
 
+    def set_patient_name(self, name):
+        # type: (Text) -> None
+        try:
+            name = name.encode('ascii')
+        except UnicodeDecodeError:
+            raise ValueError('Only ASCII-safe names are tested working')
+
+        result = self._send_text_command(b'$ptname,' + name)
+
     def get_datetime(self):
         # type: () -> datetime.datetime
         """Gets the date and time as reported by the device.
