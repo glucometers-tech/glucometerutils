@@ -9,7 +9,8 @@ untested.
 Supported features:
     - get readings;
     - get and set date and time;
-    - get serial number and software version.
+    - get serial number and software version;
+    - get and set patient name.
 
 Expected device path: /dev/hidraw9 or similar HID device. Optional when using
 HIDAPI.
@@ -59,7 +60,8 @@ class Device(freestyle.FreeStyleHidDevice):
             serial_number=self.get_serial_number(),
             version_info=(
                 'Software version: ' + self._get_version(),),
-            native_unit=self.get_glucose_unit())
+            native_unit=self.get_glucose_unit(),
+            patient_name=self.get_patient_name())
 
     def get_glucose_unit(self):  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
