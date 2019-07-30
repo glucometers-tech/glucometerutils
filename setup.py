@@ -46,7 +46,7 @@ setup(
     data_files = [
         ('lib/udev/rules', ['udev/69-glucometerutils.rules']),
     ],
-    install_require = [
+    install_requires = [
         'attrs',
     ],
     tests_require = test_required,
