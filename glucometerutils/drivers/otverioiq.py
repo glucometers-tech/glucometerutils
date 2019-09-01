@@ -52,12 +52,12 @@ _READ_RTC_REQUEST = construct.Const(b'\x03\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
     construct.Const(b'\x03\x20\x01'),
-    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(
@@ -92,7 +92,7 @@ _MEAL_FLAG = {
 
 _READING_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
     'value' / construct.Int16ul,
     'control_test' / construct.Flag,
     'meal' / construct.Mapping(
