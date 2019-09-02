@@ -80,7 +80,7 @@ def _parse_clock(datestr):
     month = _MONTH_MATCHES[match.group('month')]
     year = int(match.group('year'))
 
-    hour, minute, second = map(match.group('time').split(':'), int)
+    hour, minute, second = (int (x) for x in match.group('time').split(':'))
 
     return datetime.datetime(year, month, day, hour, minute, second)
 
