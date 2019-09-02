@@ -14,9 +14,9 @@ from glucometerutils import common
 from glucometerutils import exceptions
 
 def main():
-    if sys.version_info < (3, 4):
+    if sys.version_info < (3, 5):
         raise Exception(
-            'Unsupported Python version, please use at least Python 3.4')
+            'Unsupported Python version, please use at least Python 3.5')
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="action")
