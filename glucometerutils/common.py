@@ -66,7 +66,7 @@ class GlucoseReading:
         default=MeasurementMethod.BLOOD_SAMPLE,
         validator=attr.validators.in_(
             MeasurementMethod)) # type: MeasurementMethod
-    device_id = attr.ib(default=None)  # type: int
+    extra_data = attr.ib(factory=dict)
 
     def get_value_as(self, to_unit):
         # type: (Unit) -> float
@@ -90,7 +90,7 @@ class KetoneReading:
     timestamp = attr.ib()  # type: datetime.datetime
     value = attr.ib()  # type: float
     comment = attr.ib(default='')  # type: Text
-    device_id = attr.ib(default=None)  # type: int
+    extra_data = attr.ib(factory=dict)
 
     def as_csv(self, unit):
         """Returns the reading as a formatted comma-separated value string."""
@@ -108,7 +108,7 @@ class TimeAdjustment:
         default=MeasurementMethod.TIME,
         validator=attr.validators.in_(
             MeasurementMethod))  # type: MeasurementMethod
-    device_id = attr.ib(default=None)  # type: int
+    extra_data = attr.ib(factory=dict)
 
     def as_csv(self, unit):
         del unit
