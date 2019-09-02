@@ -4,7 +4,7 @@
 """Common routines to implement the FreeStyle common protocol.
 
 Protocol documentation available at
-https://flameeyes.github.io/glucometer-protocols/abbott/shared-hid-protocol.html
+https://protocols.glucometers.tech/abbott/shared-hid-protocol
 
 """
 
@@ -72,10 +72,9 @@ def _verify_checksum(message, expected_checksum_hex):
 def convert_ketone_unit(raw_value):
     """Convert raw ketone value as read in the device to its value in mmol/L.
 
-    As per
-    https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre.html
-    this is actually not using any mg/dL→mmol/L conversion, but rather the same
-    as the meter uses for blood glucose.
+    As per https://protocols.glucometers.tech/abbott/freestyle-libre this is
+    actually not using any mg/dL→mmol/L conversion, but rather the same as the
+    meter uses for blood glucose.
 
     """
     return raw_value / 18.0

@@ -14,7 +14,7 @@ HIDAPI.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre
+https://protocols.glucometers.tech/abbott/freestyle-libre
 
 """
 

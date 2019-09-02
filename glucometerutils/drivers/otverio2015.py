@@ -18,7 +18,7 @@ Expected device path: /dev/sdb or similar USB block device.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
+https://protocols.glucometers.tech/lifescan/onetouch-verio-2015
 
 """
 

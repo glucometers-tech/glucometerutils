@@ -13,7 +13,7 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-optium
+https://protocols.glucometers.tech/abbott/freestyle-optium
 """
 
 import datetime
