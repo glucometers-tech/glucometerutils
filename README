@@ -70,7 +70,7 @@ action:
 
 If you have knowledge of a protocol of a glucometer you would have supported,
 please provide a reference, possibly by writing a specification and contribute
-it to https://github.com/Flameeyes/glucometer-protocols/.
+it to https://protocols.glucometers.tech/ .
 
 [construct]: https://construct.readthedocs.io/en/latest/
 [pyserial]: https://pythonhosted.org/pyserial/
