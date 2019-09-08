@@ -7,7 +7,8 @@ Supported features:
     - get readings (sensor, flash and blood glucose), including comments;
     - get and set date and time;
     - get serial number and software version;
-    - get and set patient name.
+    - get and set patient name;
+    - memory reset (caution!)
 
 Expected device path: /dev/hidraw9 or similar HID device. Optional when using
 HIDAPI.
@@ -252,3 +253,6 @@ class Device(freestyle.FreeStyleHidDevice):
             reading = _parse_arresult(record)
             if reading:
                 yield reading
+
+    def zero_log(self):
+        self._send_text_command(b'$resetpatient')
