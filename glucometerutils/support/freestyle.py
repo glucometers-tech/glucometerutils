@@ -275,6 +275,10 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
              in the record file.
         """
         message = self._send_text_command(command)
+        logging.debug('Received multirecord message:\n%s', message)
+        if message == "Log Empty\r\n":
+            return ()
+
         match = _MULTIRECORDS_FORMAT.search(message)
         if not match:
             raise exceptions.InvalidResponse(message)
