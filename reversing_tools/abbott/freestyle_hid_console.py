@@ -4,6 +4,7 @@
 
 import argparse
 import logging
+import sys
 
 from glucometerutils import exceptions
 from glucometerutils.support import freestyle
@@ -36,7 +37,12 @@ def main():
     device.connect()
 
     while True:
-        command = input('>>> ')
+        if sys.stdin.isatty():
+            command = input('>>> ')
+        else:
+            command = input()
+            print(f'>>> {command}')
+
         try:
             print(device._send_text_command(bytes(command, 'ascii')))
         except exceptions.InvalidResponse as error:
