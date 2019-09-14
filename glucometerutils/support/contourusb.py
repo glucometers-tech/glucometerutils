@@ -25,54 +25,6 @@ from glucometerutils.exceptions import InvalidResponse
 import usb
 from glucometerutils.support import hiddevice
 
-
-class _Vendor(int):
-    def __new__(self, vid, **kw):
-        instance = super(_Vendor, self).__new__(self, vid)
-        instance.__dict__ = kw
-        return instance
-
-
-class _vidDb(object):
-    def __init__(self, **kw):
-        self.__dict__ = kw
-
-
-ids = _vidDb(
-    Bayer=_Vendor(0x1a79, Contour=0x6002)
-)
-
-# Sequence of initialization messages sent to the device to establish HID
-# protocol.
-
-
-_TEXT_COMPLETION_RE = re.compile(b'CMD (?:OK|Fail!)')
-_TEXT_REPLY_FORMAT = re.compile(
-    b'^(?P<message>.*)CKSM:(?P<checksum>[0-9A-F]{8})\r\n'
-    b'CMD (?P<status>OK|Fail!)\r\n$', re.DOTALL)
-
-
-_MULTIRECORDS_FORMAT = re.compile(
-    '^(?P<message>.+\r\n)(?P<count>[0-9]+),(?P<checksum>[0-9A-F]{8})\r\n$',
-    re.DOTALL)
-
-
-def convert_ketone_unit(raw_value):
-    """Convert raw ketone value as read in the device to its value in mmol/L.
-
-    As per
-    https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre.html
-    this is actually not using any mg/dL→mmol/L conversion, but rather the same
-    as the meter uses for blood glucose.
-
-    """
-    return raw_value / 18.0
-
-
-class FrameError(Exception):
-    pass
-
-
 # regexr.com/4k6jb
 _HEADER_RECORD_RE = re.compile(
     "^(?P<record_type>[a-zA-Z])\\|(?P<field_del>.)(?P<repeat_del>.)"
@@ -94,17 +46,45 @@ _HEADER_RECORD_RE = re.compile(
     "(?P<low_hi_target>[0-9]{3})\\^Z=(?P<trends>[0-2])\\|"
     "(?P<total>[0-9]*)\\|\\|\\|\\|\\|\\|"
     "(?P<spec_ver>[0-9]+)\\|(?P<datetime>[0-9]+)")
+
 _RESULT_RECORD_RE = re.compile(
     "^(?P<record_type>[a-zA-Z])\\|(?P<seq_num>[0-9]+)\\|\\w*\\^\\w*\\^\\w*\\"
     "^(?P<test_id>\\w+)\\|(?P<value>[0-9]+)\\|(?P<unit>\\w+\\/\\w+)\\^"
     "(?P<ref_method>[BPD])\\|\\|(?P<markers>)[><BADISXCZ\\/1-12]*\\|\\|"
     "(?P<datetime>[0-9]+)")
 
+_RECORD_FORMAT = re.compile(
+    '\x02(?P<check>(?P<recno>[0-7])(?P<text>[^\x0d]*)'
+    '\x0d(?P<end>[\x03\x17]))'
+    '(?P<checksum>[0-9A-F][0-9A-F])\x0d\x0a')
+
+def convert_ketone_unit(raw_value):
+    """Convert raw ketone value as read in the device to its value in mmol/L.
+
+    As per
+    https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre.html
+    this is actually not using any mg/dL→mmol/L conversion, but rather the same
+    as the meter uses for blood glucose.
+
+    """
+    return raw_value / 18.0
+
+class FrameError(Exception):
+    pass
+
 
 class ContourHidDevice(hiddevice.HidDevice):
-    """Base class implementing the Contour HID common protocol.
+    """Base class implementing the ContourUSB HID common protocol.
     """
+    
     blocksize = 64
+    
+    # Operation modes
+    mode_establish = object
+    mode_data = object()
+    mode_precommand = object()
+    mode_command = object()
+    state = None
 
     def read(self, r_size=blocksize):
         result = []
@@ -122,7 +102,7 @@ class ContourHidDevice(hiddevice.HidDevice):
         return (b"".join(result))
 
     def write(self, data):
-        data = b'ABC' + chr(len(data)).encode('ascii') + data.encode()
+        data = b'ABC' + chr(len(data)).encode() + data.encode()
         pad_length = self.blocksize - len(data)
         data += pad_length * b'\x00'
 
@@ -130,18 +110,6 @@ class ContourHidDevice(hiddevice.HidDevice):
 
     USB_VENDOR_ID = 0x1a79  # type: int  # Bayer Health Care LLC Contour
     USB_PRODUCT_ID = 0x6002  # type: int
-
-    _RECORD_FORMAT = re.compile(
-        '\x02(?P<check>(?P<recno>[0-7])(?P<text>[^\x0d]*)'
-        '\x0d(?P<end>[\x03\x17]))'
-        '(?P<checksum>[0-9A-F][0-9A-F])\x0d\x0a')
-
-    # Operation modes
-    mode_establish = object
-    mode_data = object()
-    mode_precommand = object()
-    mode_command = object()
-    state = None
 
     def parse_header_record(self, text):
 
@@ -204,7 +172,7 @@ class ContourHidDevice(hiddevice.HidDevice):
         return ('00' + checksum)[-2:]
 
     def checkframe(self, frame):
-        match = self._RECORD_FORMAT.match(frame)
+        match = _RECORD_FORMAT.match(frame)
         if not match:
             raise FrameError("Couldn't parse frame", frame)
 
@@ -239,28 +207,24 @@ class ContourHidDevice(hiddevice.HidDevice):
         self.currecno = None
         self.state = self.mode_establish
         try:
-            # res = self._read() # clear the enq
             while True:
                 self.write('\x04')
-                res = self.read()  # clear the eot
+                res = self.read()
                 if res[0] == 4 and res[-1] == 5:
                     # we are connected and just got a header
                     header_record = res.decode()
-
                     stx = header_record.find('\x02')
                     if stx != -1:
-                        result = self._RECORD_FORMAT.match(
+                        result = _RECORD_FORMAT.match(
                             header_record[stx:]).group('text')
                         self.parse_header_record(result)
                     break
-                    # self._read() #read the eot
                 else:
                     pass
 
         except FrameError as e:
-            # print(e)
-            print("FRAME ERROR")
-            pass
+            print("Frame error")
+            raise e
 
         except Exception as e:
             print("Uknown error occured")
@@ -311,7 +275,6 @@ class ContourHidDevice(hiddevice.HidDevice):
             result = None
             foo = 0
             while True:
-                #print( '>>>', repr(tometer))
                 self.write(tometer)
                 if result is not None and self.state == self.mode_data:
                     yield result
@@ -322,7 +285,7 @@ class ContourHidDevice(hiddevice.HidDevice):
                 if self.state == self.mode_establish:
                     if data_bytes[-1] == 15:
                         # got a <NAK>, send <EOT>
-                        tometer = chr(foo)  # '\x15'
+                        tometer = chr(foo)
                         foo += 1
                         foo %= 256
                         continue
@@ -380,7 +343,3 @@ class ContourHidDevice(hiddevice.HidDevice):
                 records_arr.append(rec_text)
         # return csv.reader(records_arr)
         return records_arr  # array of groupdicts
-
-
-class Result(object):
-    is_control = False
