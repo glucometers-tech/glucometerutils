@@ -6,6 +6,9 @@
 Protocol documentation available from Ascensia at
 http://protocols.ascensia.com/Programming-Guide.aspx
 
+* glucodump code segments are developed by Anders Hammarquist
+* Rest of code is developed by Arvanitis Christos
+
 """
 
 import csv
@@ -58,25 +61,12 @@ _RECORD_FORMAT = re.compile(
     '\x0d(?P<end>[\x03\x17]))'
     '(?P<checksum>[0-9A-F][0-9A-F])\x0d\x0a')
 
-def convert_ketone_unit(raw_value):
-    """Convert raw ketone value as read in the device to its value in mmol/L.
-
-    As per
-    https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre.html
-    this is actually not using any mg/dL→mmol/L conversion, but rather the same
-    as the meter uses for blood glucose.
-
-    """
-    return raw_value / 18.0
-
 class FrameError(Exception):
     pass
-
 
 class ContourHidDevice(hiddevice.HidDevice):
     """Base class implementing the ContourUSB HID common protocol.
     """
-    
     blocksize = 64
     
     # Operation modes
@@ -326,7 +316,7 @@ class ContourHidDevice(hiddevice.HidDevice):
     def _get_multirecord(self):
         # type: (bytes) -> Iterator[List[Text]]
         """Queries for, and returns, "multirecords" results.
-        
+
         Returns:
           (csv.reader): a CSV reader object that returns a record for each line
              in the record file.
