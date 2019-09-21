@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 # SPDX-License-Identifier: MIT
-"""Driver for FreeStyle Libre devices.
+"""Driver for ContourUSB devices.
 
 Supported features:
-    - get readings (sensor, flash and blood glucose), including comments;
-    - get and date and time;
+    - get readings (blood glucose), including comments;
+    - get date and time;
     - get serial number and software version;
     - get device info (e.g. unit)
 
@@ -14,7 +14,7 @@ HIDAPI.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre
+http://protocols.ascensia.com/Programming-Guide.aspx
 
 """
 
@@ -26,7 +26,7 @@ from glucometerutils.support import contourusb
 def _extract_timestamp(parsed_record, prefix=''):
     """Extract the timestamp from a parsed record.
 
-    This leverages the fact that all the records have the same base structure.
+    This leverages the fact that all the reading records have the same base structure.
     """
     datetime_str = parsed_record['datetime']
 
@@ -58,8 +58,6 @@ class Device(contourusb.ContourHidDevice):
 
     def get_glucose_unit(self):  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
-        # TODO(Flameeyes): figure out how to identify the actual unit on the
-        # device.
         
         if self._get_glucose_unit() == '0':
             return common.Unit.MG_DL
@@ -68,16 +66,16 @@ class Device(contourusb.ContourHidDevice):
         
 
     def get_readings(self):
-
-        # First of all get the usually longer list of sensor readings, and
-        # convert them to Readings objects.
-
+        """
+        Get reading dump from download data mode(all readings stored)
+        This meter supports only blood samples
+        """
         for parsed_record in self._get_multirecord():
             yield common.GlucoseReading(
                 _extract_timestamp(parsed_record),
                 int(parsed_record['value']),
                 comment=parsed_record['markers'],
-                measure_method=common.MeasurementMethod.BLOOD_SAMPLE # only by blood sample for this meter
+                measure_method=common.MeasurementMethod.BLOOD_SAMPLE
                 )
             
 

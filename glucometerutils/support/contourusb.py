@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 # SPDX-License-Identifier: MIT
-"""Common routines to implement the FreeStyle common protocol.
+"""Common routines to implement the ContourUSB common protocol.
 
-Protocol documentation available at
-https://flameeyes.github.io/glucometer-protocols/abbott/shared-hid-protocol.html
+Protocol documentation available from Ascensia at
+http://protocols.ascensia.com/Programming-Guide.aspx
 
 """
 
@@ -91,10 +91,7 @@ class ContourHidDevice(hiddevice.HidDevice):
 
         while True:
             data = self._read()
-            #print("Data returned: " + repr(data))
             dstr = data
-            #assert dstr[:3] == 'ABC'
-            #print('<<<', repr(dstr))
             result.append(dstr[4:data[3]+4])
             if data[3] != self.blocksize-4:
                 break
@@ -112,7 +109,6 @@ class ContourHidDevice(hiddevice.HidDevice):
     USB_PRODUCT_ID = 0x6002  # type: int
 
     def parse_header_record(self, text):
-
         header = _HEADER_RECORD_RE.search(text)
 
         self.field_del = header.group('field_del')
@@ -167,11 +163,20 @@ class ContourHidDevice(hiddevice.HidDevice):
         # Datetime string in YYYYMMDDHHMM format
         self.datetime = header.group('datetime')
 
+
     def checksum(self, text):
+        """
+        Implemented by Anders Hammarquist for glucodump project
+        More info: https://bitbucket.org/iko/glucodump/src/default/
+        """
         checksum = hex(sum(ord(c) for c in text) % 256).upper().split('X')[1]
         return ('00' + checksum)[-2:]
 
     def checkframe(self, frame):
+        """
+        Implemented by Anders Hammarquist for glucodump project
+        More info: https://bitbucket.org/iko/glucodump/src/default/
+        """
         match = _RECORD_FORMAT.match(frame)
         if not match:
             raise FrameError("Couldn't parse frame", frame)
@@ -266,8 +271,8 @@ class ContourHidDevice(hiddevice.HidDevice):
     def sync(self):
         """
         Sync with meter and yield received data frames
-        FSM of ContourUSB inspired by Anders Hammarquist's glucodump project
-        More info here: https://bitbucket.org/iko/glucodump/src/default/
+        FSM implemented by Anders Hammarquist's for glucodump
+        More info: https://bitbucket.org/iko/glucodump/src/default/
         """
         self.state = self.mode_establish
         try:
@@ -321,13 +326,7 @@ class ContourHidDevice(hiddevice.HidDevice):
     def _get_multirecord(self):
         # type: (bytes) -> Iterator[List[Text]]
         """Queries for, and returns, "multirecords" results.
-
-        The validation includes the general HID framing parsing, as well as
-        validation of the record count, and of the embedded records checksum.
-
-        Args:
-          command: (bytes) the text command to send to the device for the query.
-
+        
         Returns:
           (csv.reader): a CSV reader object that returns a record for each line
              in the record file.
