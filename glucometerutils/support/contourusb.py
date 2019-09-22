@@ -25,7 +25,6 @@ import construct
 
 from glucometerutils import exceptions
 from glucometerutils.exceptions import InvalidResponse
-import usb
 from glucometerutils.support import hiddevice
 
 # regexr.com/4k6jb
