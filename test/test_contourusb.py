@@ -16,6 +16,7 @@ from unittest.mock import Mock
 class TestContourUSB(absltest.TestCase):
 
     header_record = b'\x04\x021H|\\^&||7w3LBL|Bayer7390^01.24\\01.04\\09.02.20^7390-2336773^7403-|A=1^C=63^G=1^I=0200^R=0^S=1^U=0^V=10600^X=070070070070180130150250^Y=360126090050099050300089^Z=1|1714||||||1|201909221304\r\x17D7\r\n\x05'
+    
     mock_dev = Mock()
 
     def test_get_datetime(self):
@@ -100,3 +101,17 @@ class TestContourUSB(absltest.TestCase):
         self.assertEqual(self.mock_dev.datetime, "201909221304")
 
     #TO-DO checksum and checkframe unit tests
+
+    def test_parse_result_record(self):
+        #first decode the header record frame
+        result_record = "R|8|^^^Glucose|133|mg/dL^P||B/X||201202052034"
+        result_dict = contourusb.ContourHidDevice.parse_result_record(self.mock_dev, result_record)
+
+        self.assertEqual(result_dict['record_type'], 'R')
+        self.assertEqual(result_dict['seq_num'], '8')
+        self.assertEqual(result_dict['test_id'], 'Glucose')
+        self.assertEqual(result_dict['value'], '133')
+        self.assertEqual(result_dict['unit'], 'mg/dL')
+        self.assertEqual(result_dict['ref_method'], 'P')
+        self.assertEqual(result_dict['markers'], 'B/X')
+        self.assertEqual(result_dict['datetime'], '201202052034')
