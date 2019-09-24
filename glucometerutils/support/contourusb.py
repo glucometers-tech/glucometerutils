@@ -15,12 +15,6 @@ import csv
 import datetime
 import logging
 import re
-
-try:
-    from typing import AnyStr, Iterator, List, Optional, Text, Tuple
-except ImportError:
-    pass
-
 import construct
 
 from glucometerutils import exceptions

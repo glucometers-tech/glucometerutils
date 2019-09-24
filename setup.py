@@ -54,6 +54,7 @@ setup(
         # These are all the drivers' dependencies. Optional dependencies are
         # listed as mandatory for the feature.
         'accucheck_reports': [],
+        'contourusb': ['construct', 'hidapi'],
         'fsinsulinx': ['construct', 'hidapi'],
         'fslibre': ['construct', 'hidapi'],
         'fsoptium': ['pyserial'],
