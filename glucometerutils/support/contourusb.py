@@ -52,7 +52,7 @@ _HEADER_RECORD_RE = re.compile(
 _RESULT_RECORD_RE = re.compile(
     "^(?P<record_type>[a-zA-Z])\\|(?P<seq_num>[0-9]+)\\|\\w*\\^\\w*\\^\\w*\\"
     "^(?P<test_id>\\w+)\\|(?P<value>[0-9]+)\\|(?P<unit>\\w+\\/\\w+)\\^"
-    "(?P<ref_method>[BPD])\\|\\|(?P<markers>)[><BADISXCZ\\/1-12]*\\|\\|"
+    "(?P<ref_method>[BPD])\\|\\|(?P<markers>[><BADISXCZ\\/1-12]*)\\|\\|"
     "(?P<datetime>[0-9]+)")
 
 _RECORD_FORMAT = re.compile(
@@ -309,8 +309,10 @@ class ContourHidDevice(hiddevice.HidDevice):
             raise e
 
     def parse_result_record(self, text):
+        # type : text -> dict
         result = _RESULT_RECORD_RE.search(text)
-        return result
+        rec_text = result.groupdict()
+        return rec_text
 
     def _get_multirecord(self):
         # type: (bytes) -> Iterator[List[Text]]
@@ -321,13 +323,12 @@ class ContourHidDevice(hiddevice.HidDevice):
              in the record file.
         """
         records_arr = []
-
         for rec in self.sync():
             if rec[0] == 'R':
                 # parse using result record regular expression
                 rec_text = self.parse_result_record(rec)
                 # get dictionary to use in main driver module without import re
-                rec_text = rec_text.groupdict()
+                
                 records_arr.append(rec_text)
         # return csv.reader(records_arr)
         return records_arr  # array of groupdicts
