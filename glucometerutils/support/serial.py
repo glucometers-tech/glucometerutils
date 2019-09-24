@@ -5,11 +5,7 @@
 """
 
 import logging
-
-try:
-    from typing import Optional, Text
-except ImportError:
-    pass
+from typing import Optional, Text
 
 import serial
 

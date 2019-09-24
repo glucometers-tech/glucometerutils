@@ -6,11 +6,7 @@
 
 import logging
 import os
-
-try:
-    from typing import BinaryIO, Optional, Text
-except ImportError:
-    pass
+from typing import BinaryIO, Optional, Text
 
 from glucometerutils import exceptions
 

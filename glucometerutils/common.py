@@ -6,11 +6,7 @@
 import datetime
 import enum
 import textwrap
-
-try:
-    from typing import Optional, Sequence
-except ImportError:
-    pass
+from typing import Optional, Sequence
 
 import attr
 
