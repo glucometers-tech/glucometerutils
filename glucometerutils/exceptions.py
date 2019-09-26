@@ -34,10 +34,10 @@ class InvalidResponse(Error):
 
 
 class InvalidChecksum(InvalidResponse):
-    def __init__(self, expected, received):
+    def __init__(self, wire, calculated):
         super(InvalidChecksum, self).__init__(
-            'Response checksum not matching: %08x expected, %08x received' %
-            (expected, received))
+            'Response checksum not matching: %08x (wire) != %08x (calculated)' %
+            (wire, calculated))
 
 
 class InvalidGlucoseUnit(Error):
