@@ -55,6 +55,7 @@ setup(
         # listed as mandatory for the feature.
         'accucheck_reports': [],
         'contourusb': ['construct', 'hidapi'],
+        'contournextone': ['construct', 'hidapi'],
         'fsinsulinx': ['construct', 'hidapi'],
         'fslibre': ['construct', 'hidapi'],
         'fsoptium': ['pyserial'],
