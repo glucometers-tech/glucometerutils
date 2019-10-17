@@ -7,17 +7,16 @@
 
 from absl.testing import absltest
 
-from glucometerutils.support import contourusb
+from glucometerutils.drivers import contourusb
 
 from unittest.mock import Mock
-
-
 
 class TestContourUSB(absltest.TestCase):
 
     header_record = b'\x04\x021H|\\^&||7w3LBL|Bayer7390^01.24\\01.04\\09.02.20^7390-2336773^7403-|A=1^C=63^G=1^I=0200^R=0^S=1^U=0^V=10600^X=070070070070180130150250^Y=360126090050099050300089^Z=1|1714||||||1|201909221304\r\x17D7\r\n\x05'
     
     mock_dev = Mock()
+    mock_dev = contourusb.Device
 
     def test_get_datetime(self):
         import datetime
@@ -25,7 +24,7 @@ class TestContourUSB(absltest.TestCase):
         self.datetime = "201908071315" # returned by 
         self.assertEqual(
             datetime.datetime(2019,8,7,13,15),
-            contourusb.ContourHidDevice.get_datetime(self)
+            self.mock_dev.get_datetime(self)
         )
 
     
@@ -34,7 +33,7 @@ class TestContourUSB(absltest.TestCase):
         header_record_decoded = self.header_record.decode()
         stx = header_record_decoded.find('\x02')
 
-        _RECORD_FORMAT = contourusb._RECORD_FORMAT
+        _RECORD_FORMAT = self.mock_dev._RECORD_FORMAT
         result = _RECORD_FORMAT.match(header_record_decoded[stx:]).group('text')
 
         self.assertEqual(
@@ -44,16 +43,16 @@ class TestContourUSB(absltest.TestCase):
 
     def test_parse_header_record(self):
         
-        _HEADER_RECORD_RE = contourusb._HEADER_RECORD_RE
-        _RECORD_FORMAT = contourusb._RECORD_FORMAT
 
+        _HEADER_RECORD_RE = self.mock_dev._HEADER_RECORD_RE
+        _RECORD_FORMAT = self.mock_dev._RECORD_FORMAT
 
         header_record_decoded = self.header_record.decode()
         stx = header_record_decoded.find('\x02')
 
 
         result = _RECORD_FORMAT.match(header_record_decoded[stx:]).group('text')
-        contourusb.ContourHidDevice.parse_header_record(self.mock_dev,result)
+        self.mock_dev.parse_header_record(self.mock_dev,result)
 
         self.assertEqual(self.mock_dev.field_del, "\\")
         self.assertEqual(self.mock_dev.repeat_del, "^")
@@ -105,7 +104,7 @@ class TestContourUSB(absltest.TestCase):
     def test_parse_result_record(self):
         #first decode the header record frame
         result_record = "R|8|^^^Glucose|133|mg/dL^P||B/X||201202052034"
-        result_dict = contourusb.ContourHidDevice.parse_result_record(self.mock_dev, result_record)
+        result_dict = self.mock_dev.parse_result_record(self.mock_dev, result_record)
 
         self.assertEqual(result_dict['record_type'], 'R')
         self.assertEqual(result_dict['seq_num'], '8')
