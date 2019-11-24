@@ -52,13 +52,13 @@ _DATETIME_REQUEST = construct.Struct(
     construct.Const(b'\x05\x20'),  # 0x20 is the datetime
     'request_type' / construct.Enum(construct.Byte, write=0x01, read=0x02),
     'timestamp' / construct.Default(
-        construct_extras.Timestamp(construct.Int32ul),
+        construct_extras.Timestamp(construct.Int32ul),  # type: ignore
         datetime.datetime(1970, 1, 1, 0, 0)),
 )
 
 _DATETIME_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / construct_extras.Timestamp(construct.Int32ul),
+    'timestamp' / construct_extras.Timestamp(construct.Int32ul),  # type: ignore
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(
@@ -85,7 +85,7 @@ _READ_RECORD_REQUEST = construct.Struct(
 
 _READING_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / construct_extras.Timestamp(construct.Int32ul),
+    'timestamp' / construct_extras.Timestamp(construct.Int32ul),  # type: ignore
     'value' / construct.Int32ul,
 )
 

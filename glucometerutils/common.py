@@ -6,11 +6,7 @@
 import datetime
 import enum
 import textwrap
-
-try:
-    from typing import Optional, Sequence, Text
-except ImportError:
-    pass
+from typing import Optional, Sequence
 
 import attr
 
@@ -57,15 +53,17 @@ def convert_glucose_unit(value, from_unit, to_unit):
 @attr.s
 class GlucoseReading:
 
-    timestamp = attr.ib()  # type: datetime.datetime
-    value = attr.ib()  # type: float
+    timestamp = attr.ib(type=datetime.datetime)
+    value = attr.ib(type=float)
     meal = attr.ib(
-        default=Meal.NONE, validator=attr.validators.in_(Meal))  # type: Meal
-    comment = attr.ib(default='')  # type: Text
+        default=Meal.NONE, validator=attr.validators.in_(Meal),
+        type=Meal)
+    comment = attr.ib(default='', type=str)
     measure_method = attr.ib(
         default=MeasurementMethod.BLOOD_SAMPLE,
-        validator=attr.validators.in_(
-            MeasurementMethod)) # type: MeasurementMethod
+        validator=attr.validators.in_(MeasurementMethod),
+        type=MeasurementMethod)
+    extra_data = attr.ib(factory=dict)
 
     def get_value_as(self, to_unit):
         # type: (Unit) -> float
@@ -77,7 +75,7 @@ class GlucoseReading:
         return convert_glucose_unit(self.value, Unit.MG_DL, to_unit)
 
     def as_csv(self, unit):
-        # type: (Unit) -> Text
+        # type: (Unit) -> str
         """Returns the reading as a formatted comma-separated value string."""
         return '"%s","%.2f","%s","%s","%s"' % (
             self.timestamp, self.get_value_as(unit), self.meal.value,
@@ -86,9 +84,10 @@ class GlucoseReading:
 @attr.s
 class KetoneReading:
 
-    timestamp = attr.ib()  # type: datetime.datetime
-    value = attr.ib()  # type: float
-    comment = attr.ib(default='')  # type: Text
+    timestamp = attr.ib(type=datetime.datetime)
+    value = attr.ib(type=float)
+    comment = attr.ib(default='', type=str)
+    extra_data = attr.ib(factory=dict)
 
     def as_csv(self, unit):
         """Returns the reading as a formatted comma-separated value string."""
@@ -106,6 +105,7 @@ class TimeAdjustment:
         default=MeasurementMethod.TIME,
         validator=attr.validators.in_(
             MeasurementMethod))  # type: MeasurementMethod
+    extra_data = attr.ib(factory=dict)
 
     def as_csv(self, unit):
         del unit
@@ -126,12 +126,13 @@ class MeterInfo:
         the device. It can include hardware and software version.
       native_unit: One of the Unit values to identify the meter native unit.
     """
-    model = attr.ib()  # type: Text
-    serial_number = attr.ib(default='N/A')  # type: Text
-    version_info = attr.ib(default=())  # type: Sequence[Text]
+    model = attr.ib(type=str)
+    serial_number = attr.ib(default='N/A', type=str)
+    version_info = attr.ib(default=(), type=Sequence[str])
     native_unit = attr.ib(
-        default=Unit.MG_DL, validator=attr.validators.in_(Unit))  # type: Unit
-    patient_name = attr.ib(default=None)  # type: Optional[Text]
+        default=Unit.MG_DL, validator=attr.validators.in_(Unit),
+        type=Unit)
+    patient_name = attr.ib(default=None, type=Optional[str])
 
     def __str__(self):
         version_information_string = 'N/A'

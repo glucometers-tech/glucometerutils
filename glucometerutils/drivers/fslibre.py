@@ -7,14 +7,15 @@ Supported features:
     - get readings (sensor, flash and blood glucose), including comments;
     - get and set date and time;
     - get serial number and software version;
-    - get and set patient name.
+    - get and set patient name;
+    - memory reset (caution!)
 
 Expected device path: /dev/hidraw9 or similar HID device. Optional when using
 HIDAPI.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre
+https://protocols.glucometers.tech/abbott/freestyle-libre
 
 """
 
@@ -26,6 +27,7 @@ from glucometerutils.support import freestyle
 # Fields of the records returned by both $history and $arresult?
 # Tuple of pairs of idx and field name
 _BASE_ENTRY_MAP = (
+    (0, 'device_id'),
     (1, 'type'),
     (2, 'month'),
     (3, 'day'),
@@ -116,7 +118,9 @@ def _parse_arresult(record):
         parsed_record.update(_parse_record(record, _ARRESULT_TIME_ADJUSTMENT_ENTRY_MAP))
         return common.TimeAdjustment(
             _extract_timestamp(parsed_record),
-            _extract_timestamp(parsed_record, 'old_'))
+            _extract_timestamp(parsed_record, 'old_'),
+            extra_data={'device_id': parsed_record['device_id']},
+        )
     else:
         return None
 
@@ -195,7 +199,9 @@ def _parse_arresult(record):
         _extract_timestamp(parsed_record),
         value,
         comment='; '.join(comment_parts),
-        measure_method=measure_method)
+        measure_method=measure_method,
+        extra_data={'device_id': parsed_record['device_id']},
+    )
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
@@ -237,7 +243,9 @@ class Device(freestyle.FreeStyleHidDevice):
                 _extract_timestamp(parsed_record),
                 parsed_record['value'],
                 comment='(Sensor)',
-                measure_method=common.MeasurementMethod.CGM)
+                measure_method=common.MeasurementMethod.CGM,
+                extra_data={'device_id': parsed_record['device_id']},
+            )
 
         # Then get the results of explicit scans and blood tests (and other
         # events).
@@ -245,3 +253,6 @@ class Device(freestyle.FreeStyleHidDevice):
             reading = _parse_arresult(record)
             if reading:
                 yield reading
+
+    def zero_log(self):
+        self._send_text_command(b'$resetpatient')

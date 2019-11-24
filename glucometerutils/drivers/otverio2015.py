@@ -18,7 +18,7 @@ Expected device path: /dev/sdb or similar USB block device.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/lifescan/onetouch-verio-2015
+https://protocols.glucometers.tech/lifescan/onetouch-verio-2015
 
 """
 
@@ -71,12 +71,12 @@ _READ_RTC_REQUEST = construct.Const(b'\x03\x20\x02')
 
 _READ_RTC_RESPONSE = construct.Struct(
     _COMMAND_SUCCESS,
-    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
     construct.Const(b'\x03\x20\x01'),
-    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _MEMORY_ERASE_REQUEST = construct.Const(b'\x03\x1a')
@@ -105,7 +105,7 @@ _READ_RECORD_RESPONSE = construct.Struct(
     'inverse_counter' / construct.Int16ul,
     construct.Padding(1),
     'lifetime_counter' / construct.Int16ul,
-    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,
+    'timestamp' / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
     'value' / construct.Int16ul,
     'meal' / construct.Mapping(
         construct.Byte, _MEAL_FLAG),

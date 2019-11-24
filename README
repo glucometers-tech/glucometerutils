@@ -23,7 +23,7 @@ be able to set this up using `virtualenv` and `pip`:
 $ python3 -m venv $(pwd)/glucometerutils-venv
 $ . glucometerutils-venv/bin/activate
 (glucometerutils-venv) $ DRIVER=myglucometer-driver  # see table below
-(glucometerutils-venv) $ pip install "git+https://github.com/Flameeyes/glucometerutils.git#egg=project[${DRIVER}]"
+(glucometerutils-venv) $ pip install "git+https://github.com/Flameeyes/glucometerutils.git#egg=glucometerutils[${DRIVER}]"
 (glucometerutils-venv) $ glucometer --driver ${DRIVER} help
 ```
 
@@ -32,27 +32,37 @@ $ . glucometerutils-venv/bin/activate
 Please see the following table for the driver for each device that is known and
 supported.
 
-| Manufacturer | Model Name                 | Driver             | Dependencies              |
-| ---          | ---                        | ---                | ---                       |
-| LifeScan     | OneTouch Ultra 2           | `otultra2`         | [pyserial]                |
-| LifeScan     | OneTouch Ultra Easy        | `otultraeasy`      | [construct] [pyserial]    |
-| LifeScan     | OneTouch Ultra Mini        | `otultraeasy`      | [construct] [pyserial]    |
-| LifeScan     | OneTouch Verio IQ          | `otverioiq`        | [construct] [pyserial]    |
-| LifeScan     | OneTouch Verio (USB)       | `otverio2015`      | [construct] [python-scsi] |
-| LifeScan     | OneTouch Select Plus       | `otverio2015`      | [construct] [python-scsi] |
-| LifeScan     | OneTouch Select Plus Flex¹ | `otverio2015`      | [construct] [python-scsi] |
-| Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [construct] [hidapi]‡     |
-| Abbott       | FreeStyle Libre            | `fslibre`          | [construct] [hidapi]‡     |
-| Abbott       | FreeStyle Optium           | `fsoptium`         | [pyserial]                |
-| Abbott       | FreeStyle Precision Neo    | `fsprecisionneo`   | [construct] [hidapi]‡     |
-| Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [construct] [hidapi]‡     |
-| Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [construct] [hidapi]‡     |
-| Roche        | Accu-Chek Mobile           | `accuchek_reports` |                           |
-| SD Biosensor | SD CodeFree                | `sdcodefree`       | [construct] [pyserial]    |
+| Manufacturer | Model Name                 | Driver             | Dependencies                      |
+| ---          | ---                        | ---                | ---                               |
+| LifeScan     | OneTouch Ultra 2           | `otultra2`         | [pyserial]                        |
+| LifeScan     | OneTouch Ultra Easy        | `otultraeasy`      | [construct] [pyserial]            |
+| LifeScan     | OneTouch Ultra Mini        | `otultraeasy`      | [construct] [pyserial]            |
+| LifeScan     | OneTouch Verio IQ          | `otverioiq`        | [construct] [pyserial]            |
+| LifeScan     | OneTouch Verio (USB)       | `otverio2015`      | [construct] [python-scsi]         |
+| LifeScan     | OneTouch Select Plus       | `otverio2015`      | [construct] [python-scsi]         |
+| LifeScan     | OneTouch Select Plus Flex¹ | `otverio2015`      | [construct] [python-scsi]         |
+| Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [construct] [hidapi]‡             |
+| Abbott       | FreeStyle Libre            | `fslibre`          | [construct] [hidapi]‡             |
+| Abbott       | FreeStyle Optium           | `fsoptium`         | [pyserial]                        |
+| Abbott       | FreeStyle Precision Neo    | `fsprecisionneo`   | [construct] [hidapi]‡             |
+| Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [construct] [hidapi]‡             |
+| Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [construct] [hidapi]‡             |
+| Roche        | Accu-Chek Mobile           | `accuchek_reports` |                                   |
+| SD Biosensor | SD CodeFree                | `sdcodefree`       | [construct] [pyserial]            |
+| TaiDoc       | TD-4277                    | `td4277`           | [construct] [pyserial]² [hidapi]  |
+| GlucoRx      | Nexus                      | `td4277`           | [construct] [pyserial]² [hidapi]  |
+| Menarini     | GlucoMen Nexus             | `td4277`           | [construct] [pyserial]² [hidapi]  |
+| Aktivmed     | GlucoCheck XL              | `td4277`           | [construct] [pyserial]² [hidapi]  |
+| Ascensia     | ContourUSB                 | `contourusb`       | [construct] [hidapi]‡             |
 
 † Untested.
+
 ‡ Optional dependency on Linux; required on other operating systems.
+
 ¹ USB only, bluetooth not supported.
+
+² Requires a version of pyserial supporting CP2110 bridges. See [this pyserial
+pull request](https://github.com/pyserial/pyserial/pull/411).
 
 To identify the supported features for each of the driver, query the `help`
 action:
@@ -61,7 +71,7 @@ action:
 
 If you have knowledge of a protocol of a glucometer you would have supported,
 please provide a reference, possibly by writing a specification and contribute
-it to https://github.com/Flameeyes/glucometer-protocols/.
+it to https://protocols.glucometers.tech/ .
 
 [construct]: https://construct.readthedocs.io/en/latest/
 [pyserial]: https://pythonhosted.org/pyserial/
@@ -94,12 +104,12 @@ even if they are all from the same manufacturer, will use different
 protocols.
 
 If you want to contribute code, please note that the target language
-is Python 3.4, and that the style to follow is for the most part PEP8
+is Python 3.5, and that the style to follow is for the most part PEP8
 compatible.
 
 ## License
 
-Copyright © 2013-2019 Diego Elio Pettenò <flameeyes@flameeyes.com>
+Copyright © 2013-2019 The glucometerutils Authors
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

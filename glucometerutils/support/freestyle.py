@@ -4,7 +4,7 @@
 """Common routines to implement the FreeStyle common protocol.
 
 Protocol documentation available at
-https://flameeyes.github.io/glucometer-protocols/abbott/shared-hid-protocol.html
+https://protocols.glucometers.tech/abbott/shared-hid-protocol
 
 """
 
@@ -12,11 +12,7 @@ import csv
 import datetime
 import logging
 import re
-
-try:
-    from typing import Iterator, List, Optional, Text, Tuple
-except ImportError:
-    pass
+from typing import AnyStr, Iterator, List, Optional, Text, Tuple
 
 import construct
 
@@ -35,10 +31,10 @@ _FREESTYLE_MESSAGE = construct.Struct(
         construct.Prefixed(construct.Byte, construct.GreedyBytes)),
 )
 
-_TEXT_COMPLETION_RE = re.compile('CMD (?:OK|Fail!)')
+_TEXT_COMPLETION_RE = re.compile(b'CMD (?:OK|Fail!)')
 _TEXT_REPLY_FORMAT = re.compile(
-    '^(?P<message>.*)CKSM:(?P<checksum>[0-9A-F]{8})\r\n'
-    'CMD (?P<status>OK|Fail!)\r\n$', re.DOTALL)
+    b'^(?P<message>.*)CKSM:(?P<checksum>[0-9A-F]{8})\r\n'
+    b'CMD (?P<status>OK|Fail!)\r\n$', re.DOTALL)
 
 _MULTIRECORDS_FORMAT = re.compile(
     '^(?P<message>.+\r\n)(?P<count>[0-9]+),(?P<checksum>[0-9A-F]{8})\r\n$',
@@ -46,12 +42,12 @@ _MULTIRECORDS_FORMAT = re.compile(
 
 
 def _verify_checksum(message, expected_checksum_hex):
-    # type: (Text, Text) -> None
+    # type: (AnyStr, AnyStr) -> None
     """Calculate the simple checksum of the message and compare with expected.
 
     Args:
       message: (str) message to calculate the checksum of.
-      expected_checksum_hex: (str) hexadecimal string representing the checksum
+      expected_checksum_hex: hexadecimal string representing the checksum
         expected to match the message.
 
     Raises:
@@ -59,7 +55,12 @@ def _verify_checksum(message, expected_checksum_hex):
         received.
     """
     expected_checksum = int(expected_checksum_hex, 16)
-    calculated_checksum = sum(ord(c) for c in message)
+    if isinstance(message, bytes):
+        all_bytes = (c for c in message)
+    else:
+        all_bytes = (ord(c) for c in message)
+
+    calculated_checksum = sum(all_bytes)
 
     if expected_checksum != calculated_checksum:
         raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
@@ -67,10 +68,9 @@ def _verify_checksum(message, expected_checksum_hex):
 def convert_ketone_unit(raw_value):
     """Convert raw ketone value as read in the device to its value in mmol/L.
 
-    As per
-    https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-libre.html
-    this is actually not using any mg/dL→mmol/L conversion, but rather the same
-    as the meter uses for blood glucose.
+    As per https://protocols.glucometers.tech/abbott/freestyle-libre this is
+    actually not using any mg/dL→mmol/L conversion, but rather the same as the
+    meter uses for blood glucose.
 
     """
     return raw_value / 18.0
@@ -147,16 +147,19 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         self._send_command(self.TEXT_CMD, command)
 
         # Reply can stretch multiple buffers
-        full_content = ''
+        full_content = b''
         while True:
             message_type, content = self._read_response()
 
+            logging.debug(
+                'Received message: type %02x content %r', message_type, content)
+
             if message_type != self.TEXT_REPLY_CMD:
                 raise exceptions.InvalidResponse(
-                    'Message type %02x does not match expectations: %s' %
-                    (message_type, content.decode('ascii')))
+                    'Message type %02x does not match expectations: %r' %
+                    (message_type, content))
 
-            full_content += content.decode('ascii')
+            full_content += content
 
             if _TEXT_COMPLETION_RE.search(full_content):
                 break
@@ -168,10 +171,14 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         message = match.group('message')
         _verify_checksum(message, match.group('checksum'))
 
-        if match.group('status') != 'OK':
+        if match.group('status') != b'OK':
             raise exceptions.InvalidResponse(message or "Command failed")
 
-        return message
+        # If there is anything in the response that is not ASCII-safe, this is
+        # probably in the patient name. The Windows utility does not seem to
+        # validate those, so just replace anything non-ASCII with the correct
+        # unknown codepoint.
+        return message.decode('ascii', 'replace')
 
     # Some of the commands are also shared across devices that use this HID
     # protocol, but not many. Only provide here those that do seep to change
@@ -196,11 +203,11 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
     def set_patient_name(self, name):
         # type: (Text) -> None
         try:
-            name = name.encode('ascii')
+            encoded_name = name.encode('ascii')
         except UnicodeDecodeError:
             raise ValueError('Only ASCII-safe names are tested working')
 
-        result = self._send_text_command(b'$ptname,' + name)
+        result = self._send_text_command(b'$ptname,' + encoded_name)
 
     def get_datetime(self):
         # type: () -> datetime.datetime
@@ -264,6 +271,10 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
              in the record file.
         """
         message = self._send_text_command(command)
+        logging.debug('Received multirecord message:\n%s', message)
+        if message == "Log Empty\r\n":
+            return iter(())
+
         match = _MULTIRECORDS_FORMAT.search(message)
         if not match:
             raise exceptions.InvalidResponse(message)

@@ -17,7 +17,7 @@ HIDAPI.
 
 Further information on the device protocol can be found at
 
-https://flameeyes.github.io/glucometer-protocols/abbott/freestyle-precision-neo
+https://protocols.glucometers.tech/abbott/freestyle-precision-neo
 
 """
 

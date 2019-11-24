@@ -30,7 +30,7 @@ setup(
     url = 'https://www.flameeyes.com/p/glucometerutils',
     download_url = 'https://www.flameeyes.com/files/glucometerutils.tgz',
     keywords = ['glucometer', 'diabetes'],
-    python_requires = '~=3.4',
+    python_requires = '~=3.5',
     classifiers = [
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
@@ -46,23 +46,25 @@ setup(
     data_files = [
         ('lib/udev/rules', ['udev/69-glucometerutils.rules']),
     ],
-    install_require = [
+    install_requires = [
         'attrs',
     ],
     tests_require = test_required,
     extras_require = {
         # These are all the drivers' dependencies. Optional dependencies are
         # listed as mandatory for the feature.
-        'otultra2': ['pyserial'],
-        'otultraeasy': ['construct', 'pyserial'],
-        'otverio2015': ['construct', 'python-scsi'],
-        'otverioiq': ['construct', 'pyserial'],
+        'accucheck_reports': [],
+        'contourusb': ['construct', 'hidapi'],
         'fsinsulinx': ['construct', 'hidapi'],
         'fslibre': ['construct', 'hidapi'],
         'fsoptium': ['pyserial'],
         'fsprecisionneo': ['construct', 'hidapi'],
-        'accucheck_reports': [],
+        'otultra2': ['pyserial'],
+        'otultraeasy': ['construct', 'pyserial'],
+        'otverio2015': ['construct', 'python-scsi'],
+        'otverioiq': ['construct', 'pyserial'],
         'sdcodefree': ['construct', 'pyserial'],
+        'td4277': ['construct', 'pyserial', 'hidapi'],
     },
     entry_points = {
         'console_scripts': [
