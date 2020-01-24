@@ -25,10 +25,8 @@ import usbmon
 import usbmon.chatter
 import usbmon.pcapng
 
-HID_XFER_TYPES = (
-    usbmon.constants.XferType.INTERRUPT,
-    usbmon.constants.XferType.CONTROL,
-)
+_UNENCRYPTED_TYPES = (
+    0x01, 0x04, 0x05, 0x06, 0x0c, 0x0d, 0x14, 0x15, 0x33, 0x34, 0x35, 0x71,)
 
 def main():
     if sys.version_info < (3, 7):
@@ -47,6 +45,12 @@ def main():
         '--vlog', action='store', required=False, type=int,
         help=('Python logging level. See the levels at '
               'https://docs.python.org/3/library/logging.html#logging-levels'))
+
+    parser.add_argument(
+        '--libre2', action='store_true',
+        help=('Whether to expect the capture coming from a Libre 2 device. '
+              'Libre 2 devices encrypt some of the messages, and as such they '
+              'will be dumped with the undecoded length as well.'))
 
     parser.add_argument(
         'pcap_file', action='store', type=str,
@@ -85,16 +89,16 @@ def main():
 
         assert len(packet.payload) >= 2
 
-        message_length = packet.payload[1]
+        message_type = packet.payload[0]
 
-        # This is the case on Libre 2 (expected encrypted communication), in
-        # which case we ignore the message_length and we keep the whole message
-        # together.
-        if message_length > 62:
-            message_type = 'xx'
-            message = packet.payload
+        if args.libre2 and message_type not in _UNENCRYPTED_TYPES:
+            # On Libre 2 (expected encrypted communication), we ignore the
+            # message_length and we keep it with the whole message.
+            message_type = f'x{message_type:02x}'
+            message = packet.payload[1:]
         else:
-            message_type = f'{packet.payload[0]:02x}'
+            message_length = packet.payload[1]
+            message_type = f' {message_type:02x}'
             message = packet.payload[2:2+message_length]
 
         print(usbmon.chatter.dump_bytes(
