@@ -21,7 +21,7 @@ from glucometerutils.support import hiddevice
 
 # Sequence of initialization messages sent to the device to establish HID
 # protocol.
-_INIT_SEQUENCE = (0x04, 0x05, 0x15, 0x01)
+_INIT_SEQUENCE = (0x01,)
 
 _FREESTYLE_MESSAGE = construct.Struct(
     'hid_report' / construct.Const(0, construct.Byte),
