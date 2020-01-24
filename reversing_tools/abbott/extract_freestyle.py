@@ -25,8 +25,15 @@ import usbmon
 import usbmon.chatter
 import usbmon.pcapng
 
+_KEEPALIVE_TYPE = 0x22
+
 _UNENCRYPTED_TYPES = (
-    0x01, 0x04, 0x05, 0x06, 0x0c, 0x0d, 0x14, 0x15, 0x33, 0x34, 0x35, 0x71,)
+    0x01, 0x04, 0x05, 0x06, 0x0c, 0x0d,
+    0x14, 0x15,
+    0x33, 0x34, 0x35,
+    0x71,
+    _KEEPALIVE_TYPE,
+)
 
 def main():
     if sys.version_info < (3, 7):
@@ -51,6 +58,11 @@ def main():
         help=('Whether to expect the capture coming from a Libre 2 device. '
               'Libre 2 devices encrypt some of the messages, and as such they '
               'will be dumped with the undecoded length as well.'))
+
+    parser.add_argument(
+        '--print_keepalive', action='store_true',
+        help=('Whether to print the keepalive messages sent by the device. '
+              'Keepalive messages are usually safely ignored.'))
 
     parser.add_argument(
         'pcap_file', action='store', type=str,
@@ -90,6 +102,9 @@ def main():
         assert len(packet.payload) >= 2
 
         message_type = packet.payload[0]
+
+        if message_type == _KEEPALIVE_TYPE and not args.print_keepalive:
+            continue
 
         if args.libre2 and message_type not in _UNENCRYPTED_TYPES:
             # On Libre 2 (expected encrypted communication), we ignore the
