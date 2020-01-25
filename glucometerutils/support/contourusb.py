@@ -15,6 +15,8 @@ import csv
 import datetime
 import logging
 import re
+from typing import Dict, Iterator, List, Text
+
 import construct
 
 from glucometerutils import exceptions
@@ -61,7 +63,7 @@ class ContourHidDevice(hiddevice.HidDevice):
     """Base class implementing the ContourUSB HID common protocol.
     """
     blocksize = 64
-    
+
     # Operation modes
     mode_establish = object
     mode_data = object()
@@ -186,7 +188,7 @@ class ContourHidDevice(hiddevice.HidDevice):
         return match.group('text')
 
     def connect(self):
-        """Connecting the device, nothing to be done. 
+        """Connecting the device, nothing to be done.
         All process is hadled by hiddevice
         """
         pass
@@ -303,13 +305,14 @@ class ContourHidDevice(hiddevice.HidDevice):
             raise e
 
     def parse_result_record(self, text):
-        # type : text -> dict
+        # type: (Text) -> Dict[Text, Text]
         result = _RESULT_RECORD_RE.search(text)
+        assert result is not None
         rec_text = result.groupdict()
         return rec_text
 
     def _get_multirecord(self):
-        # type: (bytes) -> Iterator[List[Text]]
+        # type: () -> List[Dict[Text, Text]]
         """Queries for, and returns, "multirecords" results.
 
         Returns:
@@ -322,7 +325,7 @@ class ContourHidDevice(hiddevice.HidDevice):
                 # parse using result record regular expression
                 rec_text = self.parse_result_record(rec)
                 # get dictionary to use in main driver module without import re
-                
+
                 records_arr.append(rec_text)
         # return csv.reader(records_arr)
         return records_arr  # array of groupdicts
