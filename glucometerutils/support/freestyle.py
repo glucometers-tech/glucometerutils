@@ -132,6 +132,13 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         if message_type == 0x22 and message_length == 1:
             return self._read_response()
 
+        if message_type == 0x30 and message_content == b'\x85':
+            raise exceptions.CommandError('Invalid command')
+
+        if message_type == 0x33 and message_content == b'\x15':
+            raise exceptions.CommandError(
+                'Device encryption initialization failed.')
+
         # hidapi module returns a list of bytes rather than a bytes object.
         return (message_type, bytes(message_content))
 
