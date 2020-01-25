@@ -19,9 +19,7 @@ import construct
 from glucometerutils import exceptions
 from glucometerutils.support import hiddevice
 
-# Sequence of initialization messages sent to the device to establish HID
-# protocol.
-_INIT_SEQUENCE = (0x01,)
+_INIT_COMMAND = 0x01
 
 _FREESTYLE_MESSAGE = construct.Struct(
     'hid_report' / construct.Const(0, construct.Byte),
@@ -95,12 +93,8 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
 
     def connect(self):
         """Open connection to the device, starting the knocking sequence."""
-        for message in _INIT_SEQUENCE:
-            self._send_command(message, b'')
-            # Ignore the returned values, they are not generally useful. The
-            # Serial Number as returned may not actually match the device's
-            # serial number (e.g. in the FreeStyle Precision Neo).
-            self._read_response()
+        self._send_command(_INIT_COMMAND, b'')
+        self._read_response()  # Only expect non-error result.
 
     def disconnect(self):
         """Disconnect the device, nothing to be done."""
