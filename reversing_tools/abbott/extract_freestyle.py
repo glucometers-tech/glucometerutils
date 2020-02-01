@@ -35,6 +35,11 @@ _UNENCRYPTED_TYPES = (
     _KEEPALIVE_TYPE,
 )
 
+_ABBOTT_VENDOR_ID = 0x1a61
+_LIBRE2_PRODUCT_ID = 0x3950
+
+
+
 def main():
     if sys.version_info < (3, 7):
         raise Exception(
@@ -43,21 +48,19 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--addr_prefix', action='store', type=str, required=True,
-        help=('Prefix match applied to the device address in text format. '
-              'Only packets with source or destination matching this prefix '
-              'will be printed out.'))
+        '--device_address', action='store', type=str,
+        help=('Device address (busnum.devnum) of the device to extract capture'
+              'of. If none provided, device descriptors will be relied on.'))
+
+    parser.add_argument(
+        '--encrypted_protocol', action='store_true',
+        help=('Whether to expect encrypted protocol in the capture.'
+              ' Ignored if the device descriptors are present in the capture.'))
 
     parser.add_argument(
         '--vlog', action='store', required=False, type=int,
         help=('Python logging level. See the levels at '
               'https://docs.python.org/3/library/logging.html#logging-levels'))
-
-    parser.add_argument(
-        '--libre2', action='store_true',
-        help=('Whether to expect the capture coming from a Libre 2 device. '
-              'Libre 2 devices encrypt some of the messages, and as such they '
-              'will be dumped with the undecoded length as well.'))
 
     parser.add_argument(
         '--print_keepalive', action='store_true',
@@ -73,12 +76,33 @@ def main():
     logging.basicConfig(level=args.vlog)
 
     session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=False)
+
+    if not args.device_address:
+        for descriptor in session.device_descriptors.values():
+            if descriptor.vendor_id == _ABBOTT_VENDOR_ID:
+                if args.device_address and args.device_address != descriptor.address:
+                    raise Exception(
+                        'Multiple Abbott device present in capture, please'
+                        ' provide a --device_address flag.')
+                args.device_address = descriptor.address
+
+    descriptor = session.device_descriptors.get(args.device_address, None)
+    if not descriptor:
+        logging.warning(
+            f"Unable to find device %s in the capture's descriptors."
+            " Assuming non-encrypted protocol.", args.device_address)
+    else:
+        assert descriptor.vendor_id == _ABBOTT_VENDOR_ID
+
+    if descriptor and descriptor.product_id == _LIBRE2_PRODUCT_ID:
+        args.encrypted_protocol = True
+
     for first, second in session.in_pairs():
         # Ignore stray callbacks/errors.
         if not first.type == usbmon.constants.PacketType.SUBMISSION:
             continue
 
-        if not first.address.startswith(args.addr_prefix):
+        if not first.address.startswith(f'{args.device_address}.'):
             # No need to check second, they will be linked.
             continue
 
@@ -106,8 +130,8 @@ def main():
         if message_type == _KEEPALIVE_TYPE and not args.print_keepalive:
             continue
 
-        if args.libre2 and message_type not in _UNENCRYPTED_TYPES:
-            # On Libre 2 (expected encrypted communication), we ignore the
+        if args.encrypted_protocol and message_type not in _UNENCRYPTED_TYPES:
+            # When expecting encrypted communication), we ignore the
             # message_length and we keep it with the whole message.
             message_type = f'x{message_type:02x}'
             message = packet.payload[1:]
