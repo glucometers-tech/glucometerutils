@@ -160,7 +160,10 @@ class Device(serial.SerialDevice):
     def get_datetime(self):  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
+        if not date:
+            date = datetime.datetime.now()
+
         setdatecmd = date.strftime('ADATE%Y%m%d%H%M').encode('ascii')
 
         # Ignore the readings count.

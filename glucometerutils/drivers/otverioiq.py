@@ -172,7 +172,10 @@ class Device(serial.SerialDevice):
 
         return response.timestamp
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
+        if not date:
+            date = datetime.datetime.now()
+
         self._send_request(
             _WRITE_RTC_REQUEST, {
                 'timestamp': date,

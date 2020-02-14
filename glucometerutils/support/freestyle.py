@@ -295,10 +295,12 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         except ValueError:
             raise exceptions.InvalidDateTime()
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
         # type: (datetime.datetime) -> datetime.datetime
         """Sets the date and time of the device."""
 
+        if not date:
+            date = datetime.datetime.now()
         # The format used by the FreeStyle devices is not composable based on
         # standard strftime() (namely it includes no leading zeros), so we need
         # to build it manually.
