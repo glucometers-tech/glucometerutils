@@ -201,7 +201,10 @@ class Device:
             3, _READ_RTC_REQUEST, None, _READ_RTC_RESPONSE)
         return response.timestamp
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
+        if not date:
+            date = datetime.datetime.now()
+
         self._send_request(
             3, _WRITE_RTC_REQUEST, {'timestamp': date},
             _COMMAND_SUCCESS)

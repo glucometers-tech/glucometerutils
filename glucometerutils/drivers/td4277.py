@@ -186,7 +186,9 @@ class Device(serial.SerialDevice):
 
         return _parse_datetime(message)
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
+        if not date:
+            date = datetime.datetime.now()
         assert date.year >= 2000
 
         day_struct = _DAY_BITSTRUCT.build({

@@ -229,7 +229,7 @@ class Device(serial.SerialDevice):
         response = self._send_oneliner_command('DMF')
         return _parse_datetime(response[2:])
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
         """Sets the date and time of the glucometer.
 
         Args:
@@ -239,6 +239,9 @@ class Device(serial.SerialDevice):
         Returns:
           A datetime object built according to the returned response.
         """
+        if not date:
+            date = datetime.datetime.now()
+
         response = self._send_oneliner_command(
             'DMT' + date.strftime('%m/%d/%y %H:%M:%S'))
 

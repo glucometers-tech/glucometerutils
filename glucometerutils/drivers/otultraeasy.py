@@ -204,7 +204,10 @@ class Device(serial.SerialDevice):
 
         return response.timestamp
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
+        if not date:
+            date = datetime.datetime.now()
+
         response = self._send_request(
             _DATETIME_REQUEST, {
                 'request_type': 'write',

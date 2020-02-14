@@ -190,7 +190,7 @@ class Device(serial.SerialDevice):
 
         raise exceptions.InvalidResponse('\n'.join(data))
 
-    def set_datetime(self, date=datetime.datetime.now()):
+    def set_datetime(self, date=None):
         """Sets the date and time of the glucometer.
 
         Args:
@@ -200,6 +200,9 @@ class Device(serial.SerialDevice):
         Returns:
           A datetime object built according to the returned response.
         """
+        if not date:
+            date = datetime.datetime.now()
+
         data = self._send_command(date.strftime('tim,%m,%d,%y,%H,%M'))
 
         parsed_data = ''.join(data)
