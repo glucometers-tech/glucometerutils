@@ -48,7 +48,7 @@ def _create_matcher(message_type, content):
 
 _is_init_reply = _create_matcher(_INIT_RESPONSE, b'\x01')
 _is_keepalive_response = _create_matcher(_KEEPALIVE_RESPONSE, b'\x05')
-_is_uknown_message_error = _create_matcher(_UNKNOWN_MESSAGE_RESPONSE, b'\x85')
+_is_unknown_message_error = _create_matcher(_UNKNOWN_MESSAGE_RESPONSE, b'\x85')
 _is_encryption_missing_error = _create_matcher(
     _ENCRYPTION_SETUP_RESPONSE, b'\x15')
 _is_encryption_setup_error = _create_matcher(
@@ -194,7 +194,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice, driver_base.GlucometerDriver, ABC)
         if _is_keepalive_response(message):
             return self._read_response(encrypted=encrypted)
 
-        if _is_uknown_message_error(message):
+        if _is_unknown_message_error(message):
             raise exceptions.CommandError('Invalid command')
 
         if _is_encryption_missing_error(message):
