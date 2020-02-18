@@ -23,7 +23,6 @@ https://protocols.glucometers.tech/lifescan/onetouch-verio-2015
 """
 
 import binascii
-import datetime
 import logging
 
 import construct
@@ -32,8 +31,7 @@ from pyscsi.pyscsi.scsi_device import SCSIDevice
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.support import lifescan
-from glucometerutils.support import lifescan_binary_protocol
+from glucometerutils.support import driver_base, lifescan, lifescan_binary_protocol
 
 # This device uses SCSI blocks as registers.
 _REGISTER_SIZE = 512
@@ -112,7 +110,8 @@ _READ_RECORD_RESPONSE = construct.Struct(
     construct.Padding(4),
 )
 
-class Device:
+
+class Device(driver_base.GlucometerDriver):
     def __init__(self, device):
         if not device:
             raise exceptions.CommandLineError(
@@ -201,10 +200,7 @@ class Device:
             3, _READ_RTC_REQUEST, None, _READ_RTC_RESPONSE)
         return response.timestamp
 
-    def set_datetime(self, date=None):
-        if not date:
-            date = datetime.datetime.now()
-
+    def _set_device_datetime(self, date):
         self._send_request(
             3, _WRITE_RTC_REQUEST, {'timestamp': date},
             _COMMAND_SUCCESS)

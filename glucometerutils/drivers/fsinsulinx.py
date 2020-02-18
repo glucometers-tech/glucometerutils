@@ -71,3 +71,7 @@ class Device(freestyle.FreeStyleHidDevice):
                 raw_reading.hour, raw_reading.minute)
 
             yield common.GlucoseReading(timestamp, raw_reading.value)
+
+    def zero_log(self):
+        raise NotImplementedError
+

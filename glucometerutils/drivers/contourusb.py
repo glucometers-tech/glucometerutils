@@ -21,7 +21,8 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 import datetime
 
 from glucometerutils import common
-from glucometerutils.support import contourusb
+from glucometerutils.support import contourusb, driver_base
+
 
 def _extract_timestamp(parsed_record, prefix=''):
     """Extract the timestamp from a parsed record.
@@ -39,15 +40,13 @@ def _extract_timestamp(parsed_record, prefix=''):
         0)
 
 
-class Device(contourusb.ContourHidDevice):
+class Device(contourusb.ContourHidDevice, driver_base.GlucometerDriver):
     """Glucometer driver for FreeStyle Libre devices."""
 
     USB_VENDOR_ID = 0x1a79  # type: int  # Bayer Health Care LLC Contour
     USB_PRODUCT_ID = 0x6002  # type: int
 
-
     def get_meter_info(self):
-        """Return the device information in structured form."""
         self._get_info_record()
         return common.MeterInfo(
             'Contour USB',
@@ -57,14 +56,11 @@ class Device(contourusb.ContourHidDevice):
             native_unit= self.get_glucose_unit())
 
     def get_glucose_unit(self):  # pylint: disable=no-self-use
-        """Returns the glucose unit of the device."""
-        
         if self._get_glucose_unit() == '0':
             return common.Unit.MG_DL
         else:
             return common.Unit.MMOL_L
         
-
     def get_readings(self):
         """
         Get reading dump from download data mode(all readings stored)
@@ -77,5 +73,12 @@ class Device(contourusb.ContourHidDevice):
                 comment=parsed_record['markers'],
                 measure_method=common.MeasurementMethod.BLOOD_SAMPLE
                 )
-            
 
+    def get_serial_number(self):
+        raise NotImplementedError
+
+    def _set_device_datetime(self, date):
+        raise NotImplementedError
+
+    def zero_log(self):
+        raise NotImplementedError

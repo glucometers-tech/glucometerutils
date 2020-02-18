@@ -98,3 +98,5 @@ class Device(freestyle.FreeStyleHidDevice):
 
             yield cls(timestamp, value)
 
+    def zero_log(self):
+        raise NotImplementedError

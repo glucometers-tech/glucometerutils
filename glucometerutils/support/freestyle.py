@@ -12,12 +12,13 @@ import csv
 import datetime
 import logging
 import re
+from abc import ABC
 from typing import AnyStr, Callable, Iterator, List, Optional, Text, Tuple
 
 import construct
 
 from glucometerutils import exceptions
-from glucometerutils.support import hiddevice
+from glucometerutils.support import hiddevice, driver_base
 
 _INIT_COMMAND = 0x01
 _INIT_RESPONSE = 0x71
@@ -103,6 +104,7 @@ def _verify_checksum(message, expected_checksum_hex):
     if expected_checksum != calculated_checksum:
         raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
 
+
 def convert_ketone_unit(raw_value):
     """Convert raw ketone value as read in the device to its value in mmol/L.
 
@@ -113,7 +115,8 @@ def convert_ketone_unit(raw_value):
     """
     return raw_value / 18.0
 
-class FreeStyleHidDevice(hiddevice.HidDevice):
+
+class FreeStyleHidDevice(hiddevice.HidDevice, driver_base.GlucometerDriver, ABC):
     """Base class implementing the FreeStyle HID common protocol.
 
     This class implements opening, initializing the connection and sending
@@ -295,12 +298,9 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         except ValueError:
             raise exceptions.InvalidDateTime()
 
-    def set_datetime(self, date=None):
+    def _set_device_datetime(self, date):
         # type: (datetime.datetime) -> datetime.datetime
-        """Sets the date and time of the device."""
 
-        if not date:
-            date = datetime.datetime.now()
         # The format used by the FreeStyle devices is not composable based on
         # standard strftime() (namely it includes no leading zeros), so we need
         # to build it manually.
@@ -313,10 +313,6 @@ class FreeStyleHidDevice(hiddevice.HidDevice):
         self._send_text_command(bytes(time_cmd, "ascii"))
 
         return self.get_datetime()
-
-    def zero_log(self):
-        """Not implemented, Abbott devices don't allow resetting memory."""
-        raise NotImplementedError
 
     def _get_multirecord(self, command):
         # type: (bytes) -> Iterator[List[Text]]

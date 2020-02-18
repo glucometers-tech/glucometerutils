@@ -26,7 +26,8 @@ import construct
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.support import serial
+from glucometerutils.support import serial, driver_base
+
 
 def xor_checksum(msg):
     return functools.reduce(operator.xor, msg)
@@ -84,7 +85,7 @@ _READING = construct.Struct(
 )
 
 
-class Device(serial.SerialDevice):
+class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 38400
     DEFAULT_CABLE_ID = '10c4:ea60'  # Generic cable.
     TIMEOUT = 300  # We need to wait for data from the device.
@@ -160,10 +161,7 @@ class Device(serial.SerialDevice):
     def get_datetime(self):  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def set_datetime(self, date=None):
-        if not date:
-            date = datetime.datetime.now()
-
+    def _set_device_datetime(self, date):
         setdatecmd = date.strftime('ADATE%Y%m%d%H%M').encode('ascii')
 
         # Ignore the readings count.
