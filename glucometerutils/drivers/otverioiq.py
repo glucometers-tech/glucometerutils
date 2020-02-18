@@ -16,16 +16,12 @@ auto-detected.
 """
 
 import binascii
-import datetime
 import logging
 
 import construct
 
 from glucometerutils import common
-from glucometerutils.support import construct_extras
-from glucometerutils.support import lifescan
-from glucometerutils.support import lifescan_binary_protocol
-from glucometerutils.support import serial
+from glucometerutils.support import driver_base, lifescan, lifescan_binary_protocol, serial
 
 _PACKET = lifescan_binary_protocol.LifeScanPacket(False)
 
@@ -101,7 +97,7 @@ _READING_RESPONSE = construct.Struct(
 )
 
 
-class Device(serial.SerialDevice):
+class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 38400
     DEFAULT_CABLE_ID = '10c4:85a7'  # Specific ID for embedded cp210x
     TIMEOUT = 0.5
@@ -109,12 +105,6 @@ class Device(serial.SerialDevice):
     def __init__(self, device):
         super(Device, self).__init__(device)
         self.buffered_reader_ = construct.Rebuffered(_PACKET, tailcutoff=1024)
-
-    def connect(self):
-        pass
-
-    def disconnect(self):
-        pass
 
     def _send_packet(self, message):
         pkt = _PACKET.build(
@@ -172,10 +162,7 @@ class Device(serial.SerialDevice):
 
         return response.timestamp
 
-    def set_datetime(self, date=None):
-        if not date:
-            date = datetime.datetime.now()
-
+    def _set_device_datetime(self, date):
         self._send_request(
             _WRITE_RTC_REQUEST, {
                 'timestamp': date,

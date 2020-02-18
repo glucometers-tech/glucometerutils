@@ -18,8 +18,7 @@ import re
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.support import lifescan
-from glucometerutils.support import serial
+from glucometerutils.support import driver_base, lifescan, serial
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
@@ -129,7 +128,7 @@ def _parse_datetime(response):
     return datetime.datetime(2000 + year, month, day, hour, minute, second)
 
 
-class Device(serial.SerialDevice):
+class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = '067b:2303'  # Generic PL2303 cable.
 
@@ -229,22 +228,9 @@ class Device(serial.SerialDevice):
         response = self._send_oneliner_command('DMF')
         return _parse_datetime(response[2:])
 
-    def set_datetime(self, date=None):
-        """Sets the date and time of the glucometer.
-
-        Args:
-          date: The value to set the date/time of the glucometer to. If none is
-            given, the current date and time of the computer is used.
-
-        Returns:
-          A datetime object built according to the returned response.
-        """
-        if not date:
-            date = datetime.datetime.now()
-
+    def _set_device_datetime(self, date):
         response = self._send_oneliner_command(
             'DMT' + date.strftime('%m/%d/%y %H:%M:%S'))
-
         return _parse_datetime(response[2:])
 
     def zero_log(self):

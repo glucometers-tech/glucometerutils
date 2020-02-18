@@ -23,7 +23,8 @@ import construct
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.support import serial
+from glucometerutils.support import serial, driver_base
+
 
 class Direction(enum.Enum):
     In = 0xa5
@@ -130,7 +131,8 @@ def _select_record(record_id):
     return _READING_SELECTION_STRUCT.build({'record_id': record_id})
 
 
-class Device(serial.SerialDevice):
+class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+
     BAUDRATE = 19200
     TIMEOUT = 0.5
 
@@ -186,9 +188,7 @@ class Device(serial.SerialDevice):
 
         return _parse_datetime(message)
 
-    def set_datetime(self, date=None):
-        if not date:
-            date = datetime.datetime.now()
+    def _set_device_datetime(self, date):
         assert date.year >= 2000
 
         day_struct = _DAY_BITSTRUCT.build({
@@ -234,3 +234,7 @@ class Device(serial.SerialDevice):
 
     def zero_log(self):
         self._send_command(_CLEAR_MEMORY)
+
+    def get_glucose_unit(self):
+        """Maybe this could be implemented by someone who knows the device"""
+        raise NotImplementedError

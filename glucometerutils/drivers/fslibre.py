@@ -124,7 +124,6 @@ def _parse_arresult(record):
     else:
         return None
 
-
     # Check right away if we have rapid insulin
     if parsed_record['rapid-acting-flag']:
         parsed_record.update(
@@ -194,7 +193,6 @@ def _parse_arresult(record):
         else:
             comment_parts.append('Rapid-acting insulin')
 
-
     return cls(
         _extract_timestamp(parsed_record),
         value,
@@ -202,6 +200,7 @@ def _parse_arresult(record):
         measure_method=measure_method,
         extra_data={'device_id': parsed_record['device_id']},
     )
+
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""

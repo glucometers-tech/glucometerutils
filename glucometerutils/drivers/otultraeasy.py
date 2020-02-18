@@ -22,10 +22,7 @@ import logging
 import construct
 
 from glucometerutils import common
-from glucometerutils.support import construct_extras
-from glucometerutils.support import lifescan
-from glucometerutils.support import lifescan_binary_protocol
-from glucometerutils.support import serial
+from glucometerutils.support import construct_extras, driver_base, lifescan, lifescan_binary_protocol, serial
 
 _PACKET = lifescan_binary_protocol.LifeScanPacket(True)
 
@@ -102,7 +99,8 @@ def _make_packet(
             },
         }}})
 
-class Device(serial.SerialDevice):
+
+class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = '067b:2303'  # Generic PL2303 cable.
     TIMEOUT = 0.5
@@ -204,16 +202,12 @@ class Device(serial.SerialDevice):
 
         return response.timestamp
 
-    def set_datetime(self, date=None):
-        if not date:
-            date = datetime.datetime.now()
-
+    def _set_device_datetime(self, date):
         response = self._send_request(
             _DATETIME_REQUEST, {
                 'request_type': 'write',
                 'timestamp': date,
             }, _DATETIME_RESPONSE)
-
         return response.timestamp
 
     def zero_log(self):

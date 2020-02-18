@@ -21,6 +21,7 @@ import os
 
 from glucometerutils import common
 from glucometerutils import exceptions
+from glucometerutils.support import driver_base
 
 _UNIT_MAP = {
     'mmol/l': common.Unit.MMOL_L,
@@ -44,7 +45,8 @@ _TIME_FORMAT = '%H:%M'
 
 _DATETIME_FORMAT = ' '.join((_DATE_FORMAT, _TIME_FORMAT))
 
-class Device:
+
+class Device(driver_base.GlucometerDriver):
     def __init__(self, device):
         if not device or not os.path.isdir(device):
             raise exceptions.CommandLineError(
@@ -104,7 +106,7 @@ class Device:
     def get_datetime(self):
         raise NotImplementedError
 
-    def set_datetime(self, date=None):
+    def _set_device_datetime(self, date):
         raise NotImplementedError
 
     def zero_log(self):

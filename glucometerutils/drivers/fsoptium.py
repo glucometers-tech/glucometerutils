@@ -22,8 +22,7 @@ import re
 
 from glucometerutils import common
 from glucometerutils import exceptions
-from glucometerutils.support import serial
-
+from glucometerutils.support import serial, driver_base
 
 _CLOCK_RE = re.compile(
     r'^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t'
@@ -85,7 +84,7 @@ def _parse_clock(datestr):
     return datetime.datetime(year, month, day, hour, minute, second)
 
 
-class Device(serial.SerialDevice):
+class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 19200
     DEFAULT_CABLE_ID = '1a61:3420'
 
@@ -107,7 +106,7 @@ class Device(serial.SerialDevice):
         return decoded_response
 
     def connect(self):
-        self._send_command('xmem') # ignore output this time
+        self._send_command('xmem')  # ignore output this time
         self._fetch_device_information()
 
     def disconnect(self):  # pylint: disable=no-self-use
@@ -190,19 +189,7 @@ class Device(serial.SerialDevice):
 
         raise exceptions.InvalidResponse('\n'.join(data))
 
-    def set_datetime(self, date=None):
-        """Sets the date and time of the glucometer.
-
-        Args:
-          date: The value to set the date/time of the glucometer to. If none is
-            given, the current date and time of the computer is used.
-
-        Returns:
-          A datetime object built according to the returned response.
-        """
-        if not date:
-            date = datetime.datetime.now()
-
+    def _set_device_datetime(self, date):
         data = self._send_command(date.strftime('tim,%m,%d,%y,%H,%M'))
 
         parsed_data = ''.join(data)
