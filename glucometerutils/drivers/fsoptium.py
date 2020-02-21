@@ -20,13 +20,13 @@ import datetime
 import logging
 import re
 
-from glucometerutils import common
-from glucometerutils import exceptions
-from glucometerutils.support import serial, driver_base
+from glucometerutils import common, exceptions
+from glucometerutils.support import driver_base, serial
 
 _CLOCK_RE = re.compile(
-    r'^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t'
-    r'(?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})$')
+    r"^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t"
+    r"(?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})$"
+)
 
 # The reading can be HI (padded to three-characters by a space) if the value was
 # over what the meter was supposed to read. Unlike the "Clock:" line, the months
@@ -34,33 +34,33 @@ _CLOCK_RE = re.compile(
 # characters, so accept a space or 'e'/'y' at the end of the month name. Also,
 # the time does *not* include seconds.
 _READING_RE = re.compile(
-    r'^(?P<reading>HI |[0-9]{3})  '
-    r'(?P<month>[A-Z][a-z]{2})[ ey] '
-    r'(?P<day>[0-9]{2}) '
-    r'(?P<year>[0-9]{4}) '
-    r'(?P<time>[0-9]{2}:[0-9]{2}) '
-    r'(?P<type>[GK]) 0x00$')
+    r"^(?P<reading>HI |[0-9]{3})  "
+    r"(?P<month>[A-Z][a-z]{2})[ ey] "
+    r"(?P<day>[0-9]{2}) "
+    r"(?P<year>[0-9]{4}) "
+    r"(?P<time>[0-9]{2}:[0-9]{2}) "
+    r"(?P<type>[GK]) 0x00$"
+)
 
-_CHECKSUM_RE = re.compile(
-    r'^(?P<checksum>0x[0-9A-F]{4})  END$')
+_CHECKSUM_RE = re.compile(r"^(?P<checksum>0x[0-9A-F]{4})  END$")
 
 # There are two date format used by the device. One uses three-letters month
 # names, and that's easy enough. The other uses three-letters month names,
 # except for (at least) July. So ignore the fourth character.
 # explicit mapping. Note that the mapping *requires* a trailing whitespace.
 _MONTH_MATCHES = {
-    'Jan': 1,
-    'Feb': 2,
-    'Mar': 3,
-    'Apr': 4,
-    'May': 5,
-    'Jun': 6,
-    'Jul': 7,
-    'Aug': 8,
-    'Sep': 9,
-    'Oct': 10,
-    'Nov': 11,
-    'Dec': 12
+    "Jan": 1,
+    "Feb": 2,
+    "Mar": 3,
+    "Apr": 4,
+    "May": 5,
+    "Jun": 6,
+    "Jul": 7,
+    "Aug": 8,
+    "Sep": 9,
+    "Oct": 10,
+    "Nov": 11,
+    "Dec": 12,
 }
 
 
@@ -75,60 +75,59 @@ def _parse_clock(datestr):
         raise exceptions.InvalidResponse(datestr)
 
     # int() parses numbers in decimal, so we don't have to worry about '08'
-    day = int(match.group('day'))
-    month = _MONTH_MATCHES[match.group('month')]
-    year = int(match.group('year'))
+    day = int(match.group("day"))
+    month = _MONTH_MATCHES[match.group("month")]
+    year = int(match.group("year"))
 
-    hour, minute, second = (int (x) for x in match.group('time').split(':'))
+    hour, minute, second = (int(x) for x in match.group("time").split(":"))
 
     return datetime.datetime(year, month, day, hour, minute, second)
 
 
 class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 19200
-    DEFAULT_CABLE_ID = '1a61:3420'
+    DEFAULT_CABLE_ID = "1a61:3420"
 
     def _send_command(self, command):
-        cmd_bytes = bytes('$%s\r\n' % command, 'ascii')
-        logging.debug('Sending command: %r', cmd_bytes)
+        cmd_bytes = bytes("$%s\r\n" % command, "ascii")
+        logging.debug("Sending command: %r", cmd_bytes)
 
         self.serial_.write(cmd_bytes)
         self.serial_.flush()
 
         response = self.serial_.readlines()
 
-        logging.debug('Received response: %r', response)
+        logging.debug("Received response: %r", response)
 
         # We always want to decode the output, and remove stray \r\n. Any
         # failure in decoding means the output is invalid anyway.
-        decoded_response = [line.decode('ascii').rstrip('\r\n')
-                            for line in response]
+        decoded_response = [line.decode("ascii").rstrip("\r\n") for line in response]
         return decoded_response
 
     def connect(self):
-        self._send_command('xmem')  # ignore output this time
+        self._send_command("xmem")  # ignore output this time
         self._fetch_device_information()
 
     def disconnect(self):  # pylint: disable=no-self-use
         return
 
     def _fetch_device_information(self):
-        data = self._send_command('colq')
+        data = self._send_command("colq")
 
         for line in data:
-            parsed_line = line.split('\t')
+            parsed_line = line.split("\t")
 
-            if parsed_line[0] == 'S/N:':
+            if parsed_line[0] == "S/N:":
                 self.device_serialno_ = parsed_line[1]
-            elif parsed_line[0] == 'Ver:':
+            elif parsed_line[0] == "Ver:":
                 self.device_version_ = parsed_line[1]
-                if parsed_line[2] == 'MMOL':
+                if parsed_line[2] == "MMOL":
                     self.device_glucose_unit_ = common.Unit.MMOL_L
                 else:  # I only have a mmol/l device, so I can't be sure.
                     self.device_glucose_unit_ = common.Unit.MG_DL
             # There are more entries: Clock, Market, ROM and Usage, but we don't
             # care for those here.
-            elif parsed_line[0] == 'CMD OK':
+            elif parsed_line[0] == "CMD OK":
                 return
 
         # I have not figured out why this happens, but sometimes it's echoing
@@ -142,11 +141,11 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
           A common.MeterInfo object.
         """
         return common.MeterInfo(
-            'Freestyle Optium glucometer',
+            "Freestyle Optium glucometer",
             serial_number=self.get_serial_number(),
-            version_info=(
-                'Software version: ' + self.get_version(),),
-            native_unit=self.get_glucose_unit())
+            version_info=("Software version: " + self.get_version(),),
+            native_unit=self.get_glucose_unit(),
+        )
 
     def get_version(self):
         """Returns an identifier of the firmware version of the glucometer.
@@ -179,21 +178,21 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         Returns:
           A datetime object built according to the returned response.
         """
-        data = self._send_command('colq')
+        data = self._send_command("colq")
 
         for line in data:
-            if not line.startswith('Clock:'):
+            if not line.startswith("Clock:"):
                 continue
 
             return _parse_clock(line)
 
-        raise exceptions.InvalidResponse('\n'.join(data))
+        raise exceptions.InvalidResponse("\n".join(data))
 
     def _set_device_datetime(self, date):
-        data = self._send_command(date.strftime('tim,%m,%d,%y,%H,%M'))
+        data = self._send_command(date.strftime("tim,%m,%d,%y,%H,%M"))
 
-        parsed_data = ''.join(data)
-        if parsed_data != 'CMD OK':
+        parsed_data = "".join(data)
+        if parsed_data != "CMD OK":
             raise exceptions.InvalidResponse(parsed_data)
 
         return self.get_datetime()
@@ -216,50 +215,47 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
           expected.
 
         """
-        data = self._send_command('xmem')
+        data = self._send_command("xmem")
 
         # The first line is empty, the second is the serial number, the third
         # the version, the fourth the current time, and the fifth the record
         # count.. The last line has a checksum and the end.
         count = int(data[4])
         if count != (len(data) - 6):
-            raise exceptions.InvalidResponse('\n'.join(data))
+            raise exceptions.InvalidResponse("\n".join(data))
 
         # Extract the checksum from the last line.
         checksum_match = _CHECKSUM_RE.match(data[-1])
         if not checksum_match:
-            raise exceptions.InvalidResponse('\n'.join(data))
+            raise exceptions.InvalidResponse("\n".join(data))
 
-        expected_checksum = int(checksum_match.group('checksum'), 16)
+        expected_checksum = int(checksum_match.group("checksum"), 16)
         # exclude the last line in the checksum calculation, as that's the
         # checksum itself. The final \r\n is added separately.
-        calculated_checksum = sum(
-            ord(c) for c in '\r\n'.join(data[:-1])) + 0xd + 0xa
+        calculated_checksum = sum(ord(c) for c in "\r\n".join(data[:-1])) + 0xD + 0xA
 
         if expected_checksum != calculated_checksum:
-            raise exceptions.InvalidChecksum(
-                expected_checksum, calculated_checksum)
+            raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
 
         for line in data[5:-1]:
             match = _READING_RE.match(line)
             if not match:
                 raise exceptions.InvalidResponse(line)
 
-            if match.group('type') != 'G':
-                logging.warning(
-                    'Non-glucose readings are not supported, ignoring.')
+            if match.group("type") != "G":
+                logging.warning("Non-glucose readings are not supported, ignoring.")
                 continue
 
-            if match.group('reading') == 'HI ':
+            if match.group("reading") == "HI ":
                 value = float("inf")
             else:
-                value = float(match.group('reading'))
+                value = float(match.group("reading"))
 
-            day = int(match.group('day'))
-            month = _MONTH_MATCHES[match.group('month')]
-            year = int(match.group('year'))
+            day = int(match.group("day"))
+            month = _MONTH_MATCHES[match.group("month")]
+            year = int(match.group("year"))
 
-            hour, minute = map(int, match.group('time').split(':'))
+            hour, minute = map(int, match.group("time").split(":"))
 
             timestamp = datetime.datetime(year, month, day, hour, minute)
 

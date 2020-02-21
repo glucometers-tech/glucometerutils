@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 class GlucometerDriver(ABC):
-
     def connect(self):
         pass
 

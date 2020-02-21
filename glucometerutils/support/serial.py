@@ -8,7 +8,6 @@ import logging
 from typing import Optional, Text
 
 import serial
-
 from glucometerutils import exceptions
 
 
@@ -48,19 +47,23 @@ class SerialDevice:
         assert self.BAUDRATE is not None
 
         if not device and self.DEFAULT_CABLE_ID:
-            logging.info(
-                'No --device parameter provided, looking for default cable.')
-            device = 'hwgrep://' + self.DEFAULT_CABLE_ID
+            logging.info("No --device parameter provided, looking for default cable.")
+            device = "hwgrep://" + self.DEFAULT_CABLE_ID
 
         if not device:
             raise exceptions.CommandLineError(
-                'No --device parameter provided, and no default cable known.')
+                "No --device parameter provided, and no default cable known."
+            )
 
         self.serial_ = serial.serial_for_url(
             device,
             baudrate=self.BAUDRATE,
             timeout=self.TIMEOUT,
             writeTimeout=None,
-            bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            xonxoff=False, rtscts=False, dsrdtr=False)
+            xonxoff=False,
+            rtscts=False,
+            dsrdtr=False,
+        )
