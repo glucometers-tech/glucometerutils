@@ -3,15 +3,16 @@ dist: xenial
 language: python
 
 python:
-  - 3.5
   - 3.6
   - 3.7
   - 3.8-dev
 
 install:
-  - pip install -r test-requirements.txt
+  - pip install .[dev]
 
 script:
   - py.test
   - python setup.py bdist_wheel
   - pip install ./dist/glucometerutils-*.whl
+  - pre-commit install
+  - pre-commit run --all-files
