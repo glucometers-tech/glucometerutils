@@ -7,6 +7,7 @@ import datetime
 
 import construct
 
+
 class Timestamp(construct.Adapter):
     """Adapter for converting datetime object into timestamps.
 
@@ -14,6 +15,7 @@ class Timestamp(construct.Adapter):
     and an optional epoch offset to the UNIX Epoch.
 
     """
+
     __slots__ = ["epoch"]
 
     def __init__(self, subcon, epoch=0):

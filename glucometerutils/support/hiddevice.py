@@ -45,33 +45,36 @@ class HidDevice:
         # type: (Optional[Text]) -> None
         if None in (self.USB_VENDOR_ID, self.USB_PRODUCT_ID) and not device:
             raise exceptions.CommandLineError(
-                '--device parameter is required, should point to a /dev/hidraw '
-                'device node representing the meter.')
+                "--device parameter is required, should point to a /dev/hidraw "
+                "device node representing the meter."
+            )
 
         # If the user passed a device path that does not exist, raise an
         # error. This is to avoid writing to a file instead of to a device node.
         if device and not os.path.exists(device):
             raise exceptions.ConnectionFailed(
-                message='Path %s does not exist.' % device)
+                message="Path %s does not exist." % device
+            )
 
         # If the user passed a device, try opening it.
         if device:
-            self.handle_ = open(device, 'w+b')  # type: Optional[BinaryIO]
+            self.handle_ = open(device, "w+b")  # type: Optional[BinaryIO]
         else:
             self.handle_ = None
-            logging.info(
-                'No --device parameter provided, using hidapi library.')
+            logging.info("No --device parameter provided, using hidapi library.")
             try:
                 import hid
+
                 self.hidapi_handle_ = hid.device()
-                self.hidapi_handle_.open(
-                    self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
+                self.hidapi_handle_.open(self.USB_VENDOR_ID, self.USB_PRODUCT_ID)
             except ImportError:
                 raise exceptions.ConnectionFailed(
-                    message='Missing requied "hidapi" module.')
+                    message='Missing requied "hidapi" module.'
+                )
             except OSError as e:
                 raise exceptions.ConnectionFailed(
-                    message='Unable to connect to meter: %s.' % e)
+                    message="Unable to connect to meter: %s." % e
+                )
 
     def _write(self, report):
         # type: (bytes) -> None
@@ -95,5 +98,4 @@ class HidDevice:
         if self.handle_:
             return bytes(self.handle_.read(size))
 
-        return bytes(self.hidapi_handle_.read(
-            size, timeout_ms=self.TIMEOUT_MS))
+        return bytes(self.hidapi_handle_.read(size, timeout_ms=self.TIMEOUT_MS))

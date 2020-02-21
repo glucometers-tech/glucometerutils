@@ -28,48 +28,76 @@ import usbmon.pcapng
 _KEEPALIVE_TYPE = 0x22
 
 _UNENCRYPTED_TYPES = (
-    0x01, 0x04, 0x05, 0x06, 0x0c, 0x0d,
-    0x14, 0x15,
-    0x33, 0x34, 0x35,
+    0x01,
+    0x04,
+    0x05,
+    0x06,
+    0x0C,
+    0x0D,
+    0x14,
+    0x15,
+    0x33,
+    0x34,
+    0x35,
     0x71,
     _KEEPALIVE_TYPE,
 )
 
-_ABBOTT_VENDOR_ID = 0x1a61
+_ABBOTT_VENDOR_ID = 0x1A61
 _LIBRE2_PRODUCT_ID = 0x3950
-
 
 
 def main():
     if sys.version_info < (3, 7):
-        raise Exception(
-            'Unsupported Python version, please use at least Python 3.7.')
+        raise Exception("Unsupported Python version, please use at least Python 3.7.")
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--device_address', action='store', type=str,
-        help=('Device address (busnum.devnum) of the device to extract capture'
-              'of. If none provided, device descriptors will be relied on.'))
+        "--device_address",
+        action="store",
+        type=str,
+        help=(
+            "Device address (busnum.devnum) of the device to extract capture"
+            "of. If none provided, device descriptors will be relied on."
+        ),
+    )
 
     parser.add_argument(
-        '--encrypted_protocol', action='store_true',
-        help=('Whether to expect encrypted protocol in the capture.'
-              ' Ignored if the device descriptors are present in the capture.'))
+        "--encrypted_protocol",
+        action="store_true",
+        help=(
+            "Whether to expect encrypted protocol in the capture."
+            " Ignored if the device descriptors are present in the capture."
+        ),
+    )
 
     parser.add_argument(
-        '--vlog', action='store', required=False, type=int,
-        help=('Python logging level. See the levels at '
-              'https://docs.python.org/3/library/logging.html#logging-levels'))
+        "--vlog",
+        action="store",
+        required=False,
+        type=int,
+        help=(
+            "Python logging level. See the levels at "
+            "https://docs.python.org/3/library/logging.html#logging-levels"
+        ),
+    )
 
     parser.add_argument(
-        '--print_keepalive', action='store_true',
-        help=('Whether to print the keepalive messages sent by the device. '
-              'Keepalive messages are usually safely ignored.'))
+        "--print_keepalive",
+        action="store_true",
+        help=(
+            "Whether to print the keepalive messages sent by the device. "
+            "Keepalive messages are usually safely ignored."
+        ),
+    )
 
     parser.add_argument(
-        'pcap_file', action='store', type=str,
-        help='Path to the pcapng file with the USB capture.')
+        "pcap_file",
+        action="store",
+        type=str,
+        help="Path to the pcapng file with the USB capture.",
+    )
 
     args = parser.parse_args()
 
@@ -82,15 +110,18 @@ def main():
             if descriptor.vendor_id == _ABBOTT_VENDOR_ID:
                 if args.device_address and args.device_address != descriptor.address:
                     raise Exception(
-                        'Multiple Abbott device present in capture, please'
-                        ' provide a --device_address flag.')
+                        "Multiple Abbott device present in capture, please"
+                        " provide a --device_address flag."
+                    )
                 args.device_address = descriptor.address
 
     descriptor = session.device_descriptors.get(args.device_address, None)
     if not descriptor:
         logging.warning(
             f"Unable to find device %s in the capture's descriptors."
-            " Assuming non-encrypted protocol.", args.device_address)
+            " Assuming non-encrypted protocol.",
+            args.device_address,
+        )
     else:
         assert descriptor.vendor_id == _ABBOTT_VENDOR_ID
 
@@ -102,15 +133,17 @@ def main():
         if not first.type == usbmon.constants.PacketType.SUBMISSION:
             continue
 
-        if not first.address.startswith(f'{args.device_address}.'):
+        if not first.address.startswith(f"{args.device_address}."):
             # No need to check second, they will be linked.
             continue
 
         if first.xfer_type == usbmon.constants.XferType.INTERRUPT:
             pass
-        elif (first.xfer_type == usbmon.constants.XferType.CONTROL and
-              not first.setup_packet or
-              first.setup_packet.type == usbmon.setup.Type.CLASS):
+        elif (
+            first.xfer_type == usbmon.constants.XferType.CONTROL
+            and not first.setup_packet
+            or first.setup_packet.type == usbmon.setup.Type.CLASS
+        ):
             pass
         else:
             continue
@@ -133,19 +166,19 @@ def main():
         if args.encrypted_protocol and message_type not in _UNENCRYPTED_TYPES:
             # When expecting encrypted communication), we ignore the
             # message_length and we keep it with the whole message.
-            message_type = f'x{message_type:02x}'
+            message_type = f"x{message_type:02x}"
             message = packet.payload[1:]
         else:
             message_length = packet.payload[1]
-            message_type = f' {message_type:02x}'
-            message = packet.payload[2:2+message_length]
+            message_type = f" {message_type:02x}"
+            message = packet.payload[2 : 2 + message_length]
 
-        print(usbmon.chatter.dump_bytes(
-            packet.direction,
-            message,
-            prefix=f'[{message_type}]',
-            print_empty=True,
-        ), '\n')
+        print(
+            usbmon.chatter.dump_bytes(
+                packet.direction, message, prefix=f"[{message_type}]", print_empty=True,
+            ),
+            "\n",
+        )
 
 
 if __name__ == "__main__":
