@@ -24,43 +24,44 @@ from glucometerutils import common
 from glucometerutils.support import contourusb, driver_base
 
 
-def _extract_timestamp(parsed_record, prefix=''):
+def _extract_timestamp(parsed_record, prefix=""):
     """Extract the timestamp from a parsed record.
 
     This leverages the fact that all the reading records have the same base structure.
     """
-    datetime_str = parsed_record['datetime']
+    datetime_str = parsed_record["datetime"]
 
     return datetime.datetime(
-        int(datetime_str[0:4]), #year
-        int(datetime_str[4:6]), #month
-        int(datetime_str[6:8]), #day
-        int(datetime_str[8:10]), #hour
-        int(datetime_str[10:12]), #minute
-        0)
+        int(datetime_str[0:4]),  # year
+        int(datetime_str[4:6]),  # month
+        int(datetime_str[6:8]),  # day
+        int(datetime_str[8:10]),  # hour
+        int(datetime_str[10:12]),  # minute
+        0,
+    )
 
 
 class Device(contourusb.ContourHidDevice, driver_base.GlucometerDriver):
     """Glucometer driver for FreeStyle Libre devices."""
 
-    USB_VENDOR_ID = 0x1a79  # type: int  # Bayer Health Care LLC Contour
+    USB_VENDOR_ID = 0x1A79  # type: int  # Bayer Health Care LLC Contour
     USB_PRODUCT_ID = 0x6002  # type: int
 
     def get_meter_info(self):
         self._get_info_record()
         return common.MeterInfo(
-            'Contour USB',
+            "Contour USB",
             serial_number=self._get_serial_number(),
-            version_info=(
-                'Meter versions: ' + self._get_version(),),
-            native_unit= self.get_glucose_unit())
+            version_info=("Meter versions: " + self._get_version(),),
+            native_unit=self.get_glucose_unit(),
+        )
 
     def get_glucose_unit(self):  # pylint: disable=no-self-use
-        if self._get_glucose_unit() == '0':
+        if self._get_glucose_unit() == "0":
             return common.Unit.MG_DL
         else:
             return common.Unit.MMOL_L
-        
+
     def get_readings(self):
         """
         Get reading dump from download data mode(all readings stored)
@@ -69,10 +70,10 @@ class Device(contourusb.ContourHidDevice, driver_base.GlucometerDriver):
         for parsed_record in self._get_multirecord():
             yield common.GlucoseReading(
                 _extract_timestamp(parsed_record),
-                int(parsed_record['value']),
-                comment=parsed_record['markers'],
-                measure_method=common.MeasurementMethod.BLOOD_SAMPLE
-                )
+                int(parsed_record["value"]),
+                comment=parsed_record["markers"],
+                measure_method=common.MeasurementMethod.BLOOD_SAMPLE,
+            )
 
     def get_serial_number(self):
         raise NotImplementedError
