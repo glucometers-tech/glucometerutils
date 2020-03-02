@@ -1,3 +1,9 @@
+<p align="center">
+<a href="https://travis-ci.org/Flameeyes/glucometerutils/builds/"><img alt="build status" src="https://img.shields.io/travis/Flameeyes/glucometerutils"></a>
+<a href="https://github.com/Flameeyes/glucometerutils#license"><img alt="GitHub" src="https://img.shields.io/badge/license-MIT-green"></a>
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+</p>
+
 # Glucometer Utilities
 
 This repository includes a command line utility to interact with a number of
@@ -104,12 +110,25 @@ even if they are all from the same manufacturer, will use different
 protocols.
 
 If you want to contribute code, please note that the target language
-is Python 3.5, and that the style to follow is for the most part PEP8
+is Python 3.6, and that the style to follow is for the most part PEP8
 compatible.
+
+To set up your development environment follow these guidelines:
+
+```shell
+$ git clone https://github.com/Flameeyes/glucometerutils.git
+$ cd glucometerutils
+$ python3 -m venv --python=python3.6
+$ . venv/bin/activate
+$ pip install -e .[dev]
+$ # If you want to work on a specific driver specify this after dev e.g.
+$ # pip install -e .[dev,myglucometer-driver] # see table above
+$ pre-commit install
+```
 
 ## License
 
-Copyright © 2013-2019 The glucometerutils Authors
+Copyright © 2013-2020 The glucometerutils Authors
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
