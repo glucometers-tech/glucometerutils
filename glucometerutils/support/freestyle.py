@@ -47,7 +47,7 @@ def _create_matcher(message_type, content):
     return _matcher
 
 _is_init_reply = _create_matcher(_INIT_RESPONSE, b'\x01')
-_is_keepalive_response = _create_matcher(_KEEPALIVE_RESPONSE, b'\x05')
+_is_keepalive_response = _create_matcher(_KEEPALIVE_RESPONSE, None)
 _is_unknown_message_error = _create_matcher(_UNKNOWN_MESSAGE_RESPONSE, b'\x85')
 _is_encryption_missing_error = _create_matcher(
     _ENCRYPTION_SETUP_RESPONSE, b'\x15')
