@@ -3,11 +3,9 @@ repos:
     rev: 4.3.21
     hooks:
       - id: isort
-        language_version: python3.6
         additional_dependencies:
           - toml
 -   repo: https://github.com/python/black
     rev: 19.10b0
     hooks:
     - id: black
-      language_version: python3.6
