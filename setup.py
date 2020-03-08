@@ -32,9 +32,8 @@ setup(
     author="Diego Elio Pettenò",
     author_email="flameeyes@flameeyes.com",
     url="https://www.flameeyes.com/p/glucometerutils",
-    download_url="https://www.flameeyes.com/files/glucometerutils.tgz",
     keywords=["glucometer", "diabetes"],
-    python_requires="~=3.5",
+    python_requires="~=3.6",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
