@@ -30,16 +30,13 @@ class InvalidResponse(Error):
     """The response received from the meter was not understood"""
 
     def __init__(self, response):
-        super(InvalidResponse, self).__init__(
-            "Invalid response received:\n%s" % response
-        )
+        super(InvalidResponse, self).__init__(f"Invalid response received:\n{response}")
 
 
 class InvalidChecksum(InvalidResponse):
     def __init__(self, wire, calculated):
         super(InvalidChecksum, self).__init__(
-            "Response checksum not matching: %08x (wire) != %08x (calculated)"
-            % (wire, calculated)
+            f"Response checksum not matching: {wire:08x} (wire) != {calculated:08x} (calculated)"
         )
 
 
@@ -48,7 +45,7 @@ class InvalidGlucoseUnit(Error):
 
     def __init__(self, unit):
         super(InvalidGlucoseUnit, self).__init__(
-            "Invalid glucose unit received:\n%s" % unit
+            f"Invalid glucose unit received:\n{unit}"
         )
 
 

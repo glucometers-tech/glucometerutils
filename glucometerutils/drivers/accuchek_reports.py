@@ -57,7 +57,7 @@ class Device(driver_base.GlucometerDriver):
         report_files = glob.glob(reports_path)
         if not report_files:
             raise exceptions.ConnectionFailed(
-                'No report file found in path "%s".' % reports_path
+                f'No report file found in path "{reports_path}".'
             )
 
         self.report_file = report_files[0]
@@ -80,7 +80,7 @@ class Device(driver_base.GlucometerDriver):
 
     def get_meter_info(self):
         return common.MeterInfo(
-            "%s glucometer" % self.get_model(),
+            f"{self.get_model()} glucometer",
             serial_number=self.get_serial_number(),
             native_unit=self.get_glucose_unit(),
         )

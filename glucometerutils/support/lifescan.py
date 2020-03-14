@@ -11,7 +11,7 @@ class MissingChecksum(exceptions.InvalidResponse):
 
     def __init__(self, response):
         super(MissingChecksum, self).__init__(
-            "Response is missing checksum: %s" % response
+            f"Response is missing checksum: {response}"
         )
 
 
@@ -20,13 +20,13 @@ class InvalidSerialNumber(exceptions.Error):
 
     def __init__(self, serial_number):
         super(InvalidSerialNumber, self).__init__(
-            "Serial number %s is invalid." % serial_number
+            f"Serial number {serial_number} is invalid."
         )
 
 
 class MalformedCommand(exceptions.InvalidResponse):
     def __init__(self, message):
-        super(MalformedCommand, self).__init__("Malformed command: %s" % message)
+        super(MalformedCommand, self).__init__(f"Malformed command: {message}")
 
 
 def crc_ccitt(data):

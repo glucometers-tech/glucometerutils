@@ -105,14 +105,14 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
                 continue
             if challenge != b"\x53":
                 raise exceptions.ConnectionFailed(
-                    message="Unexpected starting bytes %r" % challenge
+                    message=f"Unexpected starting bytes {challenge!r}"
                 )
 
         challenge += self.serial_.read(6)
 
         if challenge != _CHALLENGE_PACKET_FULL:
             raise exceptions.ConnectionFailed(
-                message="Unexpected challenge %r" % challenge
+                message=f"Unexpected challenge {challenge!r}"
             )
 
         logging.debug("challenge packet received: %s", binascii.hexlify(challenge))

@@ -103,7 +103,7 @@ def main():
         driver = importlib.import_module("glucometerutils.drivers." + args.driver)
     except ImportError as e:
         logging.error(
-            'Error importing driver "%s", please check your --driver ' "parameter:\n%s",
+            'Error importing driver "%s", please check your --driver parameter:\n%s',
             args.driver,
             e,
         )
@@ -129,11 +129,7 @@ def main():
             # Also catch any leftover ValueErrors.
             except (NotImplementedError, ValueError):
                 time_str = "N/A"
-            print(
-                "{device_info}Time: {time}".format(
-                    device_info=str(device_info), time=time_str
-                )
-            )
+            print(f"{device_info}Time: {time_str}")
         elif args.action == "dump":
             unit = args.unit
             if unit is None:
@@ -179,7 +175,7 @@ def main():
                 patient_name = device.get_patient_name()
                 if patient_name is None:
                     patient_name = "[N/A]"
-                print("Patient Name: {patient_name}".format(patient_name=patient_name))
+                print(f"Patient Name: {patient_name}")
             except NotImplementedError:
                 print("The glucometer does not support retrieving patient name.")
         elif args.action == "zero":
@@ -193,7 +189,7 @@ def main():
         else:
             return 1
     except exceptions.Error as err:
-        print("Error while executing '%s': %s" % (args.action, str(err)))
+        print(f"Error while executing '{args.action}': {err}")
         return 1
 
     device.disconnect()

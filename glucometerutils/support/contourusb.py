@@ -180,14 +180,14 @@ class ContourHidDevice(hiddevice.HidDevice):
 
         if recno != self.currecno:
             raise FrameError(
-                "Bad recno, got %r expected %r" % (recno, self.currecno), frame
+                f"Bad recno, got {recno!r} expected {self.currecno!r}", frame
             )
 
-        checksum = self.checksum(match.group("check"))
-        if checksum != match.group("checksum"):
+        calculated_checksum = self.checksum(match.group("check"))
+        received_checksum = match.group("checksum")
+        if calculated_checksum != received_checksum:
             raise FrameError(
-                "Checksum error: got %s expected %s"
-                % (match.group("checksum"), checksum),
+                f"Checksum error: received {received_checksum} expected {calculated_checksum}",
                 frame,
             )
 

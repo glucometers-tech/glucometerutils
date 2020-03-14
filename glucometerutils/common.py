@@ -154,23 +154,16 @@ class MeterInfo:
             version_information_string = "\n    ".join(self.version_info).strip()
 
         base_output = textwrap.dedent(
-            """\
-            {model}
-            Serial Number: {serial_number}
+            f"""\
+            {self.model}
+            Serial Number: {self.serial_number}
             Version Information:
                 {version_information_string}
-            Native Unit: {native_unit}
+            Native Unit: {self.native_unit.value}
         """
-        ).format(
-            model=self.model,
-            serial_number=self.serial_number,
-            version_information_string=version_information_string,
-            native_unit=self.native_unit.value,
         )
 
         if self.patient_name != None:
-            base_output += "Patient Name: {patient_name}\n".format(
-                patient_name=self.patient_name
-            )
+            base_output += f"Patient Name: {self.patient_name}\n"
 
         return base_output

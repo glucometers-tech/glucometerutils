@@ -123,7 +123,7 @@ class Device(driver_base.GlucometerDriver):
         vendor = inq.result["t10_vendor_identification"][:32]
         if vendor != b"LifeScan":
             raise exceptions.ConnectionFailed(
-                "Device %s is not a LifeScan glucometer." % self.device_name_
+                f"Device {self.device_name_} is not a LifeScan glucometer."
             )
 
     def disconnect(self):  # pylint: disable=no-self-use
@@ -176,10 +176,11 @@ class Device(driver_base.GlucometerDriver):
         return response.value
 
     def get_meter_info(self):
+        model = self._query_string("model")
         return common.MeterInfo(
-            "OneTouch %s glucometer" % self._query_string("model"),
+            f"OneTouch {model} glucometer",
             serial_number=self.get_serial_number(),
-            version_info=("Software version: " + self.get_version(),),
+            version_info=(f"Software version: {self.get_version()}",),
             native_unit=self.get_glucose_unit(),
         )
 

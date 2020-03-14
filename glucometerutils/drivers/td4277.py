@@ -157,7 +157,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         )
         if response_command not in _VALID_CONNECT_RESPONSE:
             raise exceptions.ConnectionFailed(
-                "Invalid response received: %2x %r" % (response_command, message)
+                f"Invalid response received: {response_command:02x} {message!r}"
             )
 
         _, model_message = self._send_command(_GET_MODEL)
@@ -165,7 +165,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
             _MODEL_STRUCT.parse(model_message)
         except construct.ConstructError:
             raise exceptions.ConnectionFailed(
-                "Invalid model identified: %r" % model_message
+                f"Invalid model identified: {model_message!r}"
             )
 
     def disconnect(self):

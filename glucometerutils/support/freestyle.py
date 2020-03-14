@@ -152,8 +152,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice, driver_base.GlucometerDriver, ABC)
         response = self._read_response()
         if not _is_init_reply(response):
             raise exceptions.ConnectionFailed(
-                "Connection error: unexpected message %02x:%s"
-                % (response[0], response[1].hex())
+                f"Connection error: unexpected message %{response[0]:02x}:{response[1].hex()}"
             )
 
     def disconnect(self):
@@ -235,8 +234,7 @@ class FreeStyleHidDevice(hiddevice.HidDevice, driver_base.GlucometerDriver, ABC)
 
             if message_type != self.TEXT_REPLY_CMD:
                 raise exceptions.InvalidResponse(
-                    "Message type %02x does not match expectations: %r"
-                    % (message_type, content)
+                    f"Message type {message_type:02x}: content does not match expectations: {content!r}"
                 )
 
             full_content += content
@@ -317,10 +315,8 @@ class FreeStyleHidDevice(hiddevice.HidDevice, driver_base.GlucometerDriver, ABC)
         # The format used by the FreeStyle devices is not composable based on
         # standard strftime() (namely it includes no leading zeros), so we need
         # to build it manually.
-        date_cmd = "$date,{month},{day},{year}".format(
-            month=date.month, day=date.day, year=(date.year - 2000)
-        )
-        time_cmd = "$time,{hour},{minute}".format(hour=date.hour, minute=date.minute)
+        date_cmd = f"$date,{date.month},{date.day},{date.year - 2000}"
+        time_cmd = f"$time,{date.hour},{date.minute}"
 
         self._send_text_command(bytes(date_cmd, "ascii"))
         self._send_text_command(bytes(time_cmd, "ascii"))

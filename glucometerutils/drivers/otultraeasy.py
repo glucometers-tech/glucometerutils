@@ -152,8 +152,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
             pkt.link_control.sequence_number != self.expect_receive_
         ):
             raise lifescan.MalformedCommand(
-                "at position 2[0b] expected %02x, received %02x"
-                % (self.expect_receive_, pkt.link_connect.sequence_count)
+                f"at position 2[0b] expected {self.expect_receive_:02x}, received {pkt.link_connect.sequence_count:02x}"
             )
 
         return pkt

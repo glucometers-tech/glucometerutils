@@ -162,28 +162,24 @@ def _parse_arresult(record):
         comment_parts.append("Medication")
 
     if parsed_record["food-flag"]:
-        if parsed_record["food-carbs-grams"]:
-            comment_parts.append("Food (%d g)" % parsed_record["food-carbs-grams"])
+        grams = parsed_record["food-carbs-grams"]
+        if grams:
+            comment_parts.append(f"Food ({grams} g)")
         else:
             comment_parts.append("Food")
 
     if parsed_record["long-acting-flag"]:
-        if parsed_record["double-long-acting-insulin"]:
-            comment_parts.append(
-                "Long-acting insulin (%.1f)"
-                % (parsed_record["double-long-acting-insulin"] / 2.0)
-            )
+        insulin = parsed_record["double-long-acting-insulin"] / 2
+        if insulin:
+            comment_parts.append(f"Long-acting insulin ({insulin:.1f})")
         else:
             comment_parts.append("Long-acting insulin")
 
     if parsed_record["rapid-acting-flag"]:
-        # provide default value, as this record does not always exist
-        # (even if rapid-acting-flag is set)
-        if parsed_record.get("double-rapid-acting-insulin", 0):
-            comment_parts.append(
-                "Rapid-acting insulin (%.1f)"
-                % (parsed_record["double-rapid-acting-insulin"] / 2.0)
-            )
+        # This record does not always exist, so calculate it only when present.
+        if "double-rapid-acting-insulin" in parsed_record:
+            rapid_insulin = parsed_record["double-rapid-acting-insulin"] / 2
+            comment_parts.append(f"Rapid-acting insulin ({rapid_insulin:.1f})")
         else:
             comment_parts.append("Rapid-acting insulin")
 

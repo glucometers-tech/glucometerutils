@@ -56,12 +56,12 @@ def main():
             command = input(">>> ")
         else:
             command = input()
-            print(">>> {command}".format(command=command))
+            print(f">>> {command}")
 
         try:
             print(device._send_text_command(bytes(command, "ascii")))
         except exceptions.InvalidResponse as error:
-            print("! {error}".format(error=error))
+            print(f"! {error}")
 
 
 if __name__ == "__main__":

@@ -52,9 +52,7 @@ class HidDevice:
         # If the user passed a device path that does not exist, raise an
         # error. This is to avoid writing to a file instead of to a device node.
         if device and not os.path.exists(device):
-            raise exceptions.ConnectionFailed(
-                message="Path %s does not exist." % device
-            )
+            raise exceptions.ConnectionFailed(message=f"Path {device} does not exist.")
 
         # If the user passed a device, try opening it.
         if device:
@@ -73,7 +71,7 @@ class HidDevice:
                 )
             except OSError as e:
                 raise exceptions.ConnectionFailed(
-                    message="Unable to connect to meter: %s." % e
+                    message=f"Unable to connect to meter: {e}."
                 )
 
     def _write(self, report):
