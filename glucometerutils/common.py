@@ -151,7 +151,9 @@ class MeterInfo:
     def __str__(self):
         version_information_string = "N/A"
         if self.version_info:
-            version_information_string = "\n    ".join(self.version_info).strip()
+            version_information_string = "\n                ".join(
+                self.version_info
+            ).strip()
 
         base_output = textwrap.dedent(
             f"""\
