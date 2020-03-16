@@ -25,10 +25,16 @@ class PyTestCommand(TestCommand):
         sys.exit(errno)
 
 
+with open("README.md", "rt") as fh:
+    long_description = fh.read()
+
+
 setup(
     name="glucometerutils",
     version="1",
     description="Glucometer access utilities",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Diego Elio Pettenò",
     author_email="flameeyes@flameeyes.com",
     url="https://www.flameeyes.com/p/glucometerutils",
