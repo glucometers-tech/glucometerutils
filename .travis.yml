@@ -14,6 +14,7 @@ install:
 
 script:
   - py.test
+  - mypy glucometerutils
   - python setup.py bdist_wheel
   - pip install ./dist/glucometerutils-*.whl
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi

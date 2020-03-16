@@ -70,7 +70,7 @@ setup(
         "sdcodefree": ["construct", "pyserial"],
         "td4277": ["construct", "pyserial", "hidapi"],
         # Development and testing dependencies
-        "dev": test_required + ["pre-commit"],
+        "dev": test_required + ["pre-commit", "mypy"],
     },
     entry_points={"console_scripts": ["glucometer=glucometerutils.glucometer:main"]},
     cmdclass={"test": PyTestCommand,},
