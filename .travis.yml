@@ -9,13 +9,14 @@ matrix:
     - python: 3.7
     - python: 3.8
     - python: 3.9-dev
+      env: RUN_MYPY=false
 
 install:
   - pip install .[dev]
 
 script:
   - py.test
-  - mypy glucometerutils
+  - if [[ $RUN_MYPY != false ]]; then mypy glucometerutils; fi
   - python setup.py bdist_wheel
   - pip install ./dist/glucometerutils-*.whl
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
