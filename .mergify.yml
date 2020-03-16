@@ -1,0 +1,15 @@
+pull_request_rules:
+  - name: Automatic merge on approval
+    conditions:
+      - "#approved-reviews-by>=1"
+      - "status-success=continuous-integration/travis-ci/pr"
+    actions:
+      merge:
+        method: rebase
+  - name: Automatic merge from Flameeyes
+    conditions:
+      - "author=Flameeyes"
+      - "status-success=continuous-integration/travis-ci/pr"
+    actions:
+      merge:
+        method: rebase
