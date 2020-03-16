@@ -1,6 +1,6 @@
 <p align="center">
-<a href="https://travis-ci.org/Flameeyes/glucometerutils/builds/"><img alt="build status" src="https://img.shields.io/travis/Flameeyes/glucometerutils"></a>
-<a href="https://github.com/Flameeyes/glucometerutils#license"><img alt="GitHub" src="https://img.shields.io/badge/license-MIT-green"></a>
+<a href="https://travis-ci.org/glucometers-tech/glucometerutils/builds/"><img alt="build status" src="https://img.shields.io/travis/glucometers-tech/glucometerutils"></a>
+<a href="https://github.com/glucometers-tech/glucometerutils#license"><img alt="GitHub" src="https://img.shields.io/badge/license-MIT-green"></a>
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
@@ -29,7 +29,7 @@ be able to set this up using `virtualenv` and `pip`:
 $ python3 -m venv $(pwd)/glucometerutils-venv
 $ . glucometerutils-venv/bin/activate
 (glucometerutils-venv) $ DRIVER=myglucometer-driver  # see table below
-(glucometerutils-venv) $ pip install "git+https://github.com/Flameeyes/glucometerutils.git#egg=glucometerutils[${DRIVER}]"
+(glucometerutils-venv) $ pip install "git+https://github.com/glucometers-tech/glucometerutils.git#egg=glucometerutils[${DRIVER}]"
 (glucometerutils-venv) $ glucometer --driver ${DRIVER} help
 ```
 
@@ -116,7 +116,7 @@ compatible.
 To set up your development environment follow these guidelines:
 
 ```shell
-$ git clone https://github.com/Flameeyes/glucometerutils.git
+$ git clone https://github.com/glucometers-tech/glucometerutils.git
 $ cd glucometerutils
 $ python3 -m venv --python=python3.6
 $ . venv/bin/activate
