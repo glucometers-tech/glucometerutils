@@ -45,11 +45,11 @@ def main():
 
     logging.basicConfig(level=args.vlog)
 
-    device = freestyle.FreeStyleHidDevice(args.device)
-    device.TEXT_CMD = args.text_cmd_type
-    device.TEXT_REPLY_CMD = args.text_reply_type
+    session = freestyle.FreeStyleHidSession(
+        None, args.device, args.text_cmd_type, args.text_reply_type
+    )
 
-    device.connect()
+    session.connect()
 
     while True:
         if sys.stdin.isatty():
@@ -59,7 +59,7 @@ def main():
             print(f">>> {command}")
 
         try:
-            print(device._send_text_command(bytes(command, "ascii")))
+            print(session.send_text_command(bytes(command, "ascii")))
         except exceptions.InvalidResponse as error:
             print(f"! {error}")
 
