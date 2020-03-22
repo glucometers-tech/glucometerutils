@@ -11,7 +11,7 @@ matrix:
       env: RUN_MYPY=false
 
 install:
-  - pip install .[dev]
+  - pip install .[all]
 
 addons:
   apt:
