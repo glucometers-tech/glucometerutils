@@ -56,7 +56,8 @@ _NeoReading = collections.namedtuple(
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Precision Neo devices."""
 
-    USB_PRODUCT_ID = 0x3850
+    def __init__(self, device_path):
+        super().__init__(0x3850, device_path)
 
     def get_meter_info(self):
         """Return the device information in structured form."""
@@ -74,7 +75,7 @@ class Device(freestyle.FreeStyleHidDevice):
 
     def get_readings(self):
         """Iterate through the reading records in the device."""
-        for record in self._get_multirecord(b"$result?"):
+        for record in self._session.query_multirecord(b"$result?"):
             cls = None
             if record and record[0] == _TYPE_GLUCOSE_READING:
                 cls = common.GlucoseReading

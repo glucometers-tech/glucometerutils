@@ -15,13 +15,13 @@ import csv
 import datetime
 import logging
 import re
-from typing import Dict, Iterator, List, Text
+from typing import Dict, Iterator, List, Optional, Text, Tuple
 
 import construct
 
 from glucometerutils import exceptions
 from glucometerutils.exceptions import InvalidResponse
-from glucometerutils.support import hiddevice
+from glucometerutils.support import driver_base, hiddevice
 
 # regexr.com/4k6jb
 _HEADER_RECORD_RE = re.compile(
@@ -64,7 +64,7 @@ class FrameError(Exception):
     pass
 
 
-class ContourHidDevice(hiddevice.HidDevice):
+class ContourHidDevice(driver_base.GlucometerDriver):
     """Base class implementing the ContourUSB HID common protocol.
     """
 
@@ -77,11 +77,16 @@ class ContourHidDevice(hiddevice.HidDevice):
     mode_command = object()
     state = None
 
+    def __init__(self, usb_ids, device_path):
+        # type: (Tuple[int, int], Optional[Text]) -> None
+        super().__init__(device_path)
+        self._hid_session = hiddevice.HidSession(usb_ids, device_path)
+
     def read(self, r_size=blocksize):
         result = []
 
         while True:
-            data = self._read()
+            data = self._hid_session.read()
             dstr = data
             result.append(dstr[4 : data[3] + 4])
             if data[3] != self.blocksize - 4:
@@ -94,7 +99,7 @@ class ContourHidDevice(hiddevice.HidDevice):
         pad_length = self.blocksize - len(data)
         data += pad_length * b"\x00"
 
-        self._write(data)
+        self._hid_session.write(data)
 
     USB_VENDOR_ID = 0x1A79  # type: int  # Bayer Health Care LLC Contour
     USB_PRODUCT_ID = 0x6002  # type: int

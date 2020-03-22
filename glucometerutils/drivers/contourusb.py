@@ -21,7 +21,7 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 import datetime
 
 from glucometerutils import common
-from glucometerutils.support import contourusb, driver_base
+from glucometerutils.support import contourusb
 
 
 def _extract_timestamp(parsed_record, prefix=""):
@@ -41,11 +41,11 @@ def _extract_timestamp(parsed_record, prefix=""):
     )
 
 
-class Device(contourusb.ContourHidDevice, driver_base.GlucometerDriver):
+class Device(contourusb.ContourHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
 
-    USB_VENDOR_ID = 0x1A79  # type: int  # Bayer Health Care LLC Contour
-    USB_PRODUCT_ID = 0x6002  # type: int
+    def __init__(self, device):
+        self._hid_session = contourusb.ContourHidSession((0x1A79, 0x6002), device)
 
     def get_meter_info(self):
         self._get_info_record()

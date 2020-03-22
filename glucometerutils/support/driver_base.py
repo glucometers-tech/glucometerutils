@@ -1,8 +1,13 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Optional, Text
 
 
 class GlucometerDriver(ABC):
+    def __init__(self, device_path):
+        # type: (Optional[Text]) -> None
+        pass
+
     def connect(self):
         pass
 

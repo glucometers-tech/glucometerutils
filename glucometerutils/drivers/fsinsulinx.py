@@ -51,7 +51,8 @@ _InsulinxReading = collections.namedtuple(
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle InsuLinux devices."""
 
-    USB_PRODUCT_ID = 0x3460
+    def __init__(self, device_path):
+        super().__init__(0x3460, device_path)
 
     def get_meter_info(self):
         """Return the device information in structured form."""
@@ -68,7 +69,7 @@ class Device(freestyle.FreeStyleHidDevice):
 
     def get_readings(self):
         """Iterate through the reading records in the device."""
-        for record in self._get_multirecord(b"$result?"):
+        for record in self._session.query_multirecord(b"$result?"):
             if not record or record[0] != _TYPE_GLUCOSE_READING:
                 continue
 

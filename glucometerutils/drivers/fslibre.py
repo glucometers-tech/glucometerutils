@@ -195,7 +195,8 @@ def _parse_arresult(record):
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
 
-    USB_PRODUCT_ID = 0x3650
+    def __init__(self, device_path):
+        super().__init__(0x3650, device_path)
 
     def get_meter_info(self):
         """Return the device information in structured form."""
@@ -209,7 +210,7 @@ class Device(freestyle.FreeStyleHidDevice):
 
     def get_serial_number(self):
         """Overridden function as the command is not compatible."""
-        return self._send_text_command(b"$sn?").rstrip("\r\n")
+        return self._session.send_text_command(b"$sn?").rstrip("\r\n")
 
     def get_glucose_unit(self):  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
@@ -221,7 +222,7 @@ class Device(freestyle.FreeStyleHidDevice):
 
         # First of all get the usually longer list of sensor readings, and
         # convert them to Readings objects.
-        for record in self._get_multirecord(b"$history?"):
+        for record in self._session.query_multirecord(b"$history?"):
             parsed_record = _parse_record(record, _HISTORY_ENTRY_MAP)
 
             if not parsed_record or parsed_record["errors"] != 0:
@@ -238,10 +239,10 @@ class Device(freestyle.FreeStyleHidDevice):
 
         # Then get the results of explicit scans and blood tests (and other
         # events).
-        for record in self._get_multirecord(b"$arresult?"):
+        for record in self._session.query_multirecord(b"$arresult?"):
             reading = _parse_arresult(record)
             if reading:
                 yield reading
 
     def zero_log(self):
-        self._send_text_command(b"$resetpatient")
+        self._session.send_text_command(b"$resetpatient")
