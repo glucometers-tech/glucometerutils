@@ -13,6 +13,12 @@ matrix:
 install:
   - pip install .[dev]
 
+addons:
+  apt:
+    packages:
+      - libusb-1.0-0-dev
+      - libudev-dev
+
 script:
   - py.test
   - if [[ $RUN_MYPY != false ]]; then mypy glucometerutils; fi
