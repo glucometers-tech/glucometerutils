@@ -110,7 +110,7 @@ even if they are all from the same manufacturer, will use different
 protocols.
 
 If you want to contribute code, please note that the target language
-is Python 3.6, and that the style to follow is for the most part PEP8
+is Python 3.7, and that the style to follow is for the most part PEP8
 compatible.
 
 To set up your development environment follow these guidelines:
@@ -118,7 +118,7 @@ To set up your development environment follow these guidelines:
 ```shell
 $ git clone https://github.com/glucometers-tech/glucometerutils.git
 $ cd glucometerutils
-$ python3 -m venv --python=python3.6
+$ python3 -m venv --python=python3.7
 $ . venv/bin/activate
 $ pip install -e .[dev]
 $ # If you want to work on a specific driver specify this after dev e.g.

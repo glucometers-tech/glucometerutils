@@ -39,7 +39,7 @@ setup(
     author_email="flameeyes@flameeyes.com",
     url="https://www.flameeyes.com/p/glucometerutils",
     keywords=["glucometer", "diabetes"],
-    python_requires="~=3.6",
+    python_requires="~=3.7",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
