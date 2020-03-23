@@ -65,7 +65,7 @@ setup(
         "fsprecisionneo": ["construct", "hidapi"],
         "otultra2": ["pyserial"],
         "otultraeasy": ["construct", "pyserial"],
-        "otverio2015": ["construct", "python-scsi"],
+        "otverio2015": ["construct"],
         "otverioiq": ["construct", "pyserial"],
         "sdcodefree": ["construct", "pyserial"],
         "td4277": ["construct", "pyserial", "hidapi"],
