@@ -4,9 +4,8 @@ language: python
 
 matrix:
   include:
-    - python: 3.6
-      env: PRE_COMMIT=true
     - python: 3.7
+      env: PRE_COMMIT=true
     - python: 3.8
     - python: 3.9-dev
       env: RUN_MYPY=false
