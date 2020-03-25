@@ -22,6 +22,4 @@ addons:
 script:
   - py.test
   - if [[ $RUN_MYPY != false ]]; then mypy glucometerutils reversing_tools; fi
-  - python setup.py bdist_wheel
-  - pip install ./dist/glucometerutils-*.whl
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
