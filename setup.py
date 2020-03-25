@@ -4,6 +4,8 @@
 
 from setuptools import find_packages, setup
 
+import setuptools_scm  # Ensure it's present.
+
 extras_require = {
     # These are all the drivers' dependencies. Optional dependencies are
     # listed as mandatory for the feature.
