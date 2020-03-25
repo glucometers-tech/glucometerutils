@@ -21,23 +21,20 @@ extras_require = {
     "td4277": ["construct", "pyserial", "hidapi"],
     # These are not drivers, but rather tools and features.
     "reversing_tools": ["usbmon-tools"],
+    "dev": [
+        "absl-py",
+        "construct>=2.9",
+        "mypy",
+        "pre-commit",
+        "pytest-timeout>=1.3.0",
+        "pytest>=3.6.0",
+    ],
 }
-
-tests_require = [
-    "absl-py",
-    "construct>=2.9",
-    "pytest>=3.6.0",
-    "pytest-timeout>=1.3.0",
-]
-
-# Development and testing dependencies
-extras_require["dev"] = tests_require + ["pre-commit", "mypy"]
 
 all_require = []
 for extra_require in extras_require.values():
     all_require.extend(extra_require)
 
-tests_require.extend(all_require)
 extras_require["all"] = all_require
 
 
@@ -46,7 +43,6 @@ setup(
     packages=find_packages(exclude=["test", "udev"]),
     data_files=[("lib/udev/rules", ["udev/69-glucometerutils.rules"]),],
     install_requires=["attrs",],
-    tests_require=tests_require,
     extras_require=extras_require,
     entry_points={"console_scripts": ["glucometer=glucometerutils.glucometer:main"]},
 )
