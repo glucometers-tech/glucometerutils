@@ -2,10 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-import sys
-
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
 extras_require = {
     # These are all the drivers' dependencies. Optional dependencies are
@@ -44,15 +41,6 @@ tests_require.extend(all_require)
 extras_require["all"] = all_require
 
 
-class PyTestCommand(TestCommand):
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-
-        errno = pytest.main([])
-        sys.exit(errno)
-
-
 setup(
     python_requires="~=3.7",
     packages=find_packages(exclude=["test", "udev"]),
@@ -61,5 +49,4 @@ setup(
     tests_require=tests_require,
     extras_require=extras_require,
     entry_points={"console_scripts": ["glucometer=glucometerutils.glucometer:main"]},
-    cmdclass={"test": PyTestCommand,},
 )
