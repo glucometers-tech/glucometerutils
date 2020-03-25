@@ -53,31 +53,8 @@ class PyTestCommand(TestCommand):
         sys.exit(errno)
 
 
-with open("README.md", "rt") as fh:
-    long_description = fh.read()
-
-
 setup(
-    name="glucometerutils",
-    version="1",
-    description="Glucometer access utilities",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    author="Diego Elio Pettenò",
-    author_email="flameeyes@flameeyes.com",
-    url="https://www.flameeyes.com/p/glucometerutils",
-    keywords=["glucometer", "diabetes"],
     python_requires="~=3.7",
-    classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Development Status :: 4 - Beta",
-        "Environment :: Console",
-        "Operating System :: OS Independent",
-        "License :: OSI Approved :: MIT License",
-        "Intended Audience :: End Users/Desktop",
-        "Topic :: Scientific/Engineering :: Medical Science Apps.",
-    ],
     packages=find_packages(exclude=["test", "udev"]),
     data_files=[("lib/udev/rules", ["udev/69-glucometerutils.rules"]),],
     install_requires=["attrs",],
