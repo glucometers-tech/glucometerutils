@@ -212,7 +212,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     def _set_device_datetime(self, date):
         response = self._send_request(
             _DATETIME_REQUEST,
-            {"request_type": "write", "timestamp": date,},
+            {"request_type": "write", "timestamp": date},
             _DATETIME_RESPONSE,
         )
         return response.timestamp

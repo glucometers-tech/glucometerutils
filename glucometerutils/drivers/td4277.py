@@ -147,7 +147,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         logging.debug("received packet: %r", response)
 
         if validate_response and response.data.value.command != command:
-            raise InvalidResponse(response)
+            raise exceptions.InvalidResponse(response)
 
         return response.data.value.command, response.data.value.message
 
@@ -189,7 +189,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         assert date.year >= 2000
 
         day_struct = _DAY_BITSTRUCT.build(
-            {"year": date.year - 2000, "month": date.month, "day": date.day,}
+            {"year": date.year - 2000, "month": date.month, "day": date.day}
         )
 
         day_word = construct.Int16ub.parse(day_struct)

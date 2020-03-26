@@ -166,7 +166,7 @@ def main():
             else:
                 print(device.get_datetime())
         elif args.action == "patient":
-            if args.set_name != None:
+            if args.set_name is not None:
                 try:
                     device.set_patient_name(args.set_name)
                 except NotImplementedError:

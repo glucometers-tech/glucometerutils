@@ -12,7 +12,6 @@ import csv
 import datetime
 import logging
 import re
-from abc import ABC
 from typing import AnyStr, Callable, Iterator, List, Optional, Text, Tuple
 
 import construct
@@ -185,7 +184,8 @@ class FreeStyleHidSession:
 
         if not encrypted or message_type in _ALWAYS_UNENCRYPTED_MESSAGES:
             message_length = usb_packet[1]
-            message_content = usb_packet[2 : 2 + message_length]
+            message_end_idx = 2 + message_length
+            message_content = usb_packet[2:message_end_idx]
         else:
             message_content = usb_packet[1:]
 
@@ -340,7 +340,7 @@ class FreeStyleHidDevice(driver_base.GlucometerDriver):
         except UnicodeDecodeError:
             raise ValueError("Only ASCII-safe names are tested working")
 
-        result = self._session.send_text_command(b"$ptname," + encoded_name)
+        self._session.send_text_command(b"$ptname," + encoded_name)
 
     def get_datetime(self):
         # type: () -> datetime.datetime

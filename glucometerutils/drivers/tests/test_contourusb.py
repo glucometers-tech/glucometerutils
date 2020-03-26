@@ -41,7 +41,6 @@ class TestContourUSB(absltest.TestCase):
 
     def test_parse_header_record(self):
 
-        _HEADER_RECORD_RE = contourusb._HEADER_RECORD_RE
         _RECORD_FORMAT = contourusb._RECORD_FORMAT
 
         header_record_decoded = self.header_record.decode()

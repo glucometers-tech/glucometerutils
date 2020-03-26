@@ -165,7 +165,7 @@ class MeterInfo:
         """
         )
 
-        if self.patient_name != None:
+        if self.patient_name is not None:
             base_output += f"Patient Name: {self.patient_name}\n"
 
         return base_output

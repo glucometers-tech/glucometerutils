@@ -150,7 +150,7 @@ class Device(driver_base.GlucometerDriver):
         """
         try:
             request = request_format.build(request_obj)
-            request_raw = _PACKET.build({"data": {"value": {"message": request,}}})
+            request_raw = _PACKET.build({"data": {"value": {"message": request}}})
             logging.debug("Request sent: %s", binascii.hexlify(request_raw))
             self.scsi_.write10(lba, 1, request_raw)
 

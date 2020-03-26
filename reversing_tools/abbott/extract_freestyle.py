@@ -170,8 +170,9 @@ def main():
             message = packet.payload[1:]
         else:
             message_length = packet.payload[1]
+            message_end_idx = 2 + message_length
             message_type = f" {message_type:02x}"
-            message = packet.payload[2 : 2 + message_length]
+            message = packet.payload[2:message_end_idx]
 
         print(
             usbmon.chatter.dump_bytes(
