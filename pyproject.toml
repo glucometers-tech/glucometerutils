@@ -29,9 +29,11 @@ exclude = '''
 '''
 
 [tool.isort]
+# These settings ensure that black and isort don't disagree on the imports.
 line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
+
 known_first_party = ['glucometerutils']
 known_third_party = ['construct', 'hidapi', 'pyserial', 'pyscsi']
 
