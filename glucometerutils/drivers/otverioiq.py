@@ -106,7 +106,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         self.buffered_reader_ = construct.Rebuffered(_PACKET, tailcutoff=1024)
 
     def _send_packet(self, message):
-        pkt = _PACKET.build({"data": {"value": {"message": message,}}})
+        pkt = _PACKET.build({"data": {"value": {"message": message}}})
         logging.debug("sending packet: %s", binascii.hexlify(pkt))
 
         self.serial_.write(pkt)
@@ -158,7 +158,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         return response.timestamp
 
     def _set_device_datetime(self, date):
-        self._send_request(_WRITE_RTC_REQUEST, {"timestamp": date,}, _COMMAND_SUCCESS)
+        self._send_request(_WRITE_RTC_REQUEST, {"timestamp": date}, _COMMAND_SUCCESS)
 
         # The device does not return the new datetime, so confirm by calling
         # READ RTC again.

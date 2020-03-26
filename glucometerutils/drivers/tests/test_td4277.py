@@ -8,9 +8,7 @@
 import datetime
 
 from absl.testing import parameterized
-from glucometerutils import exceptions
 from glucometerutils.drivers import td4277
-from glucometerutils.support import lifescan
 
 
 class TestTD4277Nexus(parameterized.TestCase):

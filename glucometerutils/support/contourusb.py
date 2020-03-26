@@ -11,16 +11,10 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 
 """
 
-import csv
 import datetime
-import logging
 import re
-from typing import Dict, Iterator, List, Optional, Text, Tuple
+from typing import Dict, List, Optional, Text, Tuple
 
-import construct
-
-from glucometerutils import exceptions
-from glucometerutils.exceptions import InvalidResponse
 from glucometerutils.support import driver_base, hiddevice
 
 # regexr.com/4k6jb
@@ -88,7 +82,8 @@ class ContourHidDevice(driver_base.GlucometerDriver):
         while True:
             data = self._hid_session.read()
             dstr = data
-            result.append(dstr[4 : data[3] + 4])
+            data_end_idx = data[3] + 4
+            result.append(dstr[4:data_end_idx])
             if data[3] != self.blocksize - 4:
                 break
 
@@ -308,7 +303,7 @@ class ContourHidDevice(driver_base.GlucometerDriver):
                         result = self.checkframe(data[stx:])
                         tometer = "\x06"
                         self.state = self.mode_data
-                    except FrameError as e:
+                    except FrameError:
                         tometer = "\x15"  # Couldn't parse, <NAK>
                 else:
                     # Got something we don't understand, <NAK> it

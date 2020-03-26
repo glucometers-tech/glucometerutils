@@ -45,10 +45,10 @@ _NeoReading = collections.namedtuple(
         "value",
         # Extra trailing and so-far-unused fields; so discard them:
         # * for blood glucose: 10 unknown trailing fields
-        #'unknown3', 'unknown4', 'unknown5', 'unknown6', 'unknown7',
-        #'unknown8', 'unknown9', 'unknown10', 'unknown11', 'unknown12',
+        # 'unknown3', 'unknown4', 'unknown5', 'unknown6', 'unknown7',
+        # 'unknown8', 'unknown9', 'unknown10', 'unknown11', 'unknown12',
         # * for blood ketone: 2 unknown trailing fields
-        #'unknown3', 'unknown4',
+        # 'unknown3', 'unknown4',
     ),
 )
 
