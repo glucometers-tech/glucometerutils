@@ -6,7 +6,7 @@
 import datetime
 import enum
 import textwrap
-from typing import Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 import attr
 
@@ -30,8 +30,7 @@ class MeasurementMethod(enum.Enum):
     TIME = "time"
 
 
-def convert_glucose_unit(value, from_unit, to_unit):
-    # type: (float, Unit, Unit) -> float
+def convert_glucose_unit(value: float, from_unit: Unit, to_unit: Unit) -> float:
     """Convert the given value of glucose level between units.
 
     Args:
@@ -54,31 +53,28 @@ def convert_glucose_unit(value, from_unit, to_unit):
     return round(value * 18.0, 0)
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class GlucoseReading:
 
-    timestamp = attr.ib(type=datetime.datetime)
-    value = attr.ib(type=float)
-    meal = attr.ib(default=Meal.NONE, validator=attr.validators.in_(Meal), type=Meal)
-    comment = attr.ib(default="", type=str)
-    measure_method = attr.ib(
+    timestamp: datetime.datetime
+    value: float
+    meal: Meal = attr.ib(default=Meal.NONE, validator=attr.validators.in_(Meal))
+    comment: str = ""
+    measure_method: MeasurementMethod = attr.ib(
         default=MeasurementMethod.BLOOD_SAMPLE,
         validator=attr.validators.in_(MeasurementMethod),
-        type=MeasurementMethod,
     )
-    extra_data = attr.ib(factory=dict)
+    extra_data: Dict[str, Any] = attr.Factory(dict)
 
-    def get_value_as(self, to_unit):
-        # type: (Unit) -> float
+    def get_value_as(self, to_unit: Unit) -> float:
         """Returns the reading value as the given unit.
 
         Args:
-          to_unit: (Unit) The unit to return the value to.
+          to_unit: The unit to return the value to.
         """
         return convert_glucose_unit(self.value, Unit.MG_DL, to_unit)
 
-    def as_csv(self, unit):
-        # type: (Unit) -> str
+    def as_csv(self, unit: Unit) -> str:
         """Returns the reading as a formatted comma-separated value string."""
         return '"%s","%.2f","%s","%s","%s"' % (
             self.timestamp,
@@ -89,15 +85,15 @@ class GlucoseReading:
         )
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class KetoneReading:
 
-    timestamp = attr.ib(type=datetime.datetime)
-    value = attr.ib(type=float)
-    comment = attr.ib(default="", type=str)
-    extra_data = attr.ib(factory=dict)
+    timestamp: datetime.datetime
+    value: float
+    comment: str = ""
+    extra_data: Dict[str, Any] = attr.Factory(dict)
 
-    def as_csv(self, unit):
+    def as_csv(self, unit: Unit) -> str:
         """Returns the reading as a formatted comma-separated value string."""
         del unit  # Unused for Ketone readings.
 
@@ -109,16 +105,16 @@ class KetoneReading:
         )
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class TimeAdjustment:
-    timestamp = attr.ib()  # type: datetime.datetime
-    old_timestamp = attr.ib()  # type: datetime.datetime
-    measure_method = attr.ib(
+    timestamp: datetime.datetime
+    old_timestamp: datetime.datetime
+    measure_method: MeasurementMethod = attr.ib(
         default=MeasurementMethod.TIME, validator=attr.validators.in_(MeasurementMethod)
-    )  # type: MeasurementMethod
-    extra_data = attr.ib(factory=dict)
+    )
+    extra_data: Dict[str, Any] = attr.Factory(dict)
 
-    def as_csv(self, unit):
+    def as_csv(self, unit: Unit) -> str:
         del unit
         return '"%s","","%s","%s"' % (
             self.timestamp,
@@ -127,7 +123,7 @@ class TimeAdjustment:
         )
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class MeterInfo:
     """General information about the meter.
 
@@ -140,15 +136,13 @@ class MeterInfo:
       native_unit: One of the Unit values to identify the meter native unit.
     """
 
-    model = attr.ib(type=str)
-    serial_number = attr.ib(default="N/A", type=str)
-    version_info = attr.ib(default=(), type=Sequence[str])
-    native_unit = attr.ib(
-        default=Unit.MG_DL, validator=attr.validators.in_(Unit), type=Unit
-    )
-    patient_name = attr.ib(default=None, type=Optional[str])
+    model: str
+    serial_number: str = "N/A"
+    version_info: Sequence[str] = ()
+    native_unit: Unit = attr.ib(default=Unit.MG_DL, validator=attr.validators.in_(Unit))
+    patient_name: Optional[str] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         version_information_string = "N/A"
         if self.version_info:
             version_information_string = "\n                ".join(
