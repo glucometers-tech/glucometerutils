@@ -18,6 +18,7 @@ import enum
 import functools
 import logging
 import operator
+from typing import Generator, NoReturn, Optional, Tuple
 
 import construct
 
@@ -49,7 +50,7 @@ _PACKET = construct.Struct(
     / construct.Checksum(construct.Byte, byte_checksum, construct.this.data.data),
 )
 
-_EMPTY_MESSAGE = 0
+_EMPTY_MESSAGE = b"\x00\x00\x00\x00"
 
 _CONNECT_REQUEST = 0x22
 _VALID_CONNECT_RESPONSE = {0x22, 0x24, 0x54}
@@ -100,7 +101,9 @@ _READING_VALUE_STRUCT = construct.Struct(
 )
 
 
-def _make_packet(command, message, direction=Direction.Out):
+def _make_packet(
+    command: int, message: bytes, direction: Direction = Direction.Out
+) -> bytes:
     return _PACKET.build(
         {
             "data": {
@@ -114,7 +117,7 @@ def _make_packet(command, message, direction=Direction.Out):
     )
 
 
-def _parse_datetime(message):
+def _parse_datetime(message: bytes) -> datetime.datetime:
     date = _DATETIME_STRUCT.parse(message)
     # We can't parse the day properly with a single pass of Construct
     # unfortunately.
@@ -124,7 +127,7 @@ def _parse_datetime(message):
     )
 
 
-def _select_record(record_id):
+def _select_record(record_id: int) -> bytes:
     return _READING_SELECTION_STRUCT.build({"record_id": record_id})
 
 
@@ -133,11 +136,16 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 19200
     TIMEOUT = 0.5
 
-    def __init__(self, device):
-        super(Device, self).__init__("cp2110://" + device)
+    def __init__(self, device: Optional[str]):
+        super().__init__(f"cp2110://{device}")
         self.buffered_reader_ = construct.Rebuffered(_PACKET, tailcutoff=1024)
 
-    def _send_command(self, command, message=_EMPTY_MESSAGE, validate_response=True):
+    def _send_command(
+        self,
+        command: int,
+        message: bytes = _EMPTY_MESSAGE,
+        validate_response: bool = True,
+    ) -> Tuple[int, bytes]:
         pkt = _make_packet(command, message)
         logging.debug("sending packet: %s", binascii.hexlify(pkt))
 
@@ -151,7 +159,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         return response.data.value.command, response.data.value.message
 
-    def connect(self):
+    def connect(self) -> None:
         response_command, message = self._send_command(
             _CONNECT_REQUEST, validate_response=False
         )
@@ -168,24 +176,24 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
                 f"Invalid model identified: {model_message!r}"
             )
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         pass
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         return common.MeterInfo("TaiDoc TD-4277 glucometer")
 
-    def get_version(self):  # pylint: disable=no-self-use
+    def get_version(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_serial_number(self):  # pylint: disable=no-self-use
+    def get_serial_number(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_datetime(self):
+    def get_datetime(self) -> datetime.datetime:
         _, message = self._send_command(_GET_DATETIME)
 
         return _parse_datetime(message)
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         assert date.year >= 2000
 
         day_struct = _DAY_BITSTRUCT.build(
@@ -202,12 +210,12 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         return _parse_datetime(message)
 
-    def _get_reading_count(self):
+    def _get_reading_count(self) -> int:
         _, message = self._send_command(_GET_READING_COUNT)
 
         return _READING_COUNT_STRUCT.parse(message).count
 
-    def _get_reading(self, record_id):
+    def _get_reading(self, record_id: int) -> common.GlucoseReading:
         _, reading_date_message = self._send_command(
             _GET_READING_DATETIME, _select_record(record_id)
         )
@@ -222,14 +230,14 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
             reading_date, reading_value.value, meal=reading_value.meal
         )
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         record_count = self._get_reading_count()
         for record_id in range(record_count):
             yield self._get_reading(record_id)
 
-    def zero_log(self):
+    def zero_log(self) -> None:
         self._send_command(_CLEAR_MEMORY)
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self) -> NoReturn:
         """Maybe this could be implemented by someone who knows the device"""
         raise NotImplementedError

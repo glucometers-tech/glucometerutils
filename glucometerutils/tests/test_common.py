@@ -6,9 +6,12 @@
 # pylint: disable=protected-access,missing-docstring
 
 import datetime
+import unittest
 
 from absl.testing import parameterized
 from glucometerutils import common
+
+TEST_DATETIME = datetime.datetime(2018, 1, 1, 0, 30, 45)
 
 
 class TestGlucoseConversion(parameterized.TestCase):
@@ -43,11 +46,8 @@ class TestGlucoseConversion(parameterized.TestCase):
 
 
 class TestGlucoseReading(parameterized.TestCase):
-
-    TEST_DATETIME = datetime.datetime(2018, 1, 1, 0, 30, 45)
-
     def test_minimal(self):
-        reading = common.GlucoseReading(self.TEST_DATETIME, 100)
+        reading = common.GlucoseReading(TEST_DATETIME, 100)
         self.assertEqual(
             reading.as_csv(common.Unit.MG_DL),
             '"2018-01-01 00:30:45","100.00","","blood sample",""',
@@ -57,7 +57,7 @@ class TestGlucoseReading(parameterized.TestCase):
         ("_mgdl", common.Unit.MG_DL, 100), ("_mmoll", common.Unit.MMOL_L, 5.56)
     )
     def test_value(self, unit, expected_value):
-        reading = common.GlucoseReading(self.TEST_DATETIME, 100)
+        reading = common.GlucoseReading(TEST_DATETIME, 100)
         self.assertAlmostEqual(reading.get_value_as(unit), expected_value, places=2)
 
     @parameterized.named_parameters(
@@ -98,8 +98,34 @@ class TestGlucoseReading(parameterized.TestCase):
         ),
     )
     def test_csv(self, kwargs_dict, expected_csv):
-        reading = common.GlucoseReading(self.TEST_DATETIME, 100, **kwargs_dict)
+        reading = common.GlucoseReading(TEST_DATETIME, 100, **kwargs_dict)
         self.assertEqual(reading.as_csv(common.Unit.MG_DL), expected_csv)
+
+
+class TestKetoneReading(unittest.TestCase):
+    def test_measure_method(self):
+        """Raise an exception if an invalid measurement method is provided.
+
+        We allow measure_method as a parameter for compatibility with the other
+        Readings, but we don't want anything _but_ the BLOOD_SAMPLE method.
+        """
+        with self.subTest("No measure_method parameter."):
+            self.assertIsNotNone(common.KetoneReading(TEST_DATETIME, 100))
+
+        with self.subTest("measure_method=MeasurementMethod.BLOOD_SAMPLE is valid"):
+            self.assertIsNotNone(
+                common.KetoneReading(
+                    TEST_DATETIME,
+                    100,
+                    measure_method=common.MeasurementMethod.BLOOD_SAMPLE,
+                )
+            )
+
+        with self.subTest("measure_method=MeasurementMethod.TIME raises ValueError"):
+            with self.assertRaises(ValueError):
+                common.KetoneReading(
+                    TEST_DATETIME, 100, measure_method=common.MeasurementMethod.TIME
+                )
 
 
 class TestMeterInfo(parameterized.TestCase):

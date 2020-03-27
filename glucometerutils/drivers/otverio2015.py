@@ -23,7 +23,9 @@ https://protocols.glucometers.tech/lifescan/onetouch-verio-2015
 """
 
 import binascii
+import datetime
 import logging
+from typing import Any, Dict, Generator, Optional
 
 import construct
 from pyscsi.pyscsi.scsi import SCSI
@@ -105,19 +107,21 @@ _READ_RECORD_RESPONSE = construct.Struct(
 
 
 class Device(driver_base.GlucometerDriver):
-    def __init__(self, device):
+    def __init__(self, device: Optional[str]) -> None:
         if not device:
             raise exceptions.CommandLineError(
                 "--device parameter is required, should point to the disk "
                 "device representing the meter."
             )
 
+        super().__init__(device)
+
         self.device_name_ = device
         self.scsi_device_ = SCSIDevice(device, readwrite=True)
         self.scsi_ = SCSI(self.scsi_device_)
         self.scsi_.blocksize = _REGISTER_SIZE
 
-    def connect(self):
+    def connect(self) -> None:
         inq = self.scsi_.inquiry()
         logging.debug("Device connected: %r", inq.result)
         vendor = inq.result["t10_vendor_identification"][:32]
@@ -126,14 +130,20 @@ class Device(driver_base.GlucometerDriver):
                 f"Device {self.device_name_} is not a LifeScan glucometer."
             )
 
-    def disconnect(self):  # pylint: disable=no-self-use
+    def disconnect(self) -> None:  # pylint: disable=no-self-use
         return
 
-    def _send_request(self, lba, request_format, request_obj, response_format):
+    def _send_request(
+        self,
+        lba: int,
+        request_format: construct.Struct,
+        request_obj: Optional[Dict[str, Any]],
+        response_format: construct.Struct,
+    ) -> construct.Container:
         """Send a request to the meter, and read its response.
 
         Args:
-          lba: (int) the address of the block register to use, known
+          lba: the address of the block register to use, known
             valid addresses are 3, 4 and 5.
           request_format: a construct format identifier of the request to send
           request_obj: the object to format with the provided identifier
@@ -168,14 +178,14 @@ class Device(driver_base.GlucometerDriver):
         except construct.ConstructError as e:
             raise lifescan.MalformedCommand(str(e))
 
-    def _query_string(self, selector):
+    def _query_string(self, selector: str) -> str:
         response = self._send_request(
             3, _QUERY_REQUEST, {"selector": selector}, _QUERY_RESPONSE
         )
 
         return response.value
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         model = self._query_string("model")
         return common.MeterInfo(
             f"OneTouch {model} glucometer",
@@ -184,39 +194,39 @@ class Device(driver_base.GlucometerDriver):
             native_unit=self.get_glucose_unit(),
         )
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> str:
         return self._query_string("serial")
 
-    def get_version(self):
+    def get_version(self) -> str:
         return self._query_string("software")
 
-    def get_datetime(self):
+    def get_datetime(self) -> datetime.datetime:
         response = self._send_request(3, _READ_RTC_REQUEST, None, _READ_RTC_RESPONSE)
         return response.timestamp
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         self._send_request(3, _WRITE_RTC_REQUEST, {"timestamp": date}, _COMMAND_SUCCESS)
 
         # The device does not return the new datetime, so confirm by calling
         # READ RTC again.
         return self.get_datetime()
 
-    def zero_log(self):
+    def zero_log(self) -> None:
         self._send_request(3, _MEMORY_ERASE_REQUEST, None, _COMMAND_SUCCESS)
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self) -> common.Unit:
         response = self._send_request(
             4, _READ_PARAMETER_REQUEST, {"selector": "unit"}, _READ_UNIT_RESPONSE
         )
         return response.unit
 
-    def _get_reading_count(self):
+    def _get_reading_count(self) -> int:
         response = self._send_request(
             3, _READ_RECORD_COUNT_REQUEST, None, _READ_RECORD_COUNT_RESPONSE
         )
         return response.count
 
-    def _get_reading(self, record_id):
+    def _get_reading(self, record_id: int) -> common.GlucoseReading:
         response = self._send_request(
             3, _READ_RECORD_REQUEST, {"record_id": record_id}, _READ_RECORD_RESPONSE
         )
@@ -224,7 +234,7 @@ class Device(driver_base.GlucometerDriver):
             response.timestamp, float(response.value), meal=response.meal
         )
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         record_count = self._get_reading_count()
         for record_id in range(record_count):
             yield self._get_reading(record_id)

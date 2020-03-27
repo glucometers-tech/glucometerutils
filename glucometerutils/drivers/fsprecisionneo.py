@@ -21,8 +21,9 @@ https://protocols.glucometers.tech/abbott/freestyle-precision-neo
 
 """
 
-import collections
+import dataclasses
 import datetime
+from typing import Generator, NoReturn, Optional, Sequence, Type
 
 from glucometerutils import common
 from glucometerutils.support import freestyle
@@ -31,35 +32,40 @@ from glucometerutils.support import freestyle
 _TYPE_GLUCOSE_READING = "7"
 _TYPE_KETONE_READING = "9"
 
-_NeoReading = collections.namedtuple(
-    "_NeoReading",
-    (
-        "type",  # 7 = blood glucose, 9 = blood ketone
-        "id",
-        "month",
-        "day",
-        "year",  # year is two-digits
-        "hour",
-        "minute",
-        "unknown2",
-        "value",
-        # Extra trailing and so-far-unused fields; so discard them:
-        # * for blood glucose: 10 unknown trailing fields
-        # 'unknown3', 'unknown4', 'unknown5', 'unknown6', 'unknown7',
-        # 'unknown8', 'unknown9', 'unknown10', 'unknown11', 'unknown12',
-        # * for blood ketone: 2 unknown trailing fields
-        # 'unknown3', 'unknown4',
-    ),
-)
+
+@dataclasses.dataclass
+class _NeoReading:
+    type: int  # 7 = blood glucose, 9 = blood ketone
+    id: int
+    month: int
+    day: int
+    year: int  # year is two-digits
+    hour: int
+    minute: int
+    unknown: int
+    value: float
+    # Extra trailing and so-far-unused fields; so discard them:
+    # * for blood glucose: 10 unknown trailing fields
+    # 'unknown3', 'unknown4', 'unknown5', 'unknown6', 'unknown7',
+    # 'unknown8', 'unknown9', 'unknown10', 'unknown11', 'unknown12',
+    # * for blood ketone: 2 unknown trailing fields
+    # 'unknown3', 'unknown4',
+
+    def __init__(self, record: Sequence[str]) -> None:
+        for idx, field in enumerate(dataclasses.fields(self)):
+            if record[idx] == "HI":
+                setattr(self, field.name, float("inf"))
+            else:
+                setattr(self, field.name, int(record[idx]))
 
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Precision Neo devices."""
 
-    def __init__(self, device_path):
+    def __init__(self, device_path: Optional[str]):
         super().__init__(0x3850, device_path)
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         """Return the device information in structured form."""
         return common.MeterInfo(
             "FreeStyle Precision Neo",
@@ -69,14 +75,14 @@ class Device(freestyle.FreeStyleHidDevice):
             patient_name=self.get_patient_name(),
         )
 
-    def get_glucose_unit(self):  # pylint: disable=no-self-use
+    def get_glucose_unit(self) -> common.Unit:  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
         return common.Unit.MG_DL
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """Iterate through the reading records in the device."""
         for record in self._session.query_multirecord(b"$result?"):
-            cls = None
+            cls: Optional[Type[common.AnyReading]] = None
             if record and record[0] == _TYPE_GLUCOSE_READING:
                 cls = common.GlucoseReading
             elif record and record[0] == _TYPE_KETONE_READING:
@@ -84,14 +90,9 @@ class Device(freestyle.FreeStyleHidDevice):
             else:
                 continue
 
-            # Build a _reading object by parsing each of the entries in the raw
+            # Build a _NeoReading object by parsing each of the entries in the raw
             # record
-            values = []
-            for value in record:
-                if value == "HI":
-                    value = float("inf")
-                values.append(int(value))
-            raw_reading = _NeoReading._make(values[: len(_NeoReading._fields)])
+            raw_reading = _NeoReading(record)
 
             timestamp = datetime.datetime(
                 raw_reading.year + 2000,
@@ -108,5 +109,5 @@ class Device(freestyle.FreeStyleHidDevice):
 
             yield cls(timestamp, value)
 
-    def zero_log(self):
+    def zero_log(self) -> NoReturn:
         raise NotImplementedError

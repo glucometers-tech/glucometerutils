@@ -9,7 +9,7 @@ from glucometerutils import exceptions
 class MissingChecksum(exceptions.InvalidResponse):
     """The response misses the expected 4-digits checksum."""
 
-    def __init__(self, response):
+    def __init__(self, response: str):
         super(MissingChecksum, self).__init__(
             f"Response is missing checksum: {response}"
         )
@@ -18,19 +18,18 @@ class MissingChecksum(exceptions.InvalidResponse):
 class InvalidSerialNumber(exceptions.Error):
     """The serial number is not as expected."""
 
-    def __init__(self, serial_number):
+    def __init__(self, serial_number: str):
         super(InvalidSerialNumber, self).__init__(
             f"Serial number {serial_number} is invalid."
         )
 
 
 class MalformedCommand(exceptions.InvalidResponse):
-    def __init__(self, message):
+    def __init__(self, message: str):
         super(MalformedCommand, self).__init__(f"Malformed command: {message}")
 
 
-def crc_ccitt(data):
-    # type: (bytes) -> int
+def crc_ccitt(data: bytes) -> int:
     """Calculate the CRC-16-CCITT with LifeScan's common seed.
 
     Args:

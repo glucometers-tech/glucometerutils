@@ -15,6 +15,7 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 
 import datetime
 import re
+from typing import Generator
 
 from glucometerutils import common, exceptions
 from glucometerutils.support import driver_base, lifescan, serial
@@ -51,7 +52,7 @@ _DUMP_LINE_RE = re.compile(
 _RESPONSE_MATCH = re.compile(r"^(.+) ([0-9A-F]{4})\r$")
 
 
-def _calculate_checksum(bytestring):
+def _calculate_checksum(bytestring: bytes) -> int:
     """Calculate the checksum used by OneTouch Ultra and Ultra2 devices
 
     Args:
@@ -71,7 +72,7 @@ def _calculate_checksum(bytestring):
     return checksum
 
 
-def _validate_and_strip_checksum(line):
+def _validate_and_strip_checksum(line: str) -> str:
     """Verify the simple 16-bit checksum and remove it from the line.
 
     Args:
@@ -104,7 +105,7 @@ _DATETIME_RE = re.compile(
 )
 
 
-def _parse_datetime(response):
+def _parse_datetime(response: str) -> datetime.datetime:
     """Convert a response with date and time from the meter into a datetime.
 
     Args:
@@ -132,23 +133,23 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = "067b:2303"  # Generic PL2303 cable.
 
-    def connect(self):  # pylint: disable=no-self-use
+    def connect(self) -> None:  # pylint: disable=no-self-use
         return
 
-    def disconnect(self):  # pylint: disable=no-self-use
+    def disconnect(self) -> None:  # pylint: disable=no-self-use
         return
 
-    def _send_command(self, cmd):
+    def _send_command(self, cmd: str) -> None:
         """Send command interface.
 
         Args:
           cmd: command and parameters to send (without newline)
         """
-        cmdstring = bytes("\x11\r" + cmd + "\r", "ascii")
+        cmdstring = bytes(f"\x11\r{cmd}\r", "ascii")
         self.serial_.write(cmdstring)
         self.serial_.flush()
 
-    def _send_oneliner_command(self, cmd):
+    def _send_oneliner_command(self, cmd: str) -> str:
         """Send command and read a one-line response.
 
         Args:
@@ -163,7 +164,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         line = self.serial_.readline().decode("ascii")
         return _validate_and_strip_checksum(line)
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         """Fetch and parses the device information.
 
         Returns:
@@ -176,7 +177,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
             native_unit=self.get_glucose_unit(),
         )
 
-    def get_version(self):
+    def get_version(self) -> str:
         """Returns an identifier of the firmware version of the glucometer.
 
         Returns:
@@ -192,7 +193,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
     _SERIAL_NUMBER_RE = re.compile('^@ "([A-Z0-9]{9})"$')
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> str:
         """Retrieve the serial number of the device.
 
         Returns:
@@ -219,7 +220,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         return serial_number
 
-    def get_datetime(self):
+    def get_datetime(self) -> datetime.datetime:
         """Returns the current date and time for the glucometer.
 
         Returns:
@@ -228,13 +229,13 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         response = self._send_oneliner_command("DMF")
         return _parse_datetime(response[2:])
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         response = self._send_oneliner_command(
             "DMT" + date.strftime("%m/%d/%y %H:%M:%S")
         )
         return _parse_datetime(response[2:])
 
-    def zero_log(self):
+    def zero_log(self) -> None:
         """Zeros out the data log of the device.
 
         This function will clear the memory of the device deleting all the
@@ -246,7 +247,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
     _GLUCOSE_UNIT_RE = re.compile(r'^SU\?,"(MG/DL |MMOL/L)"')
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self) -> common.Unit:
         """Returns a constant representing the unit displayed by the meter.
 
         Returns:
@@ -264,6 +265,9 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         response = self._send_oneliner_command("DMSU?")
 
         match = self._GLUCOSE_UNIT_RE.match(response)
+        if match is None:
+            raise exceptions.InvalidGlucoseUnit(response)
+
         unit = match.group(1)
 
         if unit == "MG/DL ":
@@ -274,7 +278,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         raise exceptions.InvalidGlucoseUnit(response)
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """Iterates over the reading values stored in the glucometer.
 
         Args:

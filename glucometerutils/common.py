@@ -6,7 +6,7 @@
 import datetime
 import enum
 import textwrap
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence, Union
 
 import attr
 
@@ -91,6 +91,10 @@ class KetoneReading:
     timestamp: datetime.datetime
     value: float
     comment: str = ""
+    measure_method: MeasurementMethod = attr.ib(
+        default=MeasurementMethod.BLOOD_SAMPLE,
+        validator=attr.validators.in_({MeasurementMethod.BLOOD_SAMPLE}),
+    )
     extra_data: Dict[str, Any] = attr.Factory(dict)
 
     def as_csv(self, unit: Unit) -> str:
@@ -100,7 +104,7 @@ class KetoneReading:
         return '"%s","%.2f","%s","%s"' % (
             self.timestamp,
             self.value,
-            MeasurementMethod.BLOOD_SAMPLE.value,
+            self.measure_method.value,
             self.comment,
         )
 
@@ -121,6 +125,9 @@ class TimeAdjustment:
             self.measure_method.value,
             self.old_timestamp,
         )
+
+
+AnyReading = Union[GlucoseReading, KetoneReading, TimeAdjustment]
 
 
 @attr.s(auto_attribs=True)

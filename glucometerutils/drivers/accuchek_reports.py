@@ -18,6 +18,7 @@ import csv
 import datetime
 import glob
 import os
+from typing import Dict, Generator, NoReturn, Optional
 
 from glucometerutils import common, exceptions
 from glucometerutils.support import driver_base
@@ -46,7 +47,7 @@ _DATETIME_FORMAT = " ".join((_DATE_FORMAT, _TIME_FORMAT))
 
 
 class Device(driver_base.GlucometerDriver):
-    def __init__(self, device):
+    def __init__(self, device: Optional[str]) -> None:
         if not device or not os.path.isdir(device):
             raise exceptions.CommandLineError(
                 "--device parameter is required, should point to mount path "
@@ -62,7 +63,7 @@ class Device(driver_base.GlucometerDriver):
 
         self.report_file = report_files[0]
 
-    def _get_records_reader(self):
+    def _get_records_reader(self) -> csv.DictReader:
         self.report.seek(0)
         # Skip the first two lines
         next(self.report)
@@ -72,51 +73,55 @@ class Device(driver_base.GlucometerDriver):
             self.report, delimiter=";", skipinitialspace=True, quoting=csv.QUOTE_NONE
         )
 
-    def connect(self):
+    def connect(self) -> None:
         self.report = open(self.report_file, "r", newline="\r\n", encoding="utf-8")
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         self.report.close()
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         return common.MeterInfo(
             f"{self.get_model()} glucometer",
             serial_number=self.get_serial_number(),
             native_unit=self.get_glucose_unit(),
         )
 
-    def get_model(self):
+    def get_model(self) -> str:
         # $device/MODEL/Reports/*.csv
         return os.path.basename(os.path.dirname(os.path.dirname(self.report_file)))
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> str:
         self.report.seek(0)
         # ignore the first line.
         next(self.report)
         # The second line of the CSV is serial-no;report-date;report-time;;;;;;;
         return next(self.report).split(";")[0]
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self) -> common.Unit:
         # Get the first record available and parse that.
         record = next(self._get_records_reader())
         return _UNIT_MAP[record[_UNIT_CSV_KEY]]
 
-    def get_datetime(self):
+    def get_datetime(self) -> NoReturn:
         raise NotImplementedError
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> NoReturn:
         raise NotImplementedError
 
-    def zero_log(self):
+    def zero_log(self) -> NoReturn:
         raise NotImplementedError
 
-    def _extract_datetime(self, record):  # pylint: disable=no-self-use
+    def _extract_datetime(
+        self, record: Dict[str, str]
+    ) -> datetime.datetime:  # pylint: disable=no-self-use
         # Date and time are in separate column, but we want to parse them
         # together.
         date_and_time = " ".join((record[_DATE_CSV_KEY], record[_TIME_CSV_KEY]))
         return datetime.datetime.strptime(date_and_time, _DATETIME_FORMAT)
 
-    def _extract_meal(self, record):  # pylint: disable=no-self-use
+    def _extract_meal(
+        self, record: Dict[str, str]
+    ) -> common.Meal:  # pylint: disable=no-self-use
         if record[_AFTER_MEAL_CSV_KEY] and record[_BEFORE_MEAL_CSV_KEY]:
             raise exceptions.InvalidResponse("Reading cannot be before and after meal.")
         elif record[_AFTER_MEAL_CSV_KEY]:
@@ -126,7 +131,7 @@ class Device(driver_base.GlucometerDriver):
         else:
             return common.Meal.NONE
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         for record in self._get_records_reader():
             if record[_RESULT_CSV_KEY] is None:
                 continue

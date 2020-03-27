@@ -20,6 +20,7 @@ https://protocols.glucometers.tech/abbott/freestyle-libre
 """
 
 import datetime
+from typing import Dict, Generator, Mapping, Optional, Sequence, Tuple, Type
 
 from glucometerutils import common
 from glucometerutils.support import freestyle
@@ -70,7 +71,9 @@ _ARRESULT_TIME_ADJUSTMENT_ENTRY_MAP = (
 _ARRESULT_RAPID_INSULIN_ENTRY_MAP = ((43, "double-rapid-acting-insulin"),)
 
 
-def _parse_record(record, entry_map):
+def _parse_record(
+    record: Sequence[str], entry_map: Sequence[Tuple[int, str]]
+) -> Dict[str, int]:
     """Parses a list of string fields into a dictionary of integers."""
 
     if not record:
@@ -82,7 +85,9 @@ def _parse_record(record, entry_map):
         return {}
 
 
-def _extract_timestamp(parsed_record, prefix=""):
+def _extract_timestamp(
+    parsed_record: Mapping[str, int], prefix: str = ""
+) -> datetime.datetime:
     """Extract the timestamp from a parsed record.
 
     This leverages the fact that all the records have the same base structure.
@@ -98,7 +103,7 @@ def _extract_timestamp(parsed_record, prefix=""):
     )
 
 
-def _parse_arresult(record):
+def _parse_arresult(record: Sequence[str]) -> Optional[common.AnyReading]:
     """Takes an array of string fields as input and parses it into a Reading."""
 
     parsed_record = _parse_record(record, _BASE_ENTRY_MAP)
@@ -126,9 +131,9 @@ def _parse_arresult(record):
         return None
 
     comment_parts = []
-    measure_method = None
-    cls = None
-    value = None
+    measure_method: Optional[common.MeasurementMethod] = None
+    cls: Optional[Type[common.AnyReading]] = None
+    value: Optional[float] = None
 
     if parsed_record["reading-type"] == 2:
         comment_parts.append("(Scan)")
@@ -145,7 +150,10 @@ def _parse_arresult(record):
         measure_method = common.MeasurementMethod.BLOOD_SAMPLE
         cls = common.KetoneReading
         # automatically convert the raw value in mmol/L
-        value = freestyle.convert_ketone_unit(parsed_record["value"])
+        raw_value = parsed_record["value"]
+        if raw_value is None:
+            raise ValueError(f"Invalid Ketone value: {parsed_record!r}")
+        value = freestyle.convert_ketone_unit(raw_value)
     else:
         # unknown reading
         return None
@@ -183,7 +191,7 @@ def _parse_arresult(record):
         else:
             comment_parts.append("Rapid-acting insulin")
 
-    return cls(
+    reading = cls(
         _extract_timestamp(parsed_record),
         value,
         comment="; ".join(comment_parts),
@@ -191,14 +199,16 @@ def _parse_arresult(record):
         extra_data={"device_id": parsed_record["device_id"]},
     )
 
+    return reading
+
 
 class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
 
-    def __init__(self, device_path):
+    def __init__(self, device_path: Optional[str]) -> None:
         super().__init__(0x3650, device_path)
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         """Return the device information in structured form."""
         return common.MeterInfo(
             "FreeStyle Libre",
@@ -208,18 +218,17 @@ class Device(freestyle.FreeStyleHidDevice):
             patient_name=self.get_patient_name(),
         )
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> str:
         """Overridden function as the command is not compatible."""
         return self._session.send_text_command(b"$sn?").rstrip("\r\n")
 
-    def get_glucose_unit(self):  # pylint: disable=no-self-use
+    def get_glucose_unit(self) -> common.Unit:  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
         # TODO(Flameeyes): figure out how to identify the actual unit on the
         # device.
         return common.Unit.MG_DL
 
-    def get_readings(self):
-
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         # First of all get the usually longer list of sensor readings, and
         # convert them to Readings objects.
         for record in self._session.query_multirecord(b"$history?"):
@@ -244,5 +253,5 @@ class Device(freestyle.FreeStyleHidDevice):
             if reading:
                 yield reading
 
-    def zero_log(self):
+    def zero_log(self) -> None:
         self._session.send_text_command(b"$resetpatient")

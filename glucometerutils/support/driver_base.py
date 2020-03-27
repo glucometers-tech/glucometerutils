@@ -1,38 +1,45 @@
-from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import Optional, Text
+# -*- coding: utf-8 -*-
+#
+# SPDX-License-Identifier: MIT
+
+import abc
+import datetime
+from typing import Generator, Optional, Text
+
+from glucometerutils import common
 
 
-class GlucometerDriver(ABC):
-    def __init__(self, device_path):
-        # type: (Optional[Text]) -> None
+class GlucometerDriver(abc.ABC):
+    def __init__(self, device_path: Optional[Text]) -> None:
         pass
 
-    def connect(self):
+    def connect(self) -> None:
         pass
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         pass
 
-    @abstractmethod
-    def get_meter_info(self):
+    @abc.abstractmethod
+    def get_meter_info(self) -> common.MeterInfo:
         """Return the device information in structured form."""
         pass
 
-    @abstractmethod
-    def get_serial_number(self):
+    @abc.abstractmethod
+    def get_serial_number(self) -> str:
         pass
 
-    @abstractmethod
-    def get_glucose_unit(self):
+    @abc.abstractmethod
+    def get_glucose_unit(self) -> common.Unit:
         """Returns the glucose unit of the device."""
         pass
 
-    @abstractmethod
-    def get_datetime(self):
+    @abc.abstractmethod
+    def get_datetime(self) -> datetime.datetime:
         pass
 
-    def set_datetime(self, date=None):
+    def set_datetime(
+        self, date: Optional[datetime.datetime] = None
+    ) -> datetime.datetime:
         """Sets the date and time of the glucometer.
 
         Args:
@@ -43,17 +50,17 @@ class GlucometerDriver(ABC):
           A datetime object built according to the returned response.
         """
         if not date:
-            date = datetime.now()
+            date = datetime.datetime.now()
         return self._set_device_datetime(date)
 
-    @abstractmethod
-    def _set_device_datetime(self, date):
+    @abc.abstractmethod
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         pass
 
-    @abstractmethod
-    def zero_log(self):
+    @abc.abstractmethod
+    def zero_log(self) -> None:
         pass
 
-    @abstractmethod
-    def get_readings(self):
+    @abc.abstractmethod
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         pass
