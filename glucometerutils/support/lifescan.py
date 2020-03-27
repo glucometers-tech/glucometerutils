@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# SPDX-FileCopyrightText: © 2017 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """Common utility functions for LifeScan meters."""
 

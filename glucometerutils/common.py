@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# SPDX-FileCopyrightText: © 2013 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """Common routines for data in glucometers."""
 

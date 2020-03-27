@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
+# SPDX-FileCopyrightText: © 2013 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """Utility to manage glucometers' data."""
 

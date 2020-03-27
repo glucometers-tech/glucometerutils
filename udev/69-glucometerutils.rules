@@ -1,4 +1,6 @@
 # udev rules for glucometer devices using usb/tty/hid interfaces
+# SPDX-FileCopyrightText: © 2017 The glucometerutils Authors
+# SPDX-License-Identifier: MIT
 
 # Installation:
 # - Copy this file to /etc/udev/rules.d/
