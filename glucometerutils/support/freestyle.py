@@ -12,7 +12,7 @@ import csv
 import datetime
 import logging
 import re
-from typing import AnyStr, Callable, Iterator, List, Optional, Text, Tuple
+from typing import AnyStr, Callable, Iterator, List, Optional, Tuple
 
 import construct
 
@@ -45,9 +45,10 @@ _ALWAYS_UNENCRYPTED_MESSAGES = (
 )
 
 
-def _create_matcher(message_type, content):
-    # type: (int, Optional[bytes]) -> Callable[[Tuple[int, bytes]], bool]
-    def _matcher(message):
+def _create_matcher(
+    message_type: int, content: Optional[bytes]
+) -> Callable[[Tuple[int, bytes]], bool]:
+    def _matcher(message: Tuple[int, bytes]) -> bool:
         return message[0] == message_type and (content is None or content == message[1])
 
     return _matcher
@@ -91,8 +92,7 @@ _MULTIRECORDS_FORMAT = re.compile(
 )
 
 
-def _verify_checksum(message, expected_checksum_hex):
-    # type: (AnyStr, AnyStr) -> None
+def _verify_checksum(message: AnyStr, expected_checksum_hex: AnyStr) -> None:
     """Calculate the simple checksum of the message and compare with expected.
 
     Args:
@@ -116,7 +116,7 @@ def _verify_checksum(message, expected_checksum_hex):
         raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
 
 
-def convert_ketone_unit(raw_value):
+def convert_ketone_unit(raw_value: float) -> float:
     """Convert raw ketone value as read in the device to its value in mmol/L.
 
     As per https://protocols.glucometers.tech/abbott/freestyle-libre this is
@@ -132,9 +132,12 @@ ABBOTT_VENDOR_ID = 0x1A61
 
 class FreeStyleHidSession:
     def __init__(
-        self, product_id, device_path, text_message_type, text_reply_message_type
-    ):
-        # type: (int, Optional[Text], int, int) -> None
+        self,
+        product_id: int,
+        device_path: Optional[str],
+        text_message_type: int,
+        text_reply_message_type: int,
+    ) -> None:
 
         self._hid_session = hiddevice.HidSession(
             (ABBOTT_VENDOR_ID, product_id), device_path
@@ -151,13 +154,12 @@ class FreeStyleHidSession:
                 f"Connection error: unexpected message %{response[0]:02x}:{response[1].hex()}"
             )
 
-    def send_command(self, message_type, command, encrypted=False):
-        # type: (int, bytes, bool) -> None
+    def send_command(self, message_type: int, command: bytes, encrypted: bool = False):
         """Send a raw command to the device.
 
         Args:
-          message_type: (int) The first byte sent with the report to the device.
-          command: (bytes) The command to send out the device.
+          message_type: The first byte sent with the report to the device.
+          command: The command to send out the device.
         """
         if encrypted:
             assert message_type not in _ALWAYS_UNENCRYPTED_MESSAGES
@@ -172,8 +174,7 @@ class FreeStyleHidSession:
         logging.debug("Sending packet: %r", usb_packet)
         self._hid_session.write(usb_packet)
 
-    def read_response(self, encrypted=False):
-        # type: (bool) -> Tuple[int, bytes]
+    def read_response(self, encrypted: bool = False) -> Tuple[int, bytes]:
         """Read the response from the device and extracts it."""
         usb_packet = self._hid_session.read()
 
@@ -211,8 +212,7 @@ class FreeStyleHidSession:
 
         return message
 
-    def send_text_command(self, command):
-        # type: (bytes) -> Text
+    def send_text_command(self, command: bytes) -> str:
         """Send a command to the device that expects a text reply."""
         self.send_command(self._text_message_type, command)
 
@@ -237,13 +237,13 @@ class FreeStyleHidSession:
 
         match = _TEXT_REPLY_FORMAT.search(full_content)
         if not match:
-            raise exceptions.InvalidResponse(full_content)
+            raise exceptions.InvalidResponse(repr(full_content))
 
         message = match.group("message")
         _verify_checksum(message, match.group("checksum"))
 
         if match.group("status") != b"OK":
-            raise exceptions.InvalidResponse(message or "Command failed")
+            raise exceptions.InvalidResponse(repr(message) or "Command failed")
 
         # If there is anything in the response that is not ASCII-safe, this is
         # probably in the patient name. The Windows utility does not seem to
@@ -251,8 +251,7 @@ class FreeStyleHidSession:
         # unknown codepoint.
         return message.decode("ascii", "replace")
 
-    def query_multirecord(self, command):
-        # type: (bytes) -> Iterator[List[Text]]
+    def query_multirecord(self, command: bytes) -> Iterator[List[str]]:
         """Queries for, and returns, "multirecords" results.
 
         Multirecords are used for querying events, readings, history and similar
@@ -298,43 +297,44 @@ class FreeStyleHidDevice(driver_base.GlucometerDriver):
     though.
     """
 
-    def __init__(self, product_id, device_path, text_cmd=0x60, text_reply_cmd=0x60):
-        # type: (int, Optional[Text], int, int) -> None
+    def __init__(
+        self,
+        product_id: int,
+        device_path: Optional[str],
+        text_cmd: int = 0x60,
+        text_reply_cmd: int = 0x60,
+    ) -> None:
         super().__init__(device_path)
         self._session = FreeStyleHidSession(
             product_id, device_path, text_cmd, text_reply_cmd
         )
 
-    def connect(self):
+    def connect(self) -> None:
         """Open connection to the device, starting the knocking sequence."""
         self._session.connect()
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """Disconnect the device, nothing to be done."""
         pass
 
     # Some of the commands are also shared across devices that use this HID
     # protocol, but not many. Only provide here those that do seep to change
     # between them.
-    def _get_version(self):
-        # type: () -> Text
+    def _get_version(self) -> str:
         """Return the software version of the device."""
         return self._session.send_text_command(b"$swver?").rstrip("\r\n")
 
-    def get_serial_number(self):
-        # type: () -> Text
+    def get_serial_number(self) -> str:
         """Returns the serial number of the device."""
         return self._session.send_text_command(b"$serlnum?").rstrip("\r\n")
 
-    def get_patient_name(self):
-        # type: () -> Optional[Text]
+    def get_patient_name(self) -> Optional[str]:
         patient_name = self._session.send_text_command(b"$ptname?").rstrip("\r\n")
         if not patient_name:
             return None
         return patient_name
 
-    def set_patient_name(self, name):
-        # type: (Text) -> None
+    def set_patient_name(self, name: str) -> None:
         try:
             encoded_name = name.encode("ascii")
         except UnicodeDecodeError:
@@ -342,8 +342,7 @@ class FreeStyleHidDevice(driver_base.GlucometerDriver):
 
         self._session.send_text_command(b"$ptname," + encoded_name)
 
-    def get_datetime(self):
-        # type: () -> datetime.datetime
+    def get_datetime(self) -> datetime.datetime:
         """Gets the date and time as reported by the device.
 
         This is one of the few commands that appear common to many of the
@@ -364,9 +363,7 @@ class FreeStyleHidDevice(driver_base.GlucometerDriver):
         except ValueError:
             raise exceptions.InvalidDateTime()
 
-    def _set_device_datetime(self, date):
-        # type: (datetime.datetime) -> datetime.datetime
-
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         # The format used by the FreeStyle devices is not composable based on
         # standard strftime() (namely it includes no leading zeros), so we need
         # to build it manually.

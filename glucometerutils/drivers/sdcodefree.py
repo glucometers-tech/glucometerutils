@@ -21,6 +21,7 @@ import enum
 import functools
 import logging
 import operator
+from typing import Generator, NoReturn
 
 import construct
 
@@ -28,7 +29,7 @@ from glucometerutils import common, exceptions
 from glucometerutils.support import driver_base, serial
 
 
-def xor_checksum(msg):
+def xor_checksum(msg: bytes) -> int:
     return functools.reduce(operator.xor, msg)
 
 
@@ -87,12 +88,12 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     DEFAULT_CABLE_ID = "10c4:ea60"  # Generic cable.
     TIMEOUT = 300  # We need to wait for data from the device.
 
-    def read_message(self):
+    def read_message(self) -> bytes:
         pkt = _PACKET.parse_stream(self.serial_)
         logging.debug("received packet: %r", pkt)
         return pkt.message
 
-    def wait_and_ready(self):
+    def wait_and_ready(self) -> int:
 
         challenge = b"\0"
         while challenge == b"\0":
@@ -126,37 +127,37 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         return first_message.count
 
-    def send_message(self, message):
+    def send_message(self, message: bytes) -> None:
         pkt = _PACKET.build({"message": message, "direction": Direction.Out})
         logging.debug("sending packet: %s", binascii.hexlify(pkt))
         self.serial_.write(pkt)
 
-    def connect(self):  # pylint: disable=no-self-use
+    def connect(self) -> None:  # pylint: disable=no-self-use
         print("Please connect and turn on the device.")
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         self.send_message(_DISCONNECT_MESSAGE)
         response = self.read_message()
         if response != _DISCONNECTED_MESSAGE:
-            raise exceptions.InvalidResponse(response=response)
+            raise exceptions.InvalidResponse(response=repr(response))
 
-    def get_meter_info(self):  # pylint: disable=no-self-use
+    def get_meter_info(self) -> common.MeterInfo:  # pylint: disable=no-self-use
         return common.MeterInfo("SD CodeFree glucometer")
 
-    def get_version(self):  # pylint: disable=no-self-use
+    def get_version(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_serial_number(self):  # pylint: disable=no-self-use
+    def get_serial_number(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_glucose_unit(self):  # pylint: disable=no-self-use
+    def get_glucose_unit(self) -> common.Unit:  # pylint: disable=no-self-use
         # Device does not provide information on glucose unit.
         return common.Unit.MG_DL
 
-    def get_datetime(self):  # pylint: disable=no-self-use
+    def get_datetime(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         setdatecmd = date.strftime("ADATE%Y%m%d%H%M").encode("ascii")
 
         # Ignore the readings count.
@@ -165,17 +166,17 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         self.send_message(setdatecmd)
         response = self.read_message()
         if response != _DATE_SET_MESSAGE:
-            raise exceptions.InvalidResponse(response=response)
+            raise exceptions.InvalidResponse(response=repr(response))
 
         # The date we return should only include up to minute, unfortunately.
         return datetime.datetime(
             date.year, date.month, date.day, date.hour, date.minute
         )
 
-    def zero_log(self):
+    def zero_log(self) -> NoReturn:
         raise NotImplementedError
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         count = self.wait_and_ready()
 
         for _ in range(count):

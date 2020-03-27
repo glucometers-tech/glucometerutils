@@ -24,8 +24,9 @@ _LINK_CONTROL = construct.BitStruct(
 )
 
 
-def LifeScanPacket(include_link_control):  # pylint: disable=invalid-name
-    # type: (bool) -> construct.Struct
+def LifeScanPacket(
+    include_link_control: bool,
+) -> construct.Struct:  # pylint: disable=invalid-name
     if include_link_control:
         link_control_construct = _LINK_CONTROL
     else:

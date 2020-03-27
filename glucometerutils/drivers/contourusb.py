@@ -19,12 +19,13 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 """
 
 import datetime
+from typing import Dict, Generator, NoReturn, Optional
 
 from glucometerutils import common
 from glucometerutils.support import contourusb
 
 
-def _extract_timestamp(parsed_record, prefix=""):
+def _extract_timestamp(parsed_record: Dict[str, str]):
     """Extract the timestamp from a parsed record.
 
     This leverages the fact that all the reading records have the same base structure.
@@ -42,12 +43,12 @@ def _extract_timestamp(parsed_record, prefix=""):
 
 
 class Device(contourusb.ContourHidDevice):
-    """Glucometer driver for FreeStyle Libre devices."""
+    """Glucometer driver for Contour devices."""
 
-    def __init__(self, device):
-        self._hid_session = contourusb.ContourHidSession((0x1A79, 0x6002), device)
+    def __init__(self, device: Optional[str]) -> None:
+        super().__init__((0x1A79, 0x6002), device)
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         self._get_info_record()
         return common.MeterInfo(
             "Contour USB",
@@ -56,13 +57,13 @@ class Device(contourusb.ContourHidDevice):
             native_unit=self.get_glucose_unit(),
         )
 
-    def get_glucose_unit(self):  # pylint: disable=no-self-use
+    def get_glucose_unit(self) -> common.Unit:
         if self._get_glucose_unit() == "0":
             return common.Unit.MG_DL
         else:
             return common.Unit.MMOL_L
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """
         Get reading dump from download data mode(all readings stored)
         This meter supports only blood samples
@@ -75,11 +76,11 @@ class Device(contourusb.ContourHidDevice):
                 measure_method=common.MeasurementMethod.BLOOD_SAMPLE,
             )
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> NoReturn:
         raise NotImplementedError
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> NoReturn:
         raise NotImplementedError
 
-    def zero_log(self):
+    def zero_log(self) -> NoReturn:
         raise NotImplementedError

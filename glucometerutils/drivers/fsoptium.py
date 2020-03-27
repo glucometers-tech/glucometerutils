@@ -19,6 +19,7 @@ https://protocols.glucometers.tech/abbott/freestyle-optium
 import datetime
 import logging
 import re
+from typing import Generator, NoReturn, Sequence
 
 from glucometerutils import common, exceptions
 from glucometerutils.support import driver_base, serial
@@ -64,8 +65,8 @@ _MONTH_MATCHES = {
 }
 
 
-def _parse_clock(datestr):
-    """Convert the date/time string used by the the device into a datetime.
+def _parse_clock(datestr: str) -> datetime.datetime:
+    """Convert the date/time string used by the device into a datetime.
 
     Args:
       datestr: a string as returned by the device during information handling.
@@ -88,7 +89,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
     BAUDRATE = 19200
     DEFAULT_CABLE_ID = "1a61:3420"
 
-    def _send_command(self, command):
+    def _send_command(self, command: str) -> Sequence[str]:
         cmd_bytes = bytes(f"$%s\r\n" % command, "ascii")
         logging.debug("Sending command: %r", cmd_bytes)
 
@@ -104,14 +105,14 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         decoded_response = [line.decode("ascii").rstrip("\r\n") for line in response]
         return decoded_response
 
-    def connect(self):
+    def connect(self) -> None:
         self._send_command("xmem")  # ignore output this time
         self._fetch_device_information()
 
-    def disconnect(self):  # pylint: disable=no-self-use
+    def disconnect(self) -> None:  # pylint: disable=no-self-use
         return
 
-    def _fetch_device_information(self):
+    def _fetch_device_information(self) -> None:
         data = self._send_command("colq")
 
         for line in data:
@@ -134,7 +135,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         # back the commands and not replying to them.
         raise exceptions.ConnectionFailed()
 
-    def get_meter_info(self):
+    def get_meter_info(self) -> common.MeterInfo:
         """Fetch and parses the device information.
 
         Returns:
@@ -147,7 +148,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
             native_unit=self.get_glucose_unit(),
         )
 
-    def get_version(self):
+    def get_version(self) -> str:
         """Returns an identifier of the firmware version of the glucometer.
 
         Returns:
@@ -155,7 +156,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         """
         return self.device_version_
 
-    def get_serial_number(self):
+    def get_serial_number(self) -> str:
         """Retrieve the serial number of the device.
 
         Returns:
@@ -163,7 +164,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         """
         return self.device_serialno_
 
-    def get_glucose_unit(self):
+    def get_glucose_unit(self) -> common.Unit:
         """Returns a constant representing the unit displayed by the meter.
 
         Returns:
@@ -172,7 +173,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
         """
         return self.device_glucose_unit_
 
-    def get_datetime(self):
+    def get_datetime(self) -> datetime.datetime:
         """Returns the current date and time for the glucometer.
 
         Returns:
@@ -188,7 +189,7 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         raise exceptions.InvalidResponse("\n".join(data))
 
-    def _set_device_datetime(self, date):
+    def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
         data = self._send_command(date.strftime("tim,%m,%d,%y,%H,%M"))
 
         parsed_data = "".join(data)
@@ -197,10 +198,10 @@ class Device(serial.SerialDevice, driver_base.GlucometerDriver):
 
         return self.get_datetime()
 
-    def zero_log(self):
+    def zero_log(self) -> NoReturn:
         raise NotImplementedError
 
-    def get_readings(self):
+    def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """Iterates over the reading values stored in the glucometer.
 
         Args:

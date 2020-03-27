@@ -6,7 +6,7 @@
 
 import logging
 import os
-from typing import BinaryIO, Optional, Text, Tuple
+from typing import BinaryIO, Optional, Tuple
 
 from glucometerutils import exceptions
 
@@ -18,8 +18,12 @@ class HidSession:
     methods abstracting the HID library.
     """
 
-    def __init__(self, usb_id, device, timeout_ms=0):
-        # type: (Optional[Tuple[int, int]], Optional[Text], int) -> None
+    def __init__(
+        self,
+        usb_id: Optional[Tuple[int, int]],
+        device: Optional[str],
+        timeout_ms: int = 0,
+    ) -> None:
         """Construct a new session object.
 
         Args:
@@ -66,8 +70,7 @@ class HidSession:
                     message=f"Unable to connect to meter: {e}."
                 )
 
-    def write(self, report):
-        # type: (bytes) -> None
+    def write(self, report: bytes) -> None:
         """Writes a report to the HID handle."""
 
         if self.handle_:
@@ -78,8 +81,7 @@ class HidSession:
         if written < 0:
             raise exceptions.CommandError()
 
-    def read(self, size=64):
-        # type: (int) -> bytes
+    def read(self, size: int = 64) -> bytes:
         """Read a report from the HID handle.
 
         This is important as it handles the one incompatible interface between

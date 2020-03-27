@@ -5,9 +5,10 @@
 """
 
 import logging
-from typing import Optional, Text
+from typing import Optional
 
 import serial
+
 from glucometerutils import exceptions
 
 
@@ -37,13 +38,12 @@ class SerialDevice:
 
     """
 
-    BAUDRATE = None  # type: int
-    DEFAULT_CABLE_ID = None  # type: Text
+    BAUDRATE: Optional[int] = None
+    DEFAULT_CABLE_ID: Optional[str] = None
 
-    TIMEOUT = 1  # type: float
+    TIMEOUT: float = 1
 
-    def __init__(self, device):
-        # type: (Optional[Text]) -> None
+    def __init__(self, device: Optional[str]) -> None:
         assert self.BAUDRATE is not None
 
         if not device and self.DEFAULT_CABLE_ID:
