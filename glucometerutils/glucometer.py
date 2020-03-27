@@ -156,7 +156,7 @@ def main():
                     new_date = date_parser.parse(args.set)
                 except ImportError:
                     logging.error(
-                        'Unable to import module "dateutil", ' "please install it."
+                        'Unable to import module "dateutil", please install it.'
                     )
                     return 1
                 except ValueError:
