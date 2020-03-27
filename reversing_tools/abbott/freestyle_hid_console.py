@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: © 2019 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """CLI tool to send messages through FreeStyle HID protocol."""
 

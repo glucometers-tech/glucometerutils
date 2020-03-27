@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# SPDX-FileCopyrightText: © 2014 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """Driver for LifeScan OneTouch Ultra Easy devices.
 

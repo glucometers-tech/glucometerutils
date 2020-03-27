@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# SPDX-FileCopyrightText: © 2016 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """Driver for SD CodeFree devices by SD Biosensor.
 

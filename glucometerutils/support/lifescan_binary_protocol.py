@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+# SPDX-FileCopyrightText: © 2018 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 """Support module for the LifeScan binary protocol.
 
