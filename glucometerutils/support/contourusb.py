@@ -12,8 +12,9 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 """
 
 import datetime
+import enum
 import re
-from typing import Dict, List, Optional, Text, Tuple
+from typing import Dict, Generator, List, Optional, Tuple
 
 from glucometerutils.support import driver_base, hiddevice
 
@@ -58,21 +59,27 @@ class FrameError(Exception):
     pass
 
 
+@enum.unique
+class Mode(enum.Enum):
+    """Operation modes."""
+
+    ESTABLISH = enum.auto()
+    DATA = enum.auto()
+    PRECOMMAND = enum.auto()
+    COMMAND = enum.auto()
+
+
 class ContourHidDevice(driver_base.GlucometerDriver):
     """Base class implementing the ContourUSB HID common protocol.
     """
 
     blocksize = 64
 
-    # Operation modes
-    mode_establish = object
-    mode_data = object()
-    mode_precommand = object()
-    mode_command = object()
-    state = None
+    state: Optional[Mode] = None
 
-    def __init__(self, usb_ids, device_path):
-        # type: (Tuple[int, int], Optional[Text]) -> None
+    currecno: Optional[int] = None
+
+    def __init__(self, usb_ids: Tuple[int, int], device_path: Optional[str]) -> None:
         super().__init__(device_path)
         self._hid_session = hiddevice.HidSession(usb_ids, device_path)
 
@@ -96,8 +103,8 @@ class ContourHidDevice(driver_base.GlucometerDriver):
 
         self._hid_session.write(data)
 
-    USB_VENDOR_ID = 0x1A79  # type: int  # Bayer Health Care LLC Contour
-    USB_PRODUCT_ID = 0x6002  # type: int
+    USB_VENDOR_ID: int = 0x1A79  # Bayer Health Care LLC Contour
+    USB_PRODUCT_ID: int = 0x6002
 
     def parse_header_record(self, text):
         header = _HEADER_RECORD_RE.search(text)
@@ -162,7 +169,7 @@ class ContourHidDevice(driver_base.GlucometerDriver):
         checksum = hex(sum(ord(c) for c in text) % 256).upper().split("X")[1]
         return ("00" + checksum)[-2:]
 
-    def checkframe(self, frame):
+    def checkframe(self, frame) -> Optional[str]:
         """
         Implemented by Anders Hammarquist for glucodump project
         More info: https://bitbucket.org/iko/glucodump/src/default/
@@ -202,7 +209,7 @@ class ContourHidDevice(driver_base.GlucometerDriver):
 
     def _get_info_record(self):
         self.currecno = None
-        self.state = self.mode_establish
+        self.state = Mode.ESTABLISH
         try:
             while True:
                 self.write("\x04")
@@ -233,23 +240,19 @@ class ContourHidDevice(driver_base.GlucometerDriver):
     # Some of the commands are also shared across devices that use this HID
     # protocol, but not many. Only provide here those that do seep to change
     # between them.
-    def _get_version(self):
-        # type: () -> Text
+    def _get_version(self) -> str:
         """Return the software version of the device."""
         return self.dig_ver + " - " + self.anlg_ver + " - " + self.agp_ver
 
-    def _get_serial_number(self):
-        # type: () -> Text
+    def _get_serial_number(self) -> str:
         """Returns the serial number of the device."""
         return self.serial_num
 
-    def _get_glucose_unit(self):
-        # type: () -> Text
+    def _get_glucose_unit(self) -> str:
         """Return 0 for mg/dL, 1 for mmol/L"""
         return self.unit
 
-    def get_datetime(self):
-        # type: () -> datetime.datetime
+    def get_datetime(self) -> datetime.datetime:
         datetime_str = self.datetime
         return datetime.datetime(
             int(datetime_str[0:4]),  # year
@@ -260,26 +263,26 @@ class ContourHidDevice(driver_base.GlucometerDriver):
             0,
         )
 
-    def sync(self):
+    def sync(self) -> Generator[str, None, None]:
         """
         Sync with meter and yield received data frames
         FSM implemented by Anders Hammarquist's for glucodump
         More info: https://bitbucket.org/iko/glucodump/src/default/
         """
-        self.state = self.mode_establish
+        self.state = Mode.ESTABLISH
         try:
             tometer = "\x04"
             result = None
             foo = 0
             while True:
                 self.write(tometer)
-                if result is not None and self.state == self.mode_data:
+                if result is not None and self.state == Mode.DATA:
                     yield result
                 result = None
                 data_bytes = self.read()
                 data = data_bytes.decode()
 
-                if self.state == self.mode_establish:
+                if self.state == Mode.ESTABLISH:
                     if data_bytes[-1] == 15:
                         # got a <NAK>, send <EOT>
                         tometer = chr(foo)
@@ -291,10 +294,10 @@ class ContourHidDevice(driver_base.GlucometerDriver):
                         tometer = "\x06"
                         self.currecno = None
                         continue
-                if self.state == self.mode_data:
+                if self.state == Mode.DATA:
                     if data_bytes[-1] == 4:
                         # got an <EOT>, done
-                        self.state = self.mode_precommand
+                        self.state = Mode.PRECOMMAND
                         break
                 stx = data.find("\x02")
                 if stx != -1:
@@ -302,7 +305,7 @@ class ContourHidDevice(driver_base.GlucometerDriver):
                     try:
                         result = self.checkframe(data[stx:])
                         tometer = "\x06"
-                        self.state = self.mode_data
+                        self.state = Mode.DATA
                     except FrameError:
                         tometer = "\x15"  # Couldn't parse, <NAK>
                 else:
@@ -311,15 +314,13 @@ class ContourHidDevice(driver_base.GlucometerDriver):
         except Exception as e:
             raise e
 
-    def parse_result_record(self, text):
-        # type: (Text) -> Dict[Text, Text]
+    def parse_result_record(self, text: str) -> Dict[str, str]:
         result = _RESULT_RECORD_RE.search(text)
         assert result is not None
         rec_text = result.groupdict()
         return rec_text
 
-    def _get_multirecord(self):
-        # type: () -> List[Dict[Text, Text]]
+    def _get_multirecord(self) -> List[Dict[str, str]]:
         """Queries for, and returns, "multirecords" results.
 
         Returns:
