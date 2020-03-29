@@ -108,9 +108,10 @@ def main():
         )
         return 1
 
-    # This check needs to happen before we try to initialize the device, as the
-    # help action does not require a --device at all.
-    if args.action == "help":
+    # This check needs to happen before we try to initialize the device, as the help
+    # action does not require a --device at all. Also use the same output if there's no
+    # action provided.
+    if not args.action or args.action == "help":
         print(requested_driver.help)
         return 0
 
