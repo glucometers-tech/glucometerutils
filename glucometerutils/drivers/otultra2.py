@@ -18,8 +18,8 @@ import datetime
 import re
 from typing import Generator
 
-from glucometerutils import common, exceptions
-from glucometerutils.support import driver_base, lifescan, serial
+from glucometerutils import common, driver, exceptions
+from glucometerutils.support import lifescan, serial
 
 # The following two hashes are taken directly from LifeScan's documentation
 _MEAL_CODES = {
@@ -130,7 +130,7 @@ def _parse_datetime(response: str) -> datetime.datetime:
     return datetime.datetime(2000 + year, month, day, hour, minute, second)
 
 
-class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDriver):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = "067b:2303"  # Generic PL2303 cable.
 

@@ -21,8 +21,7 @@ import glob
 import os
 from typing import Dict, Generator, NoReturn, Optional
 
-from glucometerutils import common, exceptions
-from glucometerutils.support import driver_base
+from glucometerutils import common, driver, exceptions
 
 _UNIT_MAP = {
     "mmol/l": common.Unit.MMOL_L,
@@ -47,7 +46,7 @@ _TIME_FORMAT = "%H:%M"
 _DATETIME_FORMAT = " ".join((_DATE_FORMAT, _TIME_FORMAT))
 
 
-class Device(driver_base.GlucometerDriver):
+class Device(driver.GlucometerDriver):
     def __init__(self, device: Optional[str]) -> None:
         if not device or not os.path.isdir(device):
             raise exceptions.CommandLineError(

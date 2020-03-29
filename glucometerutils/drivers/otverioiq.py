@@ -23,13 +23,8 @@ from typing import Any, Dict, Generator, Optional
 
 import construct
 
-from glucometerutils import common
-from glucometerutils.support import (
-    driver_base,
-    lifescan,
-    lifescan_binary_protocol,
-    serial,
-)
+from glucometerutils import common, driver
+from glucometerutils.support import lifescan, lifescan_binary_protocol, serial
 
 _PACKET = lifescan_binary_protocol.LifeScanPacket(False)
 
@@ -99,7 +94,7 @@ _READING_RESPONSE = construct.Struct(
 )
 
 
-class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDriver):
     BAUDRATE = 38400
     DEFAULT_CABLE_ID = "10c4:85a7"  # Specific ID for embedded cp210x
     TIMEOUT = 0.5

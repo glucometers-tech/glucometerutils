@@ -22,8 +22,8 @@ import logging
 import re
 from typing import Generator, NoReturn, Sequence
 
-from glucometerutils import common, exceptions
-from glucometerutils.support import driver_base, serial
+from glucometerutils import common, driver, exceptions
+from glucometerutils.support import serial
 
 _CLOCK_RE = re.compile(
     r"^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t"
@@ -86,7 +86,7 @@ def _parse_clock(datestr: str) -> datetime.datetime:
     return datetime.datetime(year, month, day, hour, minute, second)
 
 
-class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDriver):
     BAUDRATE = 19200
     DEFAULT_CABLE_ID = "1a61:3420"
 

@@ -17,7 +17,8 @@ import enum
 import re
 from typing import Dict, Generator, List, Optional, Tuple
 
-from glucometerutils.support import driver_base, hiddevice
+from glucometerutils import driver
+from glucometerutils.support import hiddevice
 
 # regexr.com/4k6jb
 _HEADER_RECORD_RE = re.compile(
@@ -70,7 +71,7 @@ class Mode(enum.Enum):
     COMMAND = enum.auto()
 
 
-class ContourHidDevice(driver_base.GlucometerDriver):
+class ContourHidDevice(driver.GlucometerDriver):
     """Base class implementing the ContourUSB HID common protocol.
     """
 

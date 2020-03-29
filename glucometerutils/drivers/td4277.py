@@ -23,8 +23,8 @@ from typing import Generator, NoReturn, Optional, Tuple
 
 import construct
 
-from glucometerutils import common, exceptions
-from glucometerutils.support import driver_base, serial
+from glucometerutils import common, driver, exceptions
+from glucometerutils.support import serial
 
 
 class Direction(enum.Enum):
@@ -132,7 +132,7 @@ def _select_record(record_id: int) -> bytes:
     return _READING_SELECTION_STRUCT.build({"record_id": record_id})
 
 
-class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDriver):
 
     BAUDRATE = 19200
     TIMEOUT = 0.5

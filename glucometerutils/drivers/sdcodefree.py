@@ -26,8 +26,8 @@ from typing import Generator, NoReturn
 
 import construct
 
-from glucometerutils import common, exceptions
-from glucometerutils.support import driver_base, serial
+from glucometerutils import common, driver, exceptions
+from glucometerutils.support import serial
 
 
 def xor_checksum(msg: bytes) -> int:
@@ -84,7 +84,7 @@ _READING = construct.Struct(
 )
 
 
-class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDriver):
     BAUDRATE = 38400
     DEFAULT_CABLE_ID = "10c4:ea60"  # Generic cable.
     TIMEOUT = 300  # We need to wait for data from the device.

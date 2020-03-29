@@ -32,8 +32,8 @@ import construct
 from pyscsi.pyscsi.scsi import SCSI
 from pyscsi.pyscsi.scsi_device import SCSIDevice
 
-from glucometerutils import common, exceptions
-from glucometerutils.support import driver_base, lifescan, lifescan_binary_protocol
+from glucometerutils import common, driver, exceptions
+from glucometerutils.support import lifescan, lifescan_binary_protocol
 
 # This device uses SCSI blocks as registers.
 _REGISTER_SIZE = 512
@@ -107,7 +107,7 @@ _READ_RECORD_RESPONSE = construct.Struct(
 )
 
 
-class Device(driver_base.GlucometerDriver):
+class Device(driver.GlucometerDriver):
     def __init__(self, device: Optional[str]) -> None:
         if not device:
             raise exceptions.CommandLineError(
