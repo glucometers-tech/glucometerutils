@@ -84,7 +84,7 @@ _READING = construct.Struct(
 )
 
 
-class Device(serial.SerialDevice, driver.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 38400
     DEFAULT_CABLE_ID = "10c4:ea60"  # Generic cable.
     TIMEOUT = 300  # We need to wait for data from the device.

@@ -286,7 +286,7 @@ class FreeStyleHidSession:
         return csv.reader(records_str.split("\r\n"))
 
 
-class FreeStyleHidDevice(driver.GlucometerDriver):
+class FreeStyleHidDevice(driver.GlucometerDevice):
     """Base class implementing the FreeStyle HID common protocol.
 
     This class implements opening, initializing the connection and sending

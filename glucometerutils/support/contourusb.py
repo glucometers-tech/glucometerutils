@@ -71,7 +71,7 @@ class Mode(enum.Enum):
     COMMAND = enum.auto()
 
 
-class ContourHidDevice(driver.GlucometerDriver):
+class ContourHidDevice(driver.GlucometerDevice):
     """Base class implementing the ContourUSB HID common protocol.
     """
 

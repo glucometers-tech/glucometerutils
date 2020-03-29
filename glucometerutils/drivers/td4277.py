@@ -132,7 +132,7 @@ def _select_record(record_id: int) -> bytes:
     return _READING_SELECTION_STRUCT.build({"record_id": record_id})
 
 
-class Device(serial.SerialDevice, driver.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDevice):
 
     BAUDRATE = 19200
     TIMEOUT = 0.5

@@ -86,7 +86,7 @@ def _parse_clock(datestr: str) -> datetime.datetime:
     return datetime.datetime(year, month, day, hour, minute, second)
 
 
-class Device(serial.SerialDevice, driver.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 19200
     DEFAULT_CABLE_ID = "1a61:3420"
 
