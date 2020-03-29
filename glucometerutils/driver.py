@@ -4,8 +4,11 @@
 # SPDX-License-Identifier: MIT
 
 import abc
+import dataclasses
 import datetime
-from typing import Generator, Optional, Text
+import importlib
+import inspect
+from typing import Generator, Optional, Text, Type
 
 from glucometerutils import common
 
@@ -65,3 +68,17 @@ class GlucometerDevice(abc.ABC):
     @abc.abstractmethod
     def get_readings(self) -> Generator[common.AnyReading, None, None]:
         pass
+
+
+@dataclasses.dataclass
+class Driver:
+    device: Type[GlucometerDevice]
+    help: str
+
+
+def load_driver(driver_name: str) -> Driver:
+    driver_module = importlib.import_module(f"glucometerutils.drivers.{driver_name}")
+    help_string = inspect.getdoc(driver_module)
+    assert help_string is not None
+
+    return Driver(getattr(driver_module, "Device"), help_string)

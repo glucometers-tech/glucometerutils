@@ -6,12 +6,10 @@
 """Utility to manage glucometers' data."""
 
 import argparse
-import importlib
-import inspect
 import logging
 import sys
 
-from glucometerutils import common, exceptions
+from glucometerutils import common, driver, exceptions
 
 
 def main():
@@ -101,7 +99,7 @@ def main():
     logging.basicConfig(level=args.vlog)
 
     try:
-        driver = importlib.import_module("glucometerutils.drivers." + args.driver)
+        requested_driver = driver.load_driver(args.driver)
     except ImportError as e:
         logging.error(
             'Error importing driver "%s", please check your --driver parameter:\n%s',
@@ -113,10 +111,10 @@ def main():
     # This check needs to happen before we try to initialize the device, as the
     # help action does not require a --device at all.
     if args.action == "help":
-        print(inspect.getdoc(driver))
+        print(requested_driver.help)
         return 0
 
-    device = driver.Device(args.device)
+    device = requested_driver.device(args.device)
 
     device.connect()
     device_info = device.get_meter_info()
