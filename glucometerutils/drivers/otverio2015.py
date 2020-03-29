@@ -107,7 +107,7 @@ _READ_RECORD_RESPONSE = construct.Struct(
 )
 
 
-class Device(driver.GlucometerDriver):
+class Device(driver.GlucometerDevice):
     def __init__(self, device: Optional[str]) -> None:
         if not device:
             raise exceptions.CommandLineError(

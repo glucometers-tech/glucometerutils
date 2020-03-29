@@ -46,7 +46,7 @@ _TIME_FORMAT = "%H:%M"
 _DATETIME_FORMAT = " ".join((_DATE_FORMAT, _TIME_FORMAT))
 
 
-class Device(driver.GlucometerDriver):
+class Device(driver.GlucometerDevice):
     def __init__(self, device: Optional[str]) -> None:
         if not device or not os.path.isdir(device):
             raise exceptions.CommandLineError(

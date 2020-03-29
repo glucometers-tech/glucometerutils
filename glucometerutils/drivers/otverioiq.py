@@ -94,7 +94,7 @@ _READING_RESPONSE = construct.Struct(
 )
 
 
-class Device(serial.SerialDevice, driver.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 38400
     DEFAULT_CABLE_ID = "10c4:85a7"  # Specific ID for embedded cp210x
     TIMEOUT = 0.5

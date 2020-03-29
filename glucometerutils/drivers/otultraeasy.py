@@ -117,7 +117,7 @@ def _make_packet(
     )
 
 
-class Device(serial.SerialDevice, driver.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = "067b:2303"  # Generic PL2303 cable.
     TIMEOUT = 0.5

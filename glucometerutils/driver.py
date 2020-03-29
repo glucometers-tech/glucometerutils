@@ -10,7 +10,7 @@ from typing import Generator, Optional, Text
 from glucometerutils import common
 
 
-class GlucometerDriver(abc.ABC):
+class GlucometerDevice(abc.ABC):
     def __init__(self, device_path: Optional[Text]) -> None:
         pass
 

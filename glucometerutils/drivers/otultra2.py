@@ -130,7 +130,7 @@ def _parse_datetime(response: str) -> datetime.datetime:
     return datetime.datetime(2000 + year, month, day, hour, minute, second)
 
 
-class Device(serial.SerialDevice, driver.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = "067b:2303"  # Generic PL2303 cable.
 
