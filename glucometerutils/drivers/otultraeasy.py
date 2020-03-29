@@ -23,10 +23,9 @@ from typing import Any, Dict, Generator, Optional
 
 import construct
 
-from glucometerutils import common
+from glucometerutils import common, driver
 from glucometerutils.support import (
     construct_extras,
-    driver_base,
     lifescan,
     lifescan_binary_protocol,
     serial,
@@ -118,7 +117,7 @@ def _make_packet(
     )
 
 
-class Device(serial.SerialDevice, driver_base.GlucometerDriver):
+class Device(serial.SerialDevice, driver.GlucometerDriver):
     BAUDRATE = 9600
     DEFAULT_CABLE_ID = "067b:2303"  # Generic PL2303 cable.
     TIMEOUT = 0.5

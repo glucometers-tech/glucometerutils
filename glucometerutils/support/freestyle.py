@@ -17,8 +17,8 @@ from typing import AnyStr, Callable, Iterator, List, Optional, Tuple
 
 import construct
 
-from glucometerutils import exceptions
-from glucometerutils.support import driver_base, hiddevice
+from glucometerutils import driver, exceptions
+from glucometerutils.support import hiddevice
 
 _INIT_COMMAND = 0x01
 _INIT_RESPONSE = 0x71
@@ -286,7 +286,7 @@ class FreeStyleHidSession:
         return csv.reader(records_str.split("\r\n"))
 
 
-class FreeStyleHidDevice(driver_base.GlucometerDriver):
+class FreeStyleHidDevice(driver.GlucometerDriver):
     """Base class implementing the FreeStyle HID common protocol.
 
     This class implements opening, initializing the connection and sending
