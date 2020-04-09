@@ -5,10 +5,9 @@ language: python
 matrix:
   include:
     - python: 3.7
-      env: PRE_COMMIT=true
     - python: 3.8
+      env: PRE_COMMIT=true PYTEST_OPTIONS="--mypy --flake8"
     - python: 3.9-dev
-      env: RUN_MYPY=false
 
 install:
   - pip install .[all]
@@ -20,6 +19,5 @@ addons:
       - libudev-dev
 
 script:
-  - py.test
-  - if [[ $RUN_MYPY != false ]]; then mypy glucometerutils reversing_tools; fi
+  - pytest $PYTEST_OPTIONS
   - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
