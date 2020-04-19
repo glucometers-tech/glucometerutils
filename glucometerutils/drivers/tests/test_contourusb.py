@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+# SPDX-FileCopyrightText: 2013 The glucometerutils Authors
 #
 # SPDX-License-Identifier: MIT
+
 """Tests for the common ContourUSB functions.."""
 
 # pylint: disable=protected-access,missing-docstring

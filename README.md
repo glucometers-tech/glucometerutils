@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2013 The glucometerutils Authors
+
+SPDX-License-Identifier: MIT
+-->
+
 <p align="center">
 <a href="https://travis-ci.com/github/glucometers-tech/glucometerutils"><img alt="build status" src="https://travis-ci.com/glucometers-tech/glucometerutils.svg?branch=master"></a>
 <a href="https://github.com/glucometers-tech/glucometerutils#license"><img alt="GitHub" src="https://img.shields.io/badge/license-MIT-green"></a>
