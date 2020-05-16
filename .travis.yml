@@ -24,4 +24,4 @@ addons:
 
 script:
   - pytest $PYTEST_OPTIONS
-  - if [[ $PRE_COMMIT ]]; then pre-commit install; pre-commit run --all-files; fi
+  - if [[ $PRE_COMMIT ]]; then pre-commit run --all-files; fi
