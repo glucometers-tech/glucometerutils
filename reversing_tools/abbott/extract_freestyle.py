@@ -119,7 +119,7 @@ def main():
     descriptor = session.device_descriptors.get(args.device_address, None)
     if not descriptor:
         logging.warning(
-            f"Unable to find device %s in the capture's descriptors."
+            "Unable to find device %s in the capture's descriptors."
             " Assuming non-encrypted protocol.",
             args.device_address,
         )

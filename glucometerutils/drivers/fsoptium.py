@@ -91,7 +91,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
     DEFAULT_CABLE_ID = "1a61:3420"
 
     def _send_command(self, command: str) -> Sequence[str]:
-        cmd_bytes = bytes(f"$%s\r\n" % command, "ascii")
+        cmd_bytes = bytes("$%s\r\n" % command, "ascii")
         logging.debug("Sending command: %r", cmd_bytes)
 
         self.serial_.write(cmd_bytes)
