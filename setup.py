@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: © 2013 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 # Ensure it's present.
 import setuptools_scm  # noqa: F401
@@ -45,10 +45,6 @@ extras_require["all"] = all_require
 
 
 setup(
-    python_requires="~=3.7",
-    packages=find_packages(exclude=["test", "udev"]),
-    data_files=[("lib/udev/rules", ["udev/69-glucometerutils.rules"])],
-    install_requires=["attrs"],
     extras_require=extras_require,
     entry_points={"console_scripts": ["glucometer=glucometerutils.glucometer:main"]},
 )
