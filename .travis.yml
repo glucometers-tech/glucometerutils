@@ -10,7 +10,7 @@ matrix:
   include:
     - python: 3.7
     - python: 3.8
-      env: PRE_COMMIT=true PYTEST_OPTIONS="--mypy --flake8"
+      env: PYTEST_OPTIONS="--mypy"
     - python: 3.9-dev
 
 install:
@@ -24,4 +24,3 @@ addons:
 
 script:
   - pytest $PYTEST_OPTIONS
-  - if [[ $PRE_COMMIT ]]; then pre-commit run --all-files; fi
