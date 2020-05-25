@@ -47,7 +47,7 @@ def main():
         type=str,
         help=(
             "Device address (busnum.devnum) of the device to extract capture"
-            "of. If none provided, device descriptors will be relied on."
+            " of. If none provided, device descriptors will be relied on."
         ),
     )
 
@@ -66,8 +66,8 @@ def main():
         required=False,
         type=int,
         help=(
-            "Python logging level. See the levels at "
-            "https://docs.python.org/3/library/logging.html#logging-levels"
+            "Python logging level. See the levels at"
+            " https://docs.python.org/3/library/logging.html#logging-levels"
         ),
     )
 
