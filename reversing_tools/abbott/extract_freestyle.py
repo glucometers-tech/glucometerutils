@@ -10,6 +10,7 @@ import logging
 import sys
 import textwrap
 
+import construct
 import usbmon
 import usbmon.chatter
 import usbmon.pcapng
@@ -34,6 +35,13 @@ _UNENCRYPTED_TYPES = (
 
 _ABBOTT_VENDOR_ID = 0x1A61
 _LIBRE2_PRODUCT_ID = 0x3950
+
+_ENCRYPTED_MESSAGE = construct.Struct(
+    message_type=construct.Byte,
+    encrypted_message=construct.Bytes(64 - 1 - 4 - 4),
+    sequence_number=construct.Int32ul,
+    mac=construct.Int32ul,
+)
 
 
 def main():
@@ -155,10 +163,16 @@ def main():
         message_metadata = []
 
         if args.encrypted_protocol and message_type not in _UNENCRYPTED_TYPES:
-            # When expecting encrypted communication), we ignore the
-            # message_length and we keep it with the whole message.
+            # With encrypted communication, the length of the message is also encrypted,
+            # and all the packets use the full 64 bytes. So instead, we extract what
+            # metadata we can.
+            parsed = _ENCRYPTED_MESSAGE.parse(packet.payload)
+            message_metadata.extend(
+                [f"SEQUENCE_NUMBER={parsed.sequence_number}", f"MAC={parsed.mac:04x}"]
+            )
+
             message_type = f"x{message_type:02x}"
-            message = packet.payload[1:]
+            message = parsed.encrypted_message
         else:
             message_length = packet.payload[1]
             message_metadata.append(f"LENGTH={message_length}")
