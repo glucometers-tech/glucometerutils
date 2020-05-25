@@ -39,6 +39,6 @@ multi_line_output = 3
 include_trailing_comma = true
 
 known_first_party = ['glucometerutils']
-known_third_party = ['construct', 'hidapi', 'pyscsi', 'serial']
+known_third_party = ['construct', 'hidapi', 'pyscsi', 'serial', 'usbmon']
 
 [tool.setuptools_scm]
