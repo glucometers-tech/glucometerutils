@@ -8,6 +8,7 @@
 import argparse
 import logging
 import sys
+import textwrap
 
 import usbmon
 import usbmon.chatter
@@ -151,6 +152,8 @@ def main():
         if message_type == _KEEPALIVE_TYPE and not args.print_keepalive:
             continue
 
+        message_metadata = []
+
         if args.encrypted_protocol and message_type not in _UNENCRYPTED_TYPES:
             # When expecting encrypted communication), we ignore the
             # message_length and we keep it with the whole message.
@@ -158,9 +161,18 @@ def main():
             message = packet.payload[1:]
         else:
             message_length = packet.payload[1]
+            message_metadata.append(f"LENGTH={message_length}")
             message_end_idx = 2 + message_length
             message_type = f" {message_type:02x}"
             message = packet.payload[2:message_end_idx]
+
+        if message_metadata:
+            metadata_string = "\n".join(
+                textwrap.wrap(
+                    " ".join(message_metadata), width=80, break_long_words=False
+                )
+            )
+            print(metadata_string)
 
         print(
             usbmon.chatter.dump_bytes(
