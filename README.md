@@ -87,7 +87,7 @@ it to https://protocols.glucometers.tech/ .
 
 [construct]: https://construct.readthedocs.io/en/latest/
 [pyserial]: https://pythonhosted.org/pyserial/
-[python-scsi]: https://github.com/rosjat/python-scsi
+[python-scsi]: https://pypi.org/project/PYSCSI/
 [hidapi]: https://pypi.python.org/pypi/hidapi
 
 ## Dump format
