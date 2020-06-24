@@ -19,7 +19,7 @@ extras_require = {
     "fsprecisionneo": ["construct", "hidapi"],
     "otultra2": ["pyserial"],
     "otultraeasy": ["construct", "pyserial"],
-    "otverio2015": ["construct"],
+    "otverio2015": ["construct", "PYSCSI[sgio]>=2.0.1"],
     "otverioiq": ["construct", "pyserial"],
     "sdcodefree": ["construct", "pyserial"],
     "td4277": ["construct", "pyserial", "hidapi"],
