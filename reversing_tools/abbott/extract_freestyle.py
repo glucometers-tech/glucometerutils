@@ -92,7 +92,7 @@ def main():
     parser.add_argument(
         "pcap_file",
         action="store",
-        type=str,
+        type=argparse.FileType(mode="rb"),
         help="Path to the pcapng file with the USB capture.",
     )
 
@@ -100,7 +100,7 @@ def main():
 
     logging.basicConfig(level=args.vlog)
 
-    session = usbmon.pcapng.parse_file(args.pcap_file, retag_urbs=False)
+    session = usbmon.pcapng.parse_stream(args.pcap_file, retag_urbs=False)
 
     if not args.device_address:
         for descriptor in session.device_descriptors.values():
