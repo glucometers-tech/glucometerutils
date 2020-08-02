@@ -40,19 +40,18 @@ class Direction(enum.Enum):
 
 
 _PACKET = construct.Struct(
-    "stx" / construct.Const(0x53, construct.Byte),
-    "direction" / construct.Mapping(construct.Byte, {e: e.value for e in Direction}),
-    "length" / construct.Rebuild(construct.Byte, lambda this: len(this.message) + 2),
-    "message" / construct.Bytes(lambda this: this.length - 2),
-    "checksum"
-    / construct.Checksum(construct.Byte, xor_checksum, construct.this.message),
-    "etx" / construct.Const(0xAA, construct.Byte),
+    stx=construct.Const(0x53, construct.Byte),
+    direction=construct.Mapping(construct.Byte, {e: e.value for e in Direction}),
+    length=construct.Rebuild(construct.Byte, lambda this: len(this.message) + 2),
+    message=construct.Bytes(lambda this: this.length - 2),
+    checksum=construct.Checksum(construct.Byte, xor_checksum, construct.this.message),
+    etx=construct.Const(0xAA, construct.Byte),
 )
 
 _FIRST_MESSAGE = construct.Struct(
-    construct.Const(0x30, construct.Byte),
-    "count" / construct.Int16ub,
-    construct.Const(0xAA, construct.Byte)[19],
+    const_1=construct.Const(0x30, construct.Byte),
+    count=construct.Int16ub,
+    const_2=construct.Const(0xAA, construct.Byte)[19],
 )
 
 _CHALLENGE_PACKET_FULL = b"\x53\x20\x04\x10\x30\x20\xAA"
@@ -72,15 +71,15 @@ _MEAL_FLAG = {
 }
 
 _READING = construct.Struct(
-    construct.Byte[2],
-    "year" / construct.Byte,
-    "month" / construct.Byte,
-    "day" / construct.Byte,
-    "hour" / construct.Byte,
-    "minute" / construct.Byte,
-    "value" / construct.Int16ub,
-    "meal" / construct.Mapping(construct.Byte, _MEAL_FLAG),
-    construct.Byte[7],
+    unknown_1=construct.Byte[2],
+    year=construct.Byte,
+    month=construct.Byte,
+    day=construct.Byte,
+    hour=construct.Byte,
+    minute=construct.Byte,
+    value=construct.Int16ub,
+    meal=construct.Mapping(construct.Byte, _MEAL_FLAG),
+    unknown_2=construct.Byte[7],
 )
 
 

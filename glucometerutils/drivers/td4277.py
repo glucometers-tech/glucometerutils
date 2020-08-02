@@ -37,18 +37,19 @@ def byte_checksum(data):
 
 
 _PACKET = construct.Struct(
-    "data"
-    / construct.RawCopy(
+    data=construct.RawCopy(
         construct.Struct(
-            construct.Const(b"\x51"),
-            "command" / construct.Byte,
-            "message" / construct.Bytes(4),
-            "direction"
-            / construct.Mapping(construct.Byte, {e: e.value for e in Direction}),
+            const=construct.Const(b"\x51"),
+            command=construct.Byte,
+            message=construct.Bytes(4),
+            direction=construct.Mapping(
+                construct.Byte, {e: e.value for e in Direction}
+            ),
         ),
     ),
-    "checksum"
-    / construct.Checksum(construct.Byte, byte_checksum, construct.this.data.data),
+    checksum=construct.Checksum(
+        construct.Byte, byte_checksum, construct.this.data.data
+    ),
 )
 
 _EMPTY_MESSAGE = b"\x00\x00\x00\x00"
@@ -68,25 +69,27 @@ _GET_READING_VALUE = 0x26
 _CLEAR_MEMORY = 0x52
 
 _MODEL_STRUCT = construct.Struct(
-    construct.Const(b"\x77\x42"), construct.Byte, construct.Byte,
+    const=construct.Const(b"\x77\x42"),
+    unknown_1=construct.Byte,
+    unknown_2=construct.Byte,
 )
 
 _DATETIME_STRUCT = construct.Struct(
-    "day" / construct.Int16ul, "minute" / construct.Byte, "hour" / construct.Byte,
+    day=construct.Int16ul, minute=construct.Byte, hour=construct.Byte,
 )
 
 _DAY_BITSTRUCT = construct.BitStruct(
-    "year" / construct.BitsInteger(7),
-    "month" / construct.BitsInteger(4),
-    "day" / construct.BitsInteger(5),
+    year=construct.BitsInteger(7),
+    month=construct.BitsInteger(4),
+    day=construct.BitsInteger(5),
 )
 
 _READING_COUNT_STRUCT = construct.Struct(
-    "count" / construct.Int16ul, construct.Int16ul,
+    count=construct.Int16ul, unknown=construct.Int16ul,
 )
 
 _READING_SELECTION_STRUCT = construct.Struct(
-    "record_id" / construct.Int16ul, construct.Const(b"\x00\x00"),
+    record_id=construct.Int16ul, const=construct.Const(b"\x00\x00"),
 )
 
 _MEAL_FLAG = {
@@ -96,9 +99,9 @@ _MEAL_FLAG = {
 }
 
 _READING_VALUE_STRUCT = construct.Struct(
-    "value" / construct.Int16ul,
-    construct.Const(b"\x06"),
-    "meal" / construct.Mapping(construct.Byte, _MEAL_FLAG),
+    value=construct.Int16ul,
+    const=construct.Const(b"\x06"),
+    meal=construct.Mapping(construct.Byte, _MEAL_FLAG),
 )
 
 
