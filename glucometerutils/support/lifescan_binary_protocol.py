@@ -16,12 +16,12 @@ from glucometerutils import common
 from glucometerutils.support import construct_extras, lifescan
 
 _LINK_CONTROL = construct.BitStruct(
-    construct.Padding(3),
-    "more" / construct.Default(construct.Flag, False),
-    "disconnect" / construct.Default(construct.Flag, False),
-    "acknowledge" / construct.Default(construct.Flag, False),
-    "expect_receive" / construct.Default(construct.Flag, False),
-    "sequence_number" / construct.Default(construct.Flag, False),
+    padding=construct.Padding(3),
+    more=construct.Default(construct.Flag, False),
+    disconnect=construct.Default(construct.Flag, False),
+    acknowledge=construct.Default(construct.Flag, False),
+    expect_receive=construct.Default(construct.Flag, False),
+    sequence_number=construct.Default(construct.Flag, False),
 )
 
 
@@ -34,19 +34,18 @@ def LifeScanPacket(
         link_control_construct = construct.Const(b"\x00")
 
     return construct.Struct(
-        "data"
-        / construct.RawCopy(
+        data=construct.RawCopy(
             construct.Struct(
-                construct.Const(b"\x02"),  # stx
-                "length"
-                / construct.Rebuild(construct.Byte, lambda this: len(this.message) + 6),
-                "link_control" / link_control_construct,
-                "message" / construct.Bytes(lambda this: this.length - 6),
-                construct.Const(b"\x03"),  # etx
+                stx=construct.Const(b"\x02"),
+                length=construct.Rebuild(
+                    construct.Byte, lambda this: len(this.message) + 6
+                ),
+                link_control=link_control_construct,
+                message=construct.Bytes(lambda this: this.length - 6),
+                etx=construct.Const(b"\x03"),
             ),
         ),
-        "checksum"
-        / construct.Checksum(
+        checksum=construct.Checksum(
             construct.Int16ul, lifescan.crc_ccitt, construct.this.data.data
         ),
     )

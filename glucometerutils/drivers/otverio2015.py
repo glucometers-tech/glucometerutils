@@ -45,34 +45,34 @@ _PACKET = construct.Padded(
 _COMMAND_SUCCESS = construct.Const(b"\x03\x06")
 
 _QUERY_REQUEST = construct.Struct(
-    construct.Const(b"\x03\xe6\x02"),
-    "selector" / construct.Enum(construct.Byte, serial=0x00, model=0x01, software=0x02),
+    const=construct.Const(b"\x03\xe6\x02"),
+    selector=construct.Enum(construct.Byte, serial=0x00, model=0x01, software=0x02),
 )
 
 _QUERY_RESPONSE = construct.Struct(
-    construct.Const(b"\x03\x06"), "value" / construct.CString(encoding="utf-16-le"),
+    const=construct.Const(b"\x03\x06"), value=construct.CString(encoding="utf-16-le"),
 )
 
 _READ_PARAMETER_REQUEST = construct.Struct(
-    construct.Const(b"\x03"), "selector" / construct.Enum(construct.Byte, unit=0x04),
+    const=construct.Const(b"\x03"), selector=construct.Enum(construct.Byte, unit=0x04),
 )
 
 _READ_UNIT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "unit" / lifescan_binary_protocol.GLUCOSE_UNIT,
-    construct.Padding(3),
+    success=_COMMAND_SUCCESS,
+    unit=lifescan_binary_protocol.GLUCOSE_UNIT,
+    padding=construct.Padding(3),
 )
 
 _READ_RTC_REQUEST = construct.Const(b"\x03\x20\x02")
 
 _READ_RTC_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "timestamp" / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
+    success=_COMMAND_SUCCESS,
+    timestamp=lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
-    construct.Const(b"\x03\x20\x01"),
-    "timestamp" / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
+    const=construct.Const(b"\x03\x20\x01"),
+    timestamp=lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _MEMORY_ERASE_REQUEST = construct.Const(b"\x03\x1a")
@@ -80,13 +80,13 @@ _MEMORY_ERASE_REQUEST = construct.Const(b"\x03\x1a")
 _READ_RECORD_COUNT_REQUEST = construct.Const(b"\x03\x27\x00")
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS, "count" / construct.Int16ul,
+    success=_COMMAND_SUCCESS, count=construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b"\x03\x31\x02"),
-    "record_id" / construct.Int16ul,
-    construct.Const(b"\x00"),
+    const_1=construct.Const(b"\x03\x31\x02"),
+    record_id=construct.Int16ul,
+    const_2=construct.Const(b"\x00"),
 )
 
 _MEAL_FLAG = {
@@ -96,14 +96,14 @@ _MEAL_FLAG = {
 }
 
 _READ_RECORD_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "inverse_counter" / construct.Int16ul,
-    construct.Padding(1),
-    "lifetime_counter" / construct.Int16ul,
-    "timestamp" / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
-    "value" / construct.Int16ul,
-    "meal" / construct.Mapping(construct.Byte, _MEAL_FLAG),
-    construct.Padding(4),
+    success=_COMMAND_SUCCESS,
+    inverse_counter=construct.Int16ul,
+    padding_1=construct.Padding(1),
+    lifetime_counter=construct.Int16ul,
+    timestamp=lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
+    value=construct.Int16ul,
+    meal=construct.Mapping(construct.Byte, _MEAL_FLAG),
+    padding_2=construct.Padding(4),
 )
 
 

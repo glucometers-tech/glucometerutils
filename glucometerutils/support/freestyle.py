@@ -62,20 +62,18 @@ _is_encryption_missing_error = _create_matcher(_ENCRYPTION_SETUP_RESPONSE, b"\x1
 _is_encryption_setup_error = _create_matcher(_ENCRYPTION_SETUP_RESPONSE, b"\x14")
 
 _FREESTYLE_MESSAGE = construct.Struct(
-    "hid_report" / construct.Const(0, construct.Byte),
-    "message_type" / construct.Byte,
-    "command"
-    / construct.Padded(
+    hid_report=construct.Const(0, construct.Byte),
+    message_type=construct.Byte,
+    command=construct.Padded(
         63,  # command can only be up to 62 bytes, but one is used for length.
         construct.Prefixed(construct.Byte, construct.GreedyBytes),
     ),
 )
 
 _FREESTYLE_ENCRYPTED_MESSAGE = construct.Struct(
-    "hid_report" / construct.Const(0, construct.Byte),
-    "message_type" / construct.Byte,
-    "command"
-    / construct.Padded(
+    hid_report=construct.Const(0, construct.Byte),
+    message_type=construct.Byte,
+    command=construct.Padded(
         63,  # command can only be up to 62 bytes, but one is used for length.
         construct.GreedyBytes,
     ),

@@ -40,8 +40,8 @@ _COMMAND_SUCCESS = construct.Const(b"\x05\x06")
 _VERSION_REQUEST = construct.Const(b"\x05\x0d\x02")
 
 _VERSION_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "version" / construct.PascalString(construct.Byte, encoding="ascii"),
+    success=_COMMAND_SUCCESS,
+    version=construct.PascalString(construct.Byte, encoding="ascii"),
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(
@@ -49,47 +49,46 @@ _SERIAL_NUMBER_REQUEST = construct.Const(
 )
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS, "serial_number" / construct.GreedyString(encoding="ascii"),
+    success=_COMMAND_SUCCESS, serial_number=construct.GreedyString(encoding="ascii"),
 )
 
 _DATETIME_REQUEST = construct.Struct(
-    construct.Const(b"\x05\x20"),  # 0x20 is the datetime
-    "request_type" / construct.Enum(construct.Byte, write=0x01, read=0x02),
-    "timestamp"
-    / construct.Default(
+    const=construct.Const(b"\x05\x20"),  # 0x20 is the datetime
+    request_type=construct.Enum(construct.Byte, write=0x01, read=0x02),
+    timestamp=construct.Default(
         construct_extras.Timestamp(construct.Int32ul),  # type: ignore
         datetime.datetime(1970, 1, 1, 0, 0),
     ),
 )
 
 _DATETIME_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "timestamp" / construct_extras.Timestamp(construct.Int32ul),  # type: ignore
+    success=_COMMAND_SUCCESS,
+    timestamp=construct_extras.Timestamp(construct.Int32ul),  # type: ignore
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(b"\x05\x09\x02\x09\x00\x00\x00\x00")
 
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "unit" / lifescan_binary_protocol.GLUCOSE_UNIT,
-    construct.Padding(3),
+    success=_COMMAND_SUCCESS,
+    unit=lifescan_binary_protocol.GLUCOSE_UNIT,
+    padding=construct.Padding(3),
 )
 
 _MEMORY_ERASE_REQUEST = construct.Const(b"\x05\x1A")
 
 _READING_COUNT_RESPONSE = construct.Struct(
-    construct.Const(b"\x0f"), "count" / construct.Int16ul,
+    const=construct.Const(b"\x0f"), count=construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b"\x05\x1f"), "record_id" / construct.Int16ul,
+    const=construct.Const(b"\x05\x1f"), record_id=construct.Int16ul,
 )
 
 _READING_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "timestamp" / construct_extras.Timestamp(construct.Int32ul),  # type: ignore
-    "value" / construct.Int32ul,
+    success=_COMMAND_SUCCESS,
+    timestamp=construct_extras.Timestamp(construct.Int32ul),  # type: ignore
+    value=construct.Int32ul,
 )
 
 

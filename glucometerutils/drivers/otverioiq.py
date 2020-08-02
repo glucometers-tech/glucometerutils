@@ -33,37 +33,37 @@ _COMMAND_SUCCESS = construct.Const(b"\x03\x06")
 _VERSION_REQUEST = construct.Const(b"\x03\x0d\x01")
 
 _VERSION_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "version" / construct.PascalString(construct.Byte, encoding="ascii"),
+    success=_COMMAND_SUCCESS,
+    version=construct.PascalString(construct.Byte, encoding="ascii"),
     # NULL-termination is not included in string length.
-    construct.Const(b"\x00"),
+    const=construct.Const(b"\x00"),
 )
 
 _SERIAL_NUMBER_REQUEST = construct.Const(b"\x03\x0b\x01\x02")
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS, "serial_number" / construct.CString(encoding="ascii"),
+    success=_COMMAND_SUCCESS, serial_number=construct.CString(encoding="ascii"),
 )
 
 _READ_RTC_REQUEST = construct.Const(b"\x03\x20\x02")
 
 _READ_RTC_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "timestamp" / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
+    success=_COMMAND_SUCCESS,
+    timestamp=lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _WRITE_RTC_REQUEST = construct.Struct(
-    construct.Const(b"\x03\x20\x01"),
-    "timestamp" / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
+    const=construct.Const(b"\x03\x20\x01"),
+    timestamp=lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
 )
 
 _GLUCOSE_UNIT_REQUEST = construct.Const(b"\x03\x09\x02\x02")
 
 
 _GLUCOSE_UNIT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "unit" / lifescan_binary_protocol.GLUCOSE_UNIT,
-    construct.Padding(3),
+    success=_COMMAND_SUCCESS,
+    unit=lifescan_binary_protocol.GLUCOSE_UNIT,
+    padding=construct.Padding(3),
 )
 
 _MEMORY_ERASE_REQUEST = construct.Const(b"\x03\x1a")
@@ -71,11 +71,11 @@ _MEMORY_ERASE_REQUEST = construct.Const(b"\x03\x1a")
 _READ_RECORD_COUNT_REQUEST = construct.Const(b"\x03\x27\x00")
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS, "count" / construct.Int16ul,
+    success=_COMMAND_SUCCESS, count=construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    construct.Const(b"\x03\x21"), "record_id" / construct.Int16ul,
+    const=construct.Const(b"\x03\x21"), record_id=construct.Int16ul,
 )
 
 _MEAL_FLAG = {
@@ -85,12 +85,12 @@ _MEAL_FLAG = {
 }
 
 _READING_RESPONSE = construct.Struct(
-    _COMMAND_SUCCESS,
-    "timestamp" / lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
-    "value" / construct.Int16ul,
-    "control_test" / construct.Flag,
-    "meal" / construct.Mapping(construct.Byte, _MEAL_FLAG),
-    construct.Padding(2),  # unknown
+    success=_COMMAND_SUCCESS,
+    timestamp=lifescan_binary_protocol.VERIO_TIMESTAMP,  # type: ignore
+    value=construct.Int16ul,
+    control_test=construct.Flag,
+    meal=construct.Mapping(construct.Byte, _MEAL_FLAG),
+    padding=construct.Padding(2),  # unknown
 )
 
 
