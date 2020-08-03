@@ -33,6 +33,13 @@ _UNENCRYPTED_TYPES = (
     _KEEPALIVE_TYPE,
 )
 
+_ENCRYPTION_SETUP_TYPES = (0x14, 0x33)
+
+_START_AUTHORIZE_CMD = 0x11
+_CHALLENGE_CMD = 0x16
+_CHALLENGE_RESPONSE_CMD = 0x17
+_CHALLENGE_ACCEPTED_CMD = 0x18
+
 _ABBOTT_VENDOR_ID = 0x1A61
 _LIBRE2_PRODUCT_ID = 0x3950
 
@@ -66,6 +73,15 @@ def main():
         help=(
             "Whether to expect encrypted protocol in the capture."
             " Ignored if the device descriptors are present in the capture."
+        ),
+    )
+
+    parser.add_argument(
+        "--verbose-encryption-setup",
+        action="store_true",
+        help=(
+            "Whether to parse encryption setup commands and printing their component"
+            " together with the raw messsage."
         ),
     )
 
@@ -173,6 +189,32 @@ def main():
 
             message_type = f"x{message_type:02x}"
             message = parsed.encrypted_message
+        elif args.verbose_encryption_setup and message_type in _ENCRYPTION_SETUP_TYPES:
+            message_length = packet.payload[1]
+            message_end_idx = 2 + message_length
+            message = packet.payload[2:message_end_idx]
+
+            if message[0] == _START_AUTHORIZE_CMD:
+                message_metadata.append("START_AUTHORIZE")
+            elif message[0] == _CHALLENGE_CMD:
+                message_metadata.append("CHALLENGE")
+                challenge = message[1:9]
+                iv = message[9:16]
+                message_metadata.append(f"CHALLENGE={challenge.hex()}")
+                message_metadata.append(f"IV={iv.hex()}")
+            elif message[0] == _CHALLENGE_RESPONSE_CMD:
+                message_metadata.append("CHALLENGE_RESPONSE")
+                encrypted_challenge = message[1:17]
+                challenge_mac = message[18:26]
+                message_metadata.append(
+                    f"ENCRYPTED_CHALLENGE={encrypted_challenge.hex()}"
+                )
+                message_metadata.append(f"MAC={challenge_mac.hex()}")
+            elif message[0] == _CHALLENGE_ACCEPTED_CMD:
+                message_metadata.append("CHALLENGE_ACCEPTED")
+
+            message_metadata.append(f"RAW_LENGTH={message_length}")
+            message_type = f" {message_type:02x}"
         else:
             message_length = packet.payload[1]
             message_metadata.append(f"LENGTH={message_length}")
