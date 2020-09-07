@@ -10,6 +10,7 @@ import datetime
 import unittest
 
 from absl.testing import parameterized
+
 from glucometerutils import common
 
 TEST_DATETIME = datetime.datetime(2018, 1, 1, 0, 30, 45)

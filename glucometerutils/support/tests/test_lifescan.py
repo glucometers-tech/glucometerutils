@@ -9,6 +9,7 @@
 import array
 
 from absl.testing import absltest
+
 from glucometerutils.support import lifescan
 
 

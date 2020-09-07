@@ -72,8 +72,7 @@ class Mode(enum.Enum):
 
 
 class ContourHidDevice(driver.GlucometerDevice):
-    """Base class implementing the ContourUSB HID common protocol.
-    """
+    """Base class implementing the ContourUSB HID common protocol."""
 
     blocksize = 64
 

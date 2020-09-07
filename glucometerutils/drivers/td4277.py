@@ -75,7 +75,9 @@ _MODEL_STRUCT = construct.Struct(
 )
 
 _DATETIME_STRUCT = construct.Struct(
-    day=construct.Int16ul, minute=construct.Byte, hour=construct.Byte,
+    day=construct.Int16ul,
+    minute=construct.Byte,
+    hour=construct.Byte,
 )
 
 _DAY_BITSTRUCT = construct.BitStruct(
@@ -85,11 +87,13 @@ _DAY_BITSTRUCT = construct.BitStruct(
 )
 
 _READING_COUNT_STRUCT = construct.Struct(
-    count=construct.Int16ul, unknown=construct.Int16ul,
+    count=construct.Int16ul,
+    unknown=construct.Int16ul,
 )
 
 _READING_SELECTION_STRUCT = construct.Struct(
-    record_id=construct.Int16ul, const=construct.Const(b"\x00\x00"),
+    record_id=construct.Int16ul,
+    const=construct.Const(b"\x00\x00"),
 )
 
 _MEAL_FLAG = {

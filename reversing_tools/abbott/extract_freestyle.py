@@ -232,7 +232,10 @@ def main():
 
         print(
             usbmon.chatter.dump_bytes(
-                packet.direction, message, prefix=f"[{message_type}]", print_empty=True,
+                packet.direction,
+                message,
+                prefix=f"[{message_type}]",
+                print_empty=True,
             ),
             "\n",
         )
