@@ -40,7 +40,10 @@ _BASE_ENTRY_MAP = (
 )
 
 # Fields of the records returned by $history?
-_HISTORY_ENTRY_MAP = _BASE_ENTRY_MAP + ((13, "value"), (15, "errors"),)
+_HISTORY_ENTRY_MAP = _BASE_ENTRY_MAP + (
+    (13, "value"),
+    (15, "errors"),
+)
 
 # Fields of the results returned by $arresult? where type = 2
 _ARRESULT_TYPE2_ENTRY_MAP = (

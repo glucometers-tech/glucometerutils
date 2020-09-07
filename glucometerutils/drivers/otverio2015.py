@@ -50,11 +50,13 @@ _QUERY_REQUEST = construct.Struct(
 )
 
 _QUERY_RESPONSE = construct.Struct(
-    const=construct.Const(b"\x03\x06"), value=construct.CString(encoding="utf-16-le"),
+    const=construct.Const(b"\x03\x06"),
+    value=construct.CString(encoding="utf-16-le"),
 )
 
 _READ_PARAMETER_REQUEST = construct.Struct(
-    const=construct.Const(b"\x03"), selector=construct.Enum(construct.Byte, unit=0x04),
+    const=construct.Const(b"\x03"),
+    selector=construct.Enum(construct.Byte, unit=0x04),
 )
 
 _READ_UNIT_RESPONSE = construct.Struct(
@@ -80,7 +82,8 @@ _MEMORY_ERASE_REQUEST = construct.Const(b"\x03\x1a")
 _READ_RECORD_COUNT_REQUEST = construct.Const(b"\x03\x27\x00")
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
-    success=_COMMAND_SUCCESS, count=construct.Int16ul,
+    success=_COMMAND_SUCCESS,
+    count=construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(

@@ -49,7 +49,8 @@ _SERIAL_NUMBER_REQUEST = construct.Const(
 )
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
-    success=_COMMAND_SUCCESS, serial_number=construct.GreedyString(encoding="ascii"),
+    success=_COMMAND_SUCCESS,
+    serial_number=construct.GreedyString(encoding="ascii"),
 )
 
 _DATETIME_REQUEST = construct.Struct(
@@ -78,11 +79,13 @@ _GLUCOSE_UNIT_RESPONSE = construct.Struct(
 _MEMORY_ERASE_REQUEST = construct.Const(b"\x05\x1A")
 
 _READING_COUNT_RESPONSE = construct.Struct(
-    const=construct.Const(b"\x0f"), count=construct.Int16ul,
+    const=construct.Const(b"\x0f"),
+    count=construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    const=construct.Const(b"\x05\x1f"), record_id=construct.Int16ul,
+    const=construct.Const(b"\x05\x1f"),
+    record_id=construct.Int16ul,
 )
 
 _READING_RESPONSE = construct.Struct(

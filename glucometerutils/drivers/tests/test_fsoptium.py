@@ -9,6 +9,7 @@
 import datetime
 
 from absl.testing import parameterized
+
 from glucometerutils import exceptions
 from glucometerutils.drivers import fsoptium
 

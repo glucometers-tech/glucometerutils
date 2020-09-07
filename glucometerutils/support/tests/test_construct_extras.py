@@ -9,8 +9,8 @@
 import datetime
 
 import construct
-
 from absl.testing import absltest
+
 from glucometerutils.support import construct_extras
 
 _TEST_DATE1 = datetime.datetime(1970, 1, 2, 0, 0)

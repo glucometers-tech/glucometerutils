@@ -9,6 +9,7 @@
 from unittest import mock
 
 from absl.testing import parameterized
+
 from glucometerutils import exceptions
 from glucometerutils.drivers import otultra2
 from glucometerutils.support import lifescan

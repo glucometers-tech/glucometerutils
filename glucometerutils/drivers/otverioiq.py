@@ -42,7 +42,8 @@ _VERSION_RESPONSE = construct.Struct(
 _SERIAL_NUMBER_REQUEST = construct.Const(b"\x03\x0b\x01\x02")
 
 _SERIAL_NUMBER_RESPONSE = construct.Struct(
-    success=_COMMAND_SUCCESS, serial_number=construct.CString(encoding="ascii"),
+    success=_COMMAND_SUCCESS,
+    serial_number=construct.CString(encoding="ascii"),
 )
 
 _READ_RTC_REQUEST = construct.Const(b"\x03\x20\x02")
@@ -71,11 +72,13 @@ _MEMORY_ERASE_REQUEST = construct.Const(b"\x03\x1a")
 _READ_RECORD_COUNT_REQUEST = construct.Const(b"\x03\x27\x00")
 
 _READ_RECORD_COUNT_RESPONSE = construct.Struct(
-    success=_COMMAND_SUCCESS, count=construct.Int16ul,
+    success=_COMMAND_SUCCESS,
+    count=construct.Int16ul,
 )
 
 _READ_RECORD_REQUEST = construct.Struct(
-    const=construct.Const(b"\x03\x21"), record_id=construct.Int16ul,
+    const=construct.Const(b"\x03\x21"),
+    record_id=construct.Int16ul,
 )
 
 _MEAL_FLAG = {

@@ -9,6 +9,7 @@
 from unittest.mock import Mock
 
 from absl.testing import absltest
+
 from glucometerutils.support import contourusb
 
 

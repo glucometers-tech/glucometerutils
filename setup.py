@@ -3,10 +3,9 @@
 # SPDX-FileCopyrightText: © 2013 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
 
-from setuptools import setup
-
 # Ensure it's present.
 import setuptools_scm  # noqa: F401
+from setuptools import setup
 
 extras_require = {
     # These are all the drivers' dependencies. Optional dependencies are

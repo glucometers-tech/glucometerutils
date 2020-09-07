@@ -7,6 +7,7 @@
 # pylint: disable=protected-access,missing-docstring
 
 from absl.testing import absltest
+
 from glucometerutils.drivers import otultraeasy
 
 
