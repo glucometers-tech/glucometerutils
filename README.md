@@ -73,8 +73,8 @@ supported.
 
 ¹ USB only, bluetooth not supported.
 
-² Requires a version of pyserial supporting CP2110 bridges. See [this pyserial
-pull request](https://github.com/pyserial/pyserial/pull/411).
+² Requires a version of pyserial supporting CP2110 bridges. Supported starting
+  from version 3.5.
 
 To identify the supported features for each of the driver, query the `help`
 action:
