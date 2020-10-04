@@ -53,12 +53,12 @@ supported.
 | LifeScan     | OneTouch Verio (USB)       | `otverio2015`      | [construct] [python-scsi]         |
 | LifeScan     | OneTouch Select Plus       | `otverio2015`      | [construct] [python-scsi]         |
 | LifeScan     | OneTouch Select Plus Flex¹ | `otverio2015`      | [construct] [python-scsi]         |
-| Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [freestyle_hid] [hidapi]‡         |
-| Abbott       | FreeStyle Libre            | `fslibre`          | [freestyle_hid] [hidapi]‡         |
+| Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [freestyle-hid] [hidapi]‡         |
+| Abbott       | FreeStyle Libre            | `fslibre`          | [freestyle-hid] [hidapi]‡         |
 | Abbott       | FreeStyle Optium           | `fsoptium`         | [pyserial]                        |
-| Abbott       | FreeStyle Precision Neo    | `fsprecisionneo`   | [freestyle_hid] [hidapi]‡         |
-| Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [freestyle_hid] [hidapi]‡         |
-| Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [freestyle_hid] [hidapi]‡         |
+| Abbott       | FreeStyle Precision Neo    | `fsprecisionneo`   | [freestyle-hid] [hidapi]‡         |
+| Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [freestyle-hid] [hidapi]‡         |
+| Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [freestyle-hid] [hidapi]‡         |
 | Roche        | Accu-Chek Mobile           | `accuchek_reports` |                                   |
 | SD Biosensor | SD CodeFree                | `sdcodefree`       | [construct] [pyserial]            |
 | TaiDoc       | TD-4277                    | `td4277`           | [construct] [pyserial]² [hidapi]  |
