@@ -53,12 +53,12 @@ supported.
 | LifeScan     | OneTouch Verio (USB)       | `otverio2015`      | [construct] [python-scsi]         |
 | LifeScan     | OneTouch Select Plus       | `otverio2015`      | [construct] [python-scsi]         |
 | LifeScan     | OneTouch Select Plus Flex¹ | `otverio2015`      | [construct] [python-scsi]         |
-| Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [construct] [hidapi]‡             |
-| Abbott       | FreeStyle Libre            | `fslibre`          | [construct] [hidapi]‡             |
+| Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [freestyle_hid] [hidapi]‡         |
+| Abbott       | FreeStyle Libre            | `fslibre`          | [freestyle_hid] [hidapi]‡         |
 | Abbott       | FreeStyle Optium           | `fsoptium`         | [pyserial]                        |
-| Abbott       | FreeStyle Precision Neo    | `fsprecisionneo`   | [construct] [hidapi]‡             |
-| Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [construct] [hidapi]‡             |
-| Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [construct] [hidapi]‡             |
+| Abbott       | FreeStyle Precision Neo    | `fsprecisionneo`   | [freestyle_hid] [hidapi]‡         |
+| Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [freestyle_hid] [hidapi]‡         |
+| Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [freestyle_hid] [hidapi]‡         |
 | Roche        | Accu-Chek Mobile           | `accuchek_reports` |                                   |
 | SD Biosensor | SD CodeFree                | `sdcodefree`       | [construct] [pyserial]            |
 | TaiDoc       | TD-4277                    | `td4277`           | [construct] [pyserial]² [hidapi]  |
@@ -86,6 +86,7 @@ please provide a reference, possibly by writing a specification and contribute
 it to https://protocols.glucometers.tech/ .
 
 [construct]: https://construct.readthedocs.io/en/latest/
+[freestyle-hid]: https://pypi.org/project/freestyle-hid/
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://pypi.org/project/PYSCSI/
 [hidapi]: https://pypi.python.org/pypi/hidapi
