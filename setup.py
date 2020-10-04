@@ -43,5 +43,4 @@ extras_require["all"] = all_require
 
 setup(
     extras_require=extras_require,
-    entry_points={"console_scripts": ["glucometer=glucometerutils.glucometer:main"]},
 )
