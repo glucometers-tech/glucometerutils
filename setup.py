@@ -12,18 +12,16 @@ extras_require = {
     # listed as mandatory for the feature.
     "accucheck_reports": [],
     "contourusb": ["construct", "hidapi"],
-    "fsinsulinx": ["construct", "hidapi"],
-    "fslibre": ["construct", "hidapi"],
+    "fsinsulinx": ["freestyle_hid"],
+    "fslibre": ["freestyle_hid"],
     "fsoptium": ["pyserial"],
-    "fsprecisionneo": ["construct", "hidapi"],
+    "fsprecisionneo": ["freestyle_hid"],
     "otultra2": ["pyserial"],
     "otultraeasy": ["construct", "pyserial"],
     "otverio2015": ["construct", "PYSCSI[sgio]>=2.0.1"],
     "otverioiq": ["construct", "pyserial"],
     "sdcodefree": ["construct", "pyserial"],
     "td4277": ["construct", "pyserial[cp2110]>=3.5b0"],
-    # These are not drivers, but rather tools and features.
-    "reversing_tools": ["usbmon-tools"],
     "dev": [
         "absl-py",
         "construct>=2.9",
