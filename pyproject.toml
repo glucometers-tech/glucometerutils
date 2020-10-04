@@ -42,3 +42,14 @@ known_first_party = ['glucometerutils']
 known_third_party = ['construct', 'hidapi', 'pyscsi', 'serial', 'usbmon']
 
 [tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+addopts = "--color=yes --ignore=setup.py -ra"
+timeout = 120
+norecursedirs = [
+  '.env',
+  '.git',
+  'dist',
+  'build',
+  'venv',
+]
