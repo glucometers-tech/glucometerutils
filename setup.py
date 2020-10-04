@@ -27,7 +27,6 @@ extras_require = {
         "construct>=2.9",
         "mypy",
         "pre-commit",
-        "pytest-flake8",
         "pytest-mypy",
         "pytest-timeout>=1.3.0",
         "pytest>=3.6.0",
