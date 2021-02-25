@@ -21,7 +21,7 @@ extras_require = {
     "otverio2015": ["construct", "PYSCSI[sgio]>=2.0.1"],
     "otverioiq": ["construct", "pyserial"],
     "sdcodefree": ["construct", "pyserial"],
-    "td4277": ["construct", "pyserial[cp2110]>=3.5b0"],
+    "td42xx": ["construct", "pyserial[cp2110]>=3.5b0"],
     "dev": [
         "absl-py",
         "construct>=2.9",
