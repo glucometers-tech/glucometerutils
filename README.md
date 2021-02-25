@@ -61,10 +61,12 @@ supported.
 | Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [freestyle-hid] [hidapi]‡         |
 | Roche        | Accu-Chek Mobile           | `accuchek_reports` |                                   |
 | SD Biosensor | SD CodeFree                | `sdcodefree`       | [construct] [pyserial]            |
-| TaiDoc       | TD-4277                    | `td4277`           | [construct] [pyserial]² [hidapi]  |
-| GlucoRx      | Nexus                      | `td4277`           | [construct] [pyserial]² [hidapi]  |
-| Menarini     | GlucoMen Nexus             | `td4277`           | [construct] [pyserial]² [hidapi]  |
-| Aktivmed     | GlucoCheck XL              | `td4277`           | [construct] [pyserial]² [hidapi]  |
+| TaiDoc       | TD-4277                    | `td42xx`           | [construct] [pyserial]² [hidapi]  |
+| TaiDoc       | TD-4235B                   | `td42xx`           | [construct] [pyserial]² [hidapi]  |
+| GlucoRx      | Nexus                      | `td42xx`           | [construct] [pyserial]² [hidapi]  |
+| GlucoRx      | NexusQ                     | `td42xx`           | [construct] [pyserial]² [hidapi]  |
+| Menarini     | GlucoMen Nexus             | `td42xx`           | [construct] [pyserial]² [hidapi]  |
+| Aktivmed     | GlucoCheck XL              | `td42xx`           | [construct] [pyserial]² [hidapi]  |
 | Ascensia     | ContourUSB                 | `contourusb`       | [construct] [hidapi]‡             |
 
 † Untested.
