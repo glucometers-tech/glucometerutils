@@ -2,7 +2,7 @@
 #
 # SPDX-FileCopyrightText: © 2019 The glucometerutils Authors
 # SPDX-License-Identifier: MIT
-"""Driver for TaiDoc TD-4277 devices.
+"""Driver for TaiDoc TD-42xx devices.
 
 Supported features:
     - get readings, including pre-/post-meal notes;
@@ -69,7 +69,7 @@ _GET_READING_VALUE = 0x26
 _CLEAR_MEMORY = 0x52
 
 _MODEL_STRUCT = construct.Struct(
-    const=construct.Const(b"\x77\x42"),
+    model=construct.Int16ul,
     unknown_1=construct.Byte,
     unknown_2=construct.Byte,
 )
@@ -104,7 +104,7 @@ _MEAL_FLAG = {
 
 _READING_VALUE_STRUCT = construct.Struct(
     value=construct.Int16ul,
-    const=construct.Const(b"\x06"),
+    unknown_1=construct.Byte,
     meal=construct.Mapping(construct.Byte, _MEAL_FLAG),
 )
 
@@ -176,19 +176,27 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
                 f"Invalid response received: {response_command:02x} {message!r}"
             )
 
+        self._get_model()
+
+    def _get_model(self) -> str:
         _, model_message = self._send_command(_GET_MODEL)
         try:
-            _MODEL_STRUCT.parse(model_message)
-        except construct.ConstructError:
+            result = _MODEL_STRUCT.parse(model_message)
+        except construct.ConstructError as e:
             raise exceptions.ConnectionFailed(
-                f"Invalid model identified: {model_message!r}"
-            )
+                f"Invalid model response: {model_message!r}"
+            ) from e
+
+        # The model number is presented as BCD (Binary Coded Decimal).
+        model_number = hex(result.model)[2:]
+
+        return f"TD-{model_number}"
 
     def disconnect(self) -> None:
         pass
 
     def get_meter_info(self) -> common.MeterInfo:
-        return common.MeterInfo("TaiDoc TD-4277 glucometer")
+        return common.MeterInfo(f"TaiDoc {self._get_model()} glucometer")
 
     def get_version(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
