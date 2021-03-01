@@ -21,6 +21,7 @@ https://protocols.glucometers.tech/abbott/freestyle-libre
 """
 
 import datetime
+import logging
 from typing import Dict, Generator, Mapping, Optional, Sequence, Tuple, Type
 
 from glucometerutils import common
@@ -253,6 +254,7 @@ class Device(freestyle.FreeStyleHidDevice):
         # Then get the results of explicit scans and blood tests (and other
         # events).
         for record in self._session.query_multirecord(b"$arresult?"):
+            logging.debug(f"Retrieved arresult: {record!r}")
             reading = _parse_arresult(record)
             if reading:
                 yield reading
