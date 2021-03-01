@@ -165,7 +165,7 @@ def _parse_arresult(record: Sequence[str]) -> Optional[common.AnyReading]:
     custom_comments = record[29:35]
     for comment_index in range(6):
         if parsed_record["custom-comments-bitfield"] & (1 << comment_index):
-            comment_parts.append(custom_comments[comment_index][1:-1])
+            comment_parts.append(custom_comments[comment_index])
 
     if parsed_record["sport-flag"]:
         comment_parts.append("Sport")
