@@ -211,7 +211,7 @@ class Device(freestyle.FreeStyleHidDevice):
     """Glucometer driver for FreeStyle Libre devices."""
 
     def __init__(self, device_path: Optional[str]) -> None:
-        super().__init__(0x3650, device_path)
+        super().__init__(0x3650, device_path, encoding="utf-8")
 
     def get_meter_info(self) -> common.MeterInfo:
         """Return the device information in structured form."""

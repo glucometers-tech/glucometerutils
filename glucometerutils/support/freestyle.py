@@ -50,17 +50,20 @@ class FreeStyleHidDevice(driver.GlucometerDevice):
         device_path: Optional[str],
         text_cmd: int = 0x60,
         text_reply_cmd: int = 0x60,
+        encoding: str = "ascii",
     ) -> None:
         super().__init__(device_path)
+        self._encoding = encoding
         try:
             self._session = freestyle_hid.Session(
                 product_id,
                 pathlib.Path(device_path) if device_path else None,
                 text_cmd,
                 text_reply_cmd,
+                encoding=encoding,
             )
         except Exception as e:
-            raise exceptions.ConnectionFailed(str(e))
+            raise exceptions.ConnectionFailed(str(e)) from e
 
     def connect(self) -> None:
         """Open connection to the device, starting the knocking sequence."""
@@ -92,9 +95,11 @@ class FreeStyleHidDevice(driver.GlucometerDevice):
 
     def set_patient_name(self, name: str) -> None:
         try:
-            encoded_name = name.encode("ascii")
-        except UnicodeDecodeError:
-            raise ValueError("Only ASCII-safe names are tested working")
+            encoded_name = name.encode(self._encoding)
+        except UnicodeDecodeError as error:
+            raise ValueError(
+                f"Error encoding patient name to {self._encoding}."
+            ) from error
 
         self._session.send_text_command(b"$ptname," + encoded_name)
 

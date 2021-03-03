@@ -12,10 +12,10 @@ extras_require = {
     # listed as mandatory for the feature.
     "accucheck_reports": [],
     "contourusb": ["construct", "hidapi"],
-    "fsinsulinx": ["freestyle-hid"],
-    "fslibre": ["freestyle-hid"],
+    "fsinsulinx": ["freestyle-hid>=1.0.2"],
+    "fslibre": ["freestyle-hid>=1.0.2"],
     "fsoptium": ["pyserial"],
-    "fsprecisionneo": ["freestyle-hid"],
+    "fsprecisionneo": ["freestyle-hid>=1.0.2"],
     "otultra2": ["pyserial"],
     "otultraeasy": ["construct", "pyserial"],
     "otverio2015": ["construct", "PYSCSI[sgio]>=2.0.1"],
