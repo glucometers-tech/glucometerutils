@@ -10,8 +10,9 @@ matrix:
   include:
     - python: 3.7
     - python: 3.8
+    - python: 3.9
       env: PYTEST_OPTIONS="--mypy"
-    - python: 3.9-dev
+    - python: 3.10-dev
 
 install:
   - pip install .[all]
