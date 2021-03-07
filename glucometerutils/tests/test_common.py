@@ -6,6 +6,7 @@
 
 # pylint: disable=protected-access,missing-docstring
 
+import csv
 import datetime
 import unittest
 
@@ -14,6 +15,8 @@ from absl.testing import parameterized
 from glucometerutils import common
 
 TEST_DATETIME = datetime.datetime(2018, 1, 1, 0, 30, 45)
+TEST_OLD_DATETIME = datetime.datetime(2016, 2, 2, 1, 31, 46)
+CSV_FIELD_COUNT = 5
 
 
 class TestGlucoseConversion(parameterized.TestCase):
@@ -53,6 +56,10 @@ class TestGlucoseReading(parameterized.TestCase):
         self.assertEqual(
             reading.as_csv(common.Unit.MG_DL),
             '"2018-01-01 00:30:45","100.00","","blood sample",""',
+        )
+        self.assertEqual(
+            len(list(csv.reader([reading.as_csv(common.Unit.MG_DL)]))[0]),
+            CSV_FIELD_COUNT,
         )
 
     @parameterized.named_parameters(
@@ -105,6 +112,17 @@ class TestGlucoseReading(parameterized.TestCase):
 
 
 class TestKetoneReading(unittest.TestCase):
+    def test_minimal(self):
+        reading = common.KetoneReading(TEST_DATETIME, 0.1)
+        self.assertEqual(
+            reading.as_csv(common.Unit.MG_DL),
+            '"2018-01-01 00:30:45","0.10","","blood sample",""',
+        )
+        self.assertEqual(
+            len(list(csv.reader([reading.as_csv(common.Unit.MG_DL)]))[0]),
+            CSV_FIELD_COUNT,
+        )
+
     def test_measure_method(self):
         """Raise an exception if an invalid measurement method is provided.
 
@@ -128,6 +146,19 @@ class TestKetoneReading(unittest.TestCase):
                 common.KetoneReading(
                     TEST_DATETIME, 100, measure_method=common.MeasurementMethod.TIME
                 )
+
+
+class TestTimeAdjustement(unittest.TestCase):
+    def test_minimal(self):
+        reading = common.TimeAdjustment(TEST_DATETIME, TEST_OLD_DATETIME)
+        self.assertEqual(
+            reading.as_csv(common.Unit.MG_DL),
+            '"2018-01-01 00:30:45","","","time","2016-02-02 01:31:46"',
+        )
+        self.assertEqual(
+            len(list(csv.reader([reading.as_csv(common.Unit.MG_DL)]))[0]),
+            CSV_FIELD_COUNT,
+        )
 
 
 class TestMeterInfo(parameterized.TestCase):

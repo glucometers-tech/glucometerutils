@@ -102,7 +102,7 @@ class KetoneReading:
         """Returns the reading as a formatted comma-separated value string."""
         del unit  # Unused for Ketone readings.
 
-        return '"%s","%.2f","%s","%s"' % (
+        return '"%s","%.2f","","%s","%s"' % (
             self.timestamp,
             self.value,
             self.measure_method.value,
@@ -121,7 +121,7 @@ class TimeAdjustment:
 
     def as_csv(self, unit: Unit) -> str:
         del unit
-        return '"%s","","%s","%s"' % (
+        return '"%s","","","%s","%s"' % (
             self.timestamp,
             self.measure_method.value,
             self.old_timestamp,
