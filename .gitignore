@@ -7,6 +7,7 @@
 *~
 .cache
 .mypy_cache/
+.vscode/
 /MANIFEST
 /dist/
 __pycache__/
