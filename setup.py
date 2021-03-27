@@ -16,6 +16,7 @@ extras_require = {
     "fslibre": ["freestyle-hid>=1.0.2"],
     "fsoptium": ["pyserial"],
     "fsprecisionneo": ["freestyle-hid>=1.0.2"],
+    "glucomenareo": ["pyserial", "crcmod"],
     "otultra2": ["pyserial"],
     "otultraeasy": ["construct", "pyserial"],
     "otverio2015": ["construct", "PYSCSI[sgio]>=2.0.1"],

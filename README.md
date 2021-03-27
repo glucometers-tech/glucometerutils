@@ -68,6 +68,7 @@ supported.
 | Menarini     | GlucoMen Nexus             | `td42xx`           | [construct] [pyserial]² [hidapi]  |
 | Aktivmed     | GlucoCheck XL              | `td42xx`           | [construct] [pyserial]² [hidapi]  |
 | Ascensia     | ContourUSB                 | `contourusb`       | [construct] [hidapi]‡             |
+| Menarini     | GlucoMen areo³             | `glucomenareo`     | [pyserial] [crcmod]               |
 
 † Untested.
 
@@ -77,6 +78,8 @@ supported.
 
 ² Requires a version of pyserial supporting CP2110 bridges. Supported starting
   from version 3.5.
+
+³ Serial cable only, NFC not supported.
 
 To identify the supported features for each of the driver, query the `help`
 action:
@@ -92,6 +95,7 @@ it to https://protocols.glucometers.tech/ .
 [pyserial]: https://pythonhosted.org/pyserial/
 [python-scsi]: https://pypi.org/project/PYSCSI/
 [hidapi]: https://pypi.python.org/pypi/hidapi
+[crcmod]: https://pypi.org/project/crcmod/
 
 ## Dump format
 
