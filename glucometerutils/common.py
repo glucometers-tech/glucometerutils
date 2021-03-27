@@ -51,7 +51,7 @@ def convert_glucose_unit(value: float, from_unit: Unit, to_unit: Unit) -> float:
     if from_unit == Unit.MG_DL:
         return round(value / 18.0, 2)
 
-    return round(value * 18.0, 0)
+    return round(value * 18.0, 1)
 
 
 @attr.s(auto_attribs=True)
