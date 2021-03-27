@@ -40,6 +40,7 @@ class SerialDevice:
     """
 
     BAUDRATE: Optional[int] = None
+    PARITY: str = serial.PARITY_NONE
     DEFAULT_CABLE_ID: Optional[str] = None
 
     TIMEOUT: float = 1
@@ -62,7 +63,7 @@ class SerialDevice:
             timeout=self.TIMEOUT,
             writeTimeout=None,
             bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE,
+            parity=self.PARITY,
             stopbits=serial.STOPBITS_ONE,
             xonxoff=False,
             rtscts=False,
