@@ -6,7 +6,9 @@ pull_request_rules:
   - name: Automatic merge on approval
     conditions:
       - "#approved-reviews-by>=1"
-      - "status-success=Travis CI - Pull Request"
+      - "status-success=pytest (ubuntu-latest, 3.7)"
+      - "status-success=pytest (ubuntu-latest, 3.8)"
+      - "status-success=pytest (ubuntu-latest, 3.9)"
       - "status-success=pre-commit"
     actions:
       merge:
@@ -14,7 +16,9 @@ pull_request_rules:
   - name: Automatic merge from Flameeyes
     conditions:
       - "author=Flameeyes"
-      - "status-success=Travis CI - Pull Request"
+      - "status-success=pytest (ubuntu-latest, 3.7)"
+      - "status-success=pytest (ubuntu-latest, 3.8)"
+      - "status-success=pytest (ubuntu-latest, 3.9)"
       - "status-success=pre-commit"
     actions:
       merge:
