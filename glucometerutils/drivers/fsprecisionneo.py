@@ -56,6 +56,8 @@ class _NeoReading:
         for idx, field in enumerate(dataclasses.fields(self)):
             if record[idx] == "HI":
                 setattr(self, field.name, float("inf"))
+            elif record[idx] =="LO":
+                setattr(self,field.name, -float("inf"))
             else:
                 setattr(self, field.name, int(record[idx]))
 
