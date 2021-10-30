@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #
 # SPDX-FileCopyrightText: © 2021 Stefanie Tellex
@@ -14,7 +15,7 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 
 Further information on the device protocol can be found at
 
-https://protocols.glucometers.tech/abbott/freestyle-optium
+https://protocols.glucometers.tech/abbott/freestyle-lite.html
 """
 
 import datetime
@@ -25,9 +26,14 @@ from typing import Generator, NoReturn, Sequence
 from glucometerutils import common, driver, exceptions
 from glucometerutils.support import serial
 
-_CLOCK_RE = re.compile(
-    r"^Clock:\t(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4})\t"
+_CLOCK_INIT_RE = re.compile(
+    r"^(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4}) "
     r"(?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})$"
+)
+
+_CLOCK_READING_RE = re.compile(
+    r"^(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4}) "
+    r"(?P<time>[0-9]{2}:[0-9]{2})$"
 )
 
 # The reading can be HI (padded to three-characters by a space) if the value was
@@ -66,13 +72,13 @@ _MONTH_MATCHES = {
 }
 
 
-def _parse_clock(datestr: str) -> datetime.datetime:
-    """Convert the date/time string used by the device into a datetime.
+def _parse_clock_init(datestr: str) -> datetime.datetime:
+    """Convert the date/time string used by the device when it sends the current time into a datetime.  This one has seconds.
 
     Args:
-      datestr: a string as returned by the device during information handling.
+      datestr: a string as returned by the device during initialization.
     """
-    match = _CLOCK_RE.match(datestr)
+    match = _CLOCK_INIT_RE.match(datestr)
     if not match:
         raise exceptions.InvalidResponse(datestr)
 
@@ -86,9 +92,31 @@ def _parse_clock(datestr: str) -> datetime.datetime:
     return datetime.datetime(year, month, day, hour, minute, second)
 
 
+def _parse_clock_reading(datestr: str) -> datetime.datetime:
+    """Convert the date/time string used by the device into a datetime.
+
+    Args:
+      datestr: a string as returned by the device during glucose readings into a datetime.  This one does not have seconds.
+    """
+    match = _CLOCK_READING_RE.match(datestr)
+    if not match:
+        raise exceptions.InvalidResponse(datestr)
+
+    # int() parses numbers in decimal, so we don't have to worry about '08'
+    day = int(match.group("day"))
+    month = _MONTH_MATCHES[match.group("month")]
+    year = int(match.group("year"))
+
+    hour, minute = (int(x) for x in match.group("time").split(":"))
+    second = 0
+
+    return datetime.datetime(year, month, day, hour, minute, second)
+
+
 class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 19200
-    DEFAULT_CABLE_ID = "1a61:3420"
+    #DEFAULT_CABLE_ID = "1a61:3420"
+    DEFAULT_CABLE_ID = "0403:6001"
 
     def _send_command(self, command: str) -> Sequence[str]:
         cmd_bytes = bytes("$%s\r\n" % command, "ascii")
@@ -107,34 +135,27 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         return decoded_response
 
     def connect(self) -> None:
-        self._send_command("xmem")  # ignore output this time
         self._fetch_device_information()
 
     def disconnect(self) -> None:  # pylint: disable=no-self-use
         return
 
     def _fetch_device_information(self) -> None:
-        data = self._send_command("colq")
+        data = self._send_command("mem")
 
-        for line in data:
-            parsed_line = line.split("\t")
+        lines = [line for line in data]
+        self.device_serialno_ = data[1]
+        self.device_version_ = data[2]
+        self.device_datetime_ = _parse_clock_init(data[3])
 
-            if parsed_line[0] == "S/N:":
-                self.device_serialno_ = parsed_line[1]
-            elif parsed_line[0] == "Ver:":
-                self.device_version_ = parsed_line[1]
-                if parsed_line[2] == "MMOL":
-                    self.device_glucose_unit_ = common.Unit.MMOL_L
-                else:  # I only have a mmol/l device, so I can't be sure.
-                    self.device_glucose_unit_ = common.Unit.MG_DL
-            # There are more entries: Clock, Market, ROM and Usage, but we don't
-            # care for those here.
-            elif parsed_line[0] == "CMD OK":
-                return
+        numlines = int(data[4])
 
-        # I have not figured out why this happens, but sometimes it's echoing
-        # back the commands and not replying to them.
-        raise exceptions.ConnectionFailed()
+        self._readings = []
+        for line in data[6:6+numlines]:
+            glucose = int(line[0:3])
+            timestamp = _parse_clock_reading(line[5:23])
+            self._readings.append(common.GlucoseReading(timestamp, glucose))
+
 
     def get_meter_info(self) -> common.MeterInfo:
         """Fetch and parses the device information.
@@ -143,7 +164,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
           A common.MeterInfo object.
         """
         return common.MeterInfo(
-            "Freestyle Optium glucometer",
+            "Freestyle Freedom Lite",
             serial_number=self.get_serial_number(),
             version_info=("Software version: " + self.get_version(),),
             native_unit=self.get_glucose_unit(),
@@ -172,7 +193,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
           common.Unit.MG_DL: if the glucometer displays in mg/dL
           common.Unit.MMOL_L: if the glucometer displays in mmol/L
         """
-        return self.device_glucose_unit_
+        return common.Unit.MG_DL
 
     def get_datetime(self) -> datetime.datetime:
         """Returns the current date and time for the glucometer.
@@ -180,24 +201,10 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         Returns:
           A datetime object built according to the returned response.
         """
-        data = self._send_command("colq")
-
-        for line in data:
-            if not line.startswith("Clock:"):
-                continue
-
-            return _parse_clock(line)
-
-        raise exceptions.InvalidResponse("\n".join(data))
+        return self.device_datetime_
 
     def _set_device_datetime(self, date: datetime.datetime) -> datetime.datetime:
-        data = self._send_command(date.strftime("tim,%m,%d,%y,%H,%M"))
-
-        parsed_data = "".join(data)
-        if parsed_data != "CMD OK":
-            raise exceptions.InvalidResponse(parsed_data)
-
-        return self.get_datetime()
+        raise NotImplementedError
 
     def zero_log(self) -> NoReturn:
         raise NotImplementedError
@@ -217,50 +224,5 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
           expected.
 
         """
-        data = self._send_command("xmem")
-
-        # The first line is empty, the second is the serial number, the third
-        # the version, the fourth the current time, and the fifth the record
-        # count.. The last line has a checksum and the end.
-        count = int(data[4])
-        if count != (len(data) - 6):
-            raise exceptions.InvalidResponse("\n".join(data))
-
-        # Extract the checksum from the last line.
-        checksum_match = _CHECKSUM_RE.match(data[-1])
-        if not checksum_match:
-            raise exceptions.InvalidResponse("\n".join(data))
-
-        expected_checksum = int(checksum_match.group("checksum"), 16)
-        # exclude the last line in the checksum calculation, as that's the
-        # checksum itself. The final \r\n is added separately.
-        calculated_checksum = sum(ord(c) for c in "\r\n".join(data[:-1])) + 0xD + 0xA
-
-        if expected_checksum != calculated_checksum:
-            raise exceptions.InvalidChecksum(expected_checksum, calculated_checksum)
-
-        for line in data[5:-1]:
-            match = _READING_RE.match(line)
-            if not match:
-                raise exceptions.InvalidResponse(line)
-
-            if match.group("type") != "G":
-                logging.warning("Non-glucose readings are not supported, ignoring.")
-                continue
-
-            if match.group("reading") == "HI ":
-                value = float("inf")
-            else:
-                value = float(match.group("reading"))
-
-            day = int(match.group("day"))
-            month = _MONTH_MATCHES[match.group("month")]
-            year = int(match.group("year"))
-
-            hour, minute = map(int, match.group("time").split(":"))
-
-            timestamp = datetime.datetime(year, month, day, hour, minute)
-
-            # The reading, if present, is always in mg/dL even if the glucometer
-            # is set to mmol/L.
-            yield common.GlucoseReading(timestamp, value)
+        for r in self._readings:
+            yield r
