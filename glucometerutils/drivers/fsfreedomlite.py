@@ -6,9 +6,9 @@
 """Driver for FreeStyle Freedom Lite devices.
 
 Supported features:
-    - get readings (ignores ketone results);
-    - use the glucose unit preset on the device by default;
-    - get and set date and time;
+    - get readings
+    - assumes the device uses mg/dL for the glucose unit
+    - get date and time;
     - get serial number and software version.
 
 Expected device path: /dev/ttyUSB0 or similar serial port device.
@@ -209,6 +209,9 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
     def zero_log(self) -> NoReturn:
         raise NotImplementedError
 
+    def get_patient_name(self):
+        raise NotImplementedError
+    
     def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """Iterates over the reading values stored in the glucometer.
 
