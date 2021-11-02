@@ -31,6 +31,7 @@ extras_require = {
         "pytest-mypy",
         "pytest-timeout>=1.3.0",
         "pytest>=3.6.0",
+        "types-python-dateutil",
     ],
 }
 
