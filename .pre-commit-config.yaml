@@ -10,13 +10,13 @@ repos:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/PyCQA/isort
-    rev: 5.8.0
+    rev: 5.9.3
     hooks:
       - id: isort
         additional_dependencies:
           - toml
 -   repo: https://github.com/psf/black
-    rev: 21.5b1
+    rev: 21.10b0
     hooks:
     - id: black
 -   repo: https://gitlab.com/pycqa/flake8
@@ -24,6 +24,6 @@ repos:
     hooks:
     - id: flake8
 -   repo: https://github.com/fsfe/reuse-tool
-    rev: v0.12.1
+    rev: v0.13.0
     hooks:
     - id: reuse
