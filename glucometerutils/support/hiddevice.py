@@ -19,6 +19,8 @@ class HidSession:
     methods abstracting the HID library.
     """
 
+    handle_: Optional[BinaryIO]
+
     def __init__(
         self,
         usb_id: Optional[Tuple[int, int]],
@@ -51,7 +53,7 @@ class HidSession:
 
         # If the user passed a device, try opening it.
         if device:
-            self.handle_ = open(device, "w+b")  # type: Optional[BinaryIO]
+            self.handle_ = open(device, "w+b")
         else:
             self.handle_ = None
             logging.info("No --device parameter provided, using hidapi library.")
