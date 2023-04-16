@@ -56,7 +56,6 @@ def convert_glucose_unit(value: float, from_unit: Unit, to_unit: Unit) -> float:
 
 @attr.s(auto_attribs=True)
 class GlucoseReading:
-
     timestamp: datetime.datetime
     value: float
     meal: Meal = attr.ib(default=Meal.NONE, validator=attr.validators.in_(Meal))
@@ -88,7 +87,6 @@ class GlucoseReading:
 
 @attr.s(auto_attribs=True)
 class KetoneReading:
-
     timestamp: datetime.datetime
     value: float
     comment: str = ""

@@ -94,7 +94,6 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         return pkt.message
 
     def wait_and_ready(self) -> int:
-
         challenge = b"\0"
         while challenge == b"\0":
             challenge = self.serial_.read(1)

@@ -14,7 +14,6 @@ from glucometerutils.support import contourusb
 
 
 class TestContourUSB(absltest.TestCase):
-
     header_record = b"\x04\x021H|\\^&||7w3LBL|Bayer7390^01.24\\01.04\\09.02.20^7390-2336773^7403-|A=1^C=63^G=1^I=0200^R=0^S=1^U=0^V=10600^X=070070070070180130150250^Y=360126090050099050300089^Z=1|1714||||||1|201909221304\r\x17D7\r\n\x05"
 
     mock_dev = Mock()
@@ -42,7 +41,6 @@ class TestContourUSB(absltest.TestCase):
         )
 
     def test_parse_header_record(self):
-
         _RECORD_FORMAT = contourusb._RECORD_FORMAT
 
         header_record_decoded = self.header_record.decode()

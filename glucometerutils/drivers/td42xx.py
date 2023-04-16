@@ -140,7 +140,6 @@ def _select_record(record_id: int) -> bytes:
 
 
 class Device(serial.SerialDevice, driver.GlucometerDevice):
-
     BAUDRATE = 19200
     TIMEOUT = 0.5
 
