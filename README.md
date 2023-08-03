@@ -52,6 +52,7 @@ supported.
 | LifeScan     | OneTouch Verio (USB)       | `otverio2015`      | [construct] [python-scsi]                  |
 | LifeScan     | OneTouch Select Plus       | `otverio2015`      | [construct] [python-scsi]                  |
 | LifeScan     | OneTouch Select Plus Flex¹ | `otverio2015`      | [construct] [python-scsi]                  |
+| Abbott       | FreeStyle Freedom Lite†    | `fsfreedomlite`    | [pyserial]                                 |
 | Abbott       | FreeStyle InsuLinx†        | `fsinsulinx`       | [freestyle-hid] [hidapi]‡                  |
 | Abbott       | FreeStyle Libre            | `fslibre`          | [freestyle-hid] [hidapi]‡                  |
 | Abbott       | FreeStyle Libre 2          | `fslibre2`         | [freestyle-hid] [freestyle-keys] [hidapi]‡ |
