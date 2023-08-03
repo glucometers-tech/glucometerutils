@@ -12,6 +12,7 @@ extras_require = {
     # listed as mandatory for the feature.
     "accucheck_reports": [],
     "contourusb": ["construct", "hidapi"],
+    "fsfreedomlite": ["pyserial"],
     "fsinsulinx": ["freestyle-hid>=1.0.2"],
     "fslibre": ["freestyle-hid>=1.0.2"],
     "fslibre2": ["freestyle-hid[encryption]>=1.1.0"],
