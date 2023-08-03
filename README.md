@@ -125,7 +125,7 @@ even if they are all from the same manufacturer, will use different
 protocols.
 
 If you want to contribute code, please note that the target language
-is Python 3.7, and that the style to follow is for the most part PEP8
+is Python 3.9, and that the style to follow is for the most part PEP8
 compatible.
 
 To set up your development environment follow these guidelines:
