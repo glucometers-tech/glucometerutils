@@ -19,7 +19,8 @@ import csv
 import datetime
 import glob
 import os
-from typing import Dict, Generator, NoReturn, Optional
+from collections.abc import Generator
+from typing import NoReturn, Optional
 
 from glucometerutils import common, driver, exceptions
 
@@ -112,7 +113,7 @@ class Device(driver.GlucometerDevice):
         raise NotImplementedError
 
     def _extract_datetime(
-        self, record: Dict[str, str]
+        self, record: dict[str, str]
     ) -> datetime.datetime:  # pylint: disable=no-self-use
         # Date and time are in separate column, but we want to parse them
         # together.
@@ -120,7 +121,7 @@ class Device(driver.GlucometerDevice):
         return datetime.datetime.strptime(date_and_time, _DATETIME_FORMAT)
 
     def _extract_meal(
-        self, record: Dict[str, str]
+        self, record: dict[str, str]
     ) -> common.Meal:  # pylint: disable=no-self-use
         if record[_AFTER_MEAL_CSV_KEY] and record[_BEFORE_MEAL_CSV_KEY]:
             raise exceptions.InvalidResponse("Reading cannot be before and after meal.")

@@ -16,7 +16,7 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 
 import datetime
 import re
-from typing import Generator
+from collections.abc import Generator
 
 from glucometerutils import common, driver, exceptions
 from glucometerutils.support import lifescan, serial

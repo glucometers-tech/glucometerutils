@@ -22,7 +22,8 @@ import enum
 import functools
 import logging
 import operator
-from typing import Generator, NoReturn
+from collections.abc import Generator
+from typing import NoReturn
 
 import construct
 

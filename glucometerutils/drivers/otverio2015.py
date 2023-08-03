@@ -26,7 +26,8 @@ https://protocols.glucometers.tech/lifescan/onetouch-verio-2015
 import binascii
 import datetime
 import logging
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any, Optional
 
 import construct
 from pyscsi.pyscsi.scsi import SCSI
@@ -141,7 +142,7 @@ class Device(driver.GlucometerDevice):
         self,
         lba: int,
         request_format: construct.Struct,
-        request_obj: Optional[Dict[str, Any]],
+        request_obj: Optional[dict[str, Any]],
         response_format: construct.Struct,
     ) -> construct.Container:
         """Send a request to the meter, and read its response.

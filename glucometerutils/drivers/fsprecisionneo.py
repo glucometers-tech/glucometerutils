@@ -24,7 +24,8 @@ https://protocols.glucometers.tech/abbott/freestyle-precision-neo
 
 import dataclasses
 import datetime
-from typing import Generator, NoReturn, Optional, Sequence, Type
+from collections.abc import Generator, Sequence
+from typing import NoReturn, Optional
 
 from glucometerutils import common
 from glucometerutils.support import freestyle
@@ -85,7 +86,7 @@ class Device(freestyle.FreeStyleHidDevice):
     def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """Iterate through the reading records in the device."""
         for record in self._session.query_multirecord(b"$result?"):
-            cls: Optional[Type[common.AnyReading]] = None
+            cls: Optional[type[common.AnyReading]] = None
             if record and record[0] == _TYPE_GLUCOSE_READING:
                 cls = common.GlucoseReading
             elif record and record[0] == _TYPE_KETONE_READING:

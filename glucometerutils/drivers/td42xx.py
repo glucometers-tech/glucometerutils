@@ -19,7 +19,8 @@ import enum
 import functools
 import logging
 import operator
-from typing import Generator, NoReturn, Optional, Tuple
+from collections.abc import Generator
+from typing import NoReturn, Optional
 
 import construct
 
@@ -152,7 +153,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         command: int,
         message: bytes = _EMPTY_MESSAGE,
         validate_response: bool = True,
-    ) -> Tuple[int, bytes]:
+    ) -> tuple[int, bytes]:
         pkt = _make_packet(command, message)
         logging.debug("sending packet: %s", binascii.hexlify(pkt))
 

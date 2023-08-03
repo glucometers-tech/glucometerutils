@@ -20,13 +20,14 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 """
 
 import datetime
-from typing import Dict, Generator, NoReturn, Optional
+from collections.abc import Generator
+from typing import NoReturn, Optional
 
 from glucometerutils import common
 from glucometerutils.support import contourusb
 
 
-def _extract_timestamp(parsed_record: Dict[str, str]):
+def _extract_timestamp(parsed_record: dict[str, str]):
     """Extract the timestamp from a parsed record.
 
     This leverages the fact that all the reading records have the same base structure.
