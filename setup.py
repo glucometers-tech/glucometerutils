@@ -14,6 +14,7 @@ extras_require = {
     "contourusb": ["construct", "hidapi"],
     "fsinsulinx": ["freestyle-hid>=1.0.2"],
     "fslibre": ["freestyle-hid>=1.0.2"],
+    "fslibre2": ["freestyle-hid[encryption]>=1.1.0"],
     "fsoptium": ["pyserial"],
     "fsprecisionneo": ["freestyle-hid>=1.0.2"],
     "glucomenareo": ["pyserial", "crcmod"],
