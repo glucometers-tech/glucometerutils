@@ -14,7 +14,7 @@ import datetime
 import logging
 from typing import Dict, Generator, Mapping, Optional, Sequence, Tuple, Type
 
-from glucometerutils import common
+from glucometerutils import common, exceptions
 from glucometerutils.support import freestyle
 
 # Fields of the records returned by both $history and $arresult?
@@ -218,9 +218,13 @@ class LibreDevice(freestyle.FreeStyleHidDevice):
 
     def get_glucose_unit(self) -> common.Unit:  # pylint: disable=no-self-use
         """Returns the glucose unit of the device."""
-        # TODO(Flameeyes): figure out how to identify the actual unit on the
-        # device.
-        return common.Unit.MG_DL
+        uom = self._session.send_text_command(b"$uom?").rstrip("\r\n")
+        if uom == "0":
+            return common.Unit.MMOL_L
+        if uom == "1":
+            return common.Unit.MG_DL
+
+        raise exceptions.InvalidGlucoseUnit(uom)
 
     def get_readings(self) -> Generator[common.AnyReading, None, None]:
         # First of all get the usually longer list of sensor readings, and
