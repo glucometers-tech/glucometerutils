@@ -51,6 +51,7 @@ class FreeStyleHidDevice(driver.GlucometerDevice):
         text_cmd: int = 0x60,
         text_reply_cmd: int = 0x60,
         encoding: str = "ascii",
+        encrypted: bool = False,
     ) -> None:
         super().__init__(device_path)
         self._encoding = encoding
@@ -61,6 +62,7 @@ class FreeStyleHidDevice(driver.GlucometerDevice):
                 text_cmd,
                 text_reply_cmd,
                 encoding=encoding,
+                encrypted=encrypted,
             )
         except Exception as e:
             raise exceptions.ConnectionFailed(str(e)) from e
