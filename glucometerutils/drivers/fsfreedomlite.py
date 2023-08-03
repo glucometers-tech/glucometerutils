@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 #
 # SPDX-FileCopyrightText: © 2021 Stefanie Tellex
@@ -115,7 +114,6 @@ def _parse_clock_reading(datestr: str) -> datetime.datetime:
 
 class Device(serial.SerialDevice, driver.GlucometerDevice):
     BAUDRATE = 19200
-    #DEFAULT_CABLE_ID = "1a61:3420"
     DEFAULT_CABLE_ID = "0403:6001"
 
     def _send_command(self, command: str) -> Sequence[str]:
@@ -143,19 +141,18 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
     def _fetch_device_information(self) -> None:
         data = self._send_command("mem")
 
-        lines = [line for line in data]
         self.device_serialno_ = data[1]
         self.device_version_ = data[2]
         self.device_datetime_ = _parse_clock_init(data[3])
 
         numlines = int(data[4])
+        last_line = 6 + numlines
 
         self._readings = []
-        for line in data[6:6+numlines]:
+        for line in data[6:last_line]:
             glucose = int(line[0:3])
             timestamp = _parse_clock_reading(line[5:23])
             self._readings.append(common.GlucoseReading(timestamp, glucose))
-
 
     def get_meter_info(self) -> common.MeterInfo:
         """Fetch and parses the device information.
@@ -211,7 +208,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
 
     def get_patient_name(self):
         raise NotImplementedError
-    
+
     def get_readings(self) -> Generator[common.AnyReading, None, None]:
         """Iterates over the reading values stored in the glucometer.
 
