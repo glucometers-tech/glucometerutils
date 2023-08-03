@@ -77,9 +77,10 @@ class GlucoseReading:
 
     def as_csv(self, unit: Unit) -> str:
         """Returns the reading as a formatted comma-separated value string."""
-        return '"%s","%.2f","%s","%s","%s"' % (
+        return '"%s","BG","%.2f","%s","%s","%s","%s"' % (
             self.timestamp,
             self.get_value_as(unit),
+            unit.value,
             self.meal.value,
             self.measure_method.value,
             self.comment,
@@ -101,7 +102,7 @@ class KetoneReading:
         """Returns the reading as a formatted comma-separated value string."""
         del unit  # Unused for Ketone readings.
 
-        return '"%s","%.2f","","%s","%s"' % (
+        return '"%s","BK","%.2f","mmol/L","","%s","%s"' % (
             self.timestamp,
             self.value,
             self.measure_method.value,
