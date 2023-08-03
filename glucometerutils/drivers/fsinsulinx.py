@@ -19,7 +19,8 @@ Xavier Claessens.
 
 import collections
 import datetime
-from typing import Generator, NoReturn, Optional
+from collections.abc import Generator
+from typing import NoReturn, Optional
 
 from glucometerutils import common
 from glucometerutils.support import freestyle

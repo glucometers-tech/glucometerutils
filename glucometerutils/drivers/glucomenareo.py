@@ -13,7 +13,8 @@ Expected device path: /dev/ttyUSB0 or similar serial port device.
 import dataclasses
 import datetime
 import logging
-from typing import Generator, Iterator, List, Mapping, NoReturn, Sequence, Union
+from collections.abc import Generator, Iterator, Mapping, Sequence
+from typing import NoReturn, Union
 
 import crcmod.predefined
 import serial as pyserial
@@ -100,7 +101,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         return line
 
     def _read_text_response(self) -> Sequence[bytes]:
-        all_lines: List[bytes] = []
+        all_lines: list[bytes] = []
 
         while True:
             line = self._readline()

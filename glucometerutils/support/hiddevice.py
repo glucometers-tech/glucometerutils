@@ -7,7 +7,7 @@
 
 import logging
 import os
-from typing import BinaryIO, Optional, Tuple
+from typing import BinaryIO, Optional
 
 from glucometerutils import exceptions
 
@@ -23,7 +23,7 @@ class HidSession:
 
     def __init__(
         self,
-        usb_id: Optional[Tuple[int, int]],
+        usb_id: Optional[tuple[int, int]],
         device: Optional[str],
         timeout_ms: int = 0,
     ) -> None:

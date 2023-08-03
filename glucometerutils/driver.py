@@ -8,13 +8,14 @@ import dataclasses
 import datetime
 import importlib
 import inspect
-from typing import Generator, Optional, Text, Type
+from collections.abc import Generator
+from typing import Optional
 
 from glucometerutils import common
 
 
 class GlucometerDevice(abc.ABC):
-    def __init__(self, device_path: Optional[Text]) -> None:
+    def __init__(self, device_path: Optional[str]) -> None:
         pass
 
     def connect(self) -> None:
@@ -72,7 +73,7 @@ class GlucometerDevice(abc.ABC):
 
 @dataclasses.dataclass
 class Driver:
-    device: Type[GlucometerDevice]
+    device: type[GlucometerDevice]
     help: str
 
 

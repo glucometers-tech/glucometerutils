@@ -20,7 +20,8 @@ https://protocols.glucometers.tech/abbott/freestyle-optium
 import datetime
 import logging
 import re
-from typing import Generator, NoReturn, Sequence
+from collections.abc import Generator, Sequence
+from typing import NoReturn
 
 from glucometerutils import common, driver, exceptions
 from glucometerutils.support import serial

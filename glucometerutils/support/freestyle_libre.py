@@ -12,7 +12,8 @@ https://protocols.glucometers.tech/abbott/freestyle-libre
 
 import datetime
 import logging
-from typing import Dict, Generator, Mapping, Optional, Sequence, Tuple, Type
+from collections.abc import Generator, Mapping, Sequence
+from typing import Optional
 
 from glucometerutils import common, exceptions
 from glucometerutils.support import freestyle
@@ -67,8 +68,8 @@ _ARRESULT_RAPID_INSULIN_ENTRY_MAP = ((43, "double-rapid-acting-insulin"),)
 
 
 def _parse_record(
-    record: Sequence[str], entry_map: Sequence[Tuple[int, str]]
-) -> Dict[str, int]:
+    record: Sequence[str], entry_map: Sequence[tuple[int, str]]
+) -> dict[str, int]:
     """Parses a list of string fields into a dictionary of integers."""
 
     if not record:
@@ -127,7 +128,7 @@ def _parse_arresult(record: Sequence[str]) -> Optional[common.AnyReading]:
 
     comment_parts = []
     measure_method: Optional[common.MeasurementMethod] = None
-    cls: Optional[Type[common.AnyReading]] = None
+    cls: Optional[type[common.AnyReading]] = None
     value: Optional[float] = None
 
     if parsed_record["reading-type"] == 2:

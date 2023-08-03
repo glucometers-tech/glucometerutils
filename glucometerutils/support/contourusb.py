@@ -15,7 +15,8 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 import datetime
 import enum
 import re
-from typing import Dict, Generator, List, Optional, Tuple
+from collections.abc import Generator
+from typing import Optional
 
 from glucometerutils import driver
 from glucometerutils.support import hiddevice
@@ -80,7 +81,7 @@ class ContourHidDevice(driver.GlucometerDevice):
 
     currecno: Optional[int] = None
 
-    def __init__(self, usb_ids: Tuple[int, int], device_path: Optional[str]) -> None:
+    def __init__(self, usb_ids: tuple[int, int], device_path: Optional[str]) -> None:
         super().__init__(device_path)
         self._hid_session = hiddevice.HidSession(usb_ids, device_path)
 
@@ -315,13 +316,13 @@ class ContourHidDevice(driver.GlucometerDevice):
         except Exception as e:
             raise e
 
-    def parse_result_record(self, text: str) -> Dict[str, str]:
+    def parse_result_record(self, text: str) -> dict[str, str]:
         result = _RESULT_RECORD_RE.search(text)
         assert result is not None
         rec_text = result.groupdict()
         return rec_text
 
-    def _get_multirecord(self) -> List[Dict[str, str]]:
+    def _get_multirecord(self) -> list[dict[str, str]]:
         """Queries for, and returns, "multirecords" results.
 
         Returns:

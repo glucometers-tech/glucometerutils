@@ -19,7 +19,8 @@ auto-detected.
 import binascii
 import datetime
 import logging
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any, Optional
 
 import construct
 
@@ -125,7 +126,7 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
     def _send_request(
         self,
         request_format: construct.struct,
-        request_obj: Optional[Dict[str, Any]],
+        request_obj: Optional[dict[str, Any]],
         response_format: construct.Struct,
     ) -> construct.Container:
         try:

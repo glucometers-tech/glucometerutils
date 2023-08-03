@@ -7,7 +7,8 @@
 import datetime
 import enum
 import textwrap
-from typing import Any, Dict, Optional, Sequence, Union
+from collections.abc import Sequence
+from typing import Any, Optional, Union
 
 import attr
 
@@ -64,7 +65,7 @@ class GlucoseReading:
         default=MeasurementMethod.BLOOD_SAMPLE,
         validator=attr.validators.in_(MeasurementMethod),
     )
-    extra_data: Dict[str, Any] = attr.Factory(dict)
+    extra_data: dict[str, Any] = attr.Factory(dict)
 
     def get_value_as(self, to_unit: Unit) -> float:
         """Returns the reading value as the given unit.
@@ -94,7 +95,7 @@ class KetoneReading:
         default=MeasurementMethod.BLOOD_SAMPLE,
         validator=attr.validators.in_({MeasurementMethod.BLOOD_SAMPLE}),
     )
-    extra_data: Dict[str, Any] = attr.Factory(dict)
+    extra_data: dict[str, Any] = attr.Factory(dict)
 
     def as_csv(self, unit: Unit) -> str:
         """Returns the reading as a formatted comma-separated value string."""
@@ -115,7 +116,7 @@ class TimeAdjustment:
     measure_method: MeasurementMethod = attr.ib(
         default=MeasurementMethod.TIME, validator=attr.validators.in_(MeasurementMethod)
     )
-    extra_data: Dict[str, Any] = attr.Factory(dict)
+    extra_data: dict[str, Any] = attr.Factory(dict)
 
     def as_csv(self, unit: Unit) -> str:
         del unit
