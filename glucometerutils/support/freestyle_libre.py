@@ -203,6 +203,16 @@ class LibreDevice(freestyle.FreeStyleHidDevice):
 
     _MODEL_NAME: str
 
+    @staticmethod
+    def _normalize_history_record(record: Sequence[str]) -> Sequence[str]:
+        """Normalize a history record to the base column layout."""
+        return record
+
+    @staticmethod
+    def _normalize_result_record(record: Sequence[str]) -> Sequence[str]:
+        """Normalize a result record to the base column layout."""
+        return record
+
     def get_meter_info(self) -> common.MeterInfo:
         """Return the device information in structured form."""
         return common.MeterInfo(
@@ -231,6 +241,7 @@ class LibreDevice(freestyle.FreeStyleHidDevice):
         # First of all get the usually longer list of sensor readings, and
         # convert them to Readings objects.
         for record in self._session.query_multirecord(b"$history?"):
+            record = self._normalize_history_record(record)
             parsed_record = _parse_record(record, _HISTORY_ENTRY_MAP)
 
             if not parsed_record or parsed_record["errors"] != 0:
@@ -248,6 +259,7 @@ class LibreDevice(freestyle.FreeStyleHidDevice):
         # Then get the results of explicit scans and blood tests (and other
         # events).
         for record in self._session.query_multirecord(b"$arresult?"):
+            record = self._normalize_result_record(record)
             logging.debug(f"Retrieved arresult: {record!r}")
             reading = _parse_arresult(record)
             if reading:
