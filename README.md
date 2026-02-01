@@ -61,6 +61,7 @@ supported.
 | Abbott       | FreeStyle Optium Neo       | `fsprecisionneo`   | [freestyle-hid] [hidapi]‡                  |
 | Abbott       | FreeStyle Optium Neo H     | `fsprecisionneo`   | [freestyle-hid] [hidapi]‡                  |
 | Roche        | Accu-Chek Mobile           | `accuchek_reports` |                                            |
+| Roche        | Accu-Chek Guide / Relion Platinum | `accuchek_guide`   | [pyusb]                                    |
 | SD Biosensor | SD CodeFree                | `sdcodefree`       | [construct] [pyserial]                     |
 | TaiDoc       | TD-4277                    | `td42xx`           | [construct] [pyserial]² [hidapi]           |
 | TaiDoc       | TD-4235B                   | `td42xx`           | [construct] [pyserial]² [hidapi]           |

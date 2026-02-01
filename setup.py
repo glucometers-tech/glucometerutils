@@ -11,6 +11,7 @@ extras_require = {
     # These are all the drivers' dependencies. Optional dependencies are
     # listed as mandatory for the feature.
     "accucheck_reports": [],
+    "accuchek_guide": ["pyusb"],
     "contourusb": ["construct", "hidapi"],
     "fsfreedomlite": ["pyserial"],
     "fsinsulinx": ["freestyle-hid>=1.0.2"],
