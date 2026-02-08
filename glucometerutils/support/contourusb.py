@@ -14,6 +14,7 @@ http://protocols.ascensia.com/Programming-Guide.aspx
 
 import datetime
 import enum
+import logging
 import re
 from collections.abc import Generator
 from typing import Optional
@@ -21,8 +22,10 @@ from typing import Optional
 from glucometerutils import driver
 from glucometerutils.support import hiddevice
 
+logger = logging.getLogger(__name__)
+
 # regexr.com/4k6jb
-_HEADER_RECORD_RE = re.compile(
+_HEADER_RECORD_RE_USB = re.compile(
     "^(?P<record_type>[a-zA-Z])\\|(?P<field_del>.)(?P<repeat_del>.)"
     "(?P<component_del>.)(?P<escape_del>.)\\|\\w*\\|(?P<product_code>\\w+)"
     "\\^(?P<dig_ver>[0-9]{2}\\.[0-9]{2})\\\\(?P<anlg_ver>[0-9]{2}\\.[0-9]{2})"
@@ -44,10 +47,26 @@ _HEADER_RECORD_RE = re.compile(
     "(?P<spec_ver>[0-9]+)\\|(?P<datetime>[0-9]+)"
 )
 
+_HEADER_RECORD_RE_NEXT = re.compile(
+    "^(?P<record_type>[a-zA-Z])\\|(?P<field_del>.)(?P<repeat_del>.)"
+    "(?P<component_del>.)(?P<escape_del>.)\\|\\w*\\|(?P<product_code>\\w+)"
+    "\\^(?P<dig_ver>[0-9]{2}\\.[0-9]{2})\\\\(?P<anlg_ver>[0-9]{2}\\.[0-9]{2})"
+    "\\\\(?P<agp_ver>[0-9]{2}\\.[0-9]{2})"
+    "\\^(?P<serial_num>(\\w|-)+)\\|"
+    "A=(?P<res_marking>[0-9])\\^C=(?P<config_bits>[0-9]+)\\^R=(?P<ref_method>[0-9]+)\\"
+    "^S=(?P<internal>[0-9]+)\\^U=(?P<unit>[0-9]+)\\"
+    "^V=(?P<lo_bound>[0-9]{2})(?P<hi_bound>[0-9]{3})\\"
+    "^X=(?P<post_food_low>[0-9]{3})(?P<pre_food_low>[0-9]{3})"
+    "(?P<post_food_high>[0-9]{3})(?P<pre_food_high>[0-9]{3})"
+    "\\^a=(?P<a>[0-9])\\^J=(?P<J>[0-9])\\|"
+    "(?P<total>[0-9]*)\\|\\|\\|\\|\\|(?P<unknown>[P])\\|"
+    "(?P<spec_ver>[0-9]+)\\|(?P<datetime>[0-9]+)\\|"
+)
+
 _RESULT_RECORD_RE = re.compile(
     "^(?P<record_type>[a-zA-Z])\\|(?P<seq_num>[0-9]+)\\|\\w*\\^\\w*\\^\\w*\\"
     "^(?P<test_id>\\w+)\\|(?P<value>[0-9]+)\\|(?P<unit>\\w+\\/\\w+)\\^"
-    "(?P<ref_method>[BPD])\\|\\|(?P<markers>[><BADISXCZ\\/1-12]*)\\|\\|"
+    "(?P<ref_method>[BPD])\\|\\|(?P<markers>[><BADISXCZT\\/0-12]*)\\|\\|"
     "(?P<datetime>[0-9]+)"
 )
 
@@ -81,9 +100,15 @@ class ContourHidDevice(driver.GlucometerDevice):
 
     currecno: Optional[int] = None
 
-    def __init__(self, usb_ids: tuple[int, int], device_path: Optional[str]) -> None:
+    def __init__(
+        self,
+        usb_ids: tuple[int, int],
+        device_path: Optional[str],
+        header_record_re: re.Pattern[str],
+    ) -> None:
         super().__init__(device_path)
         self._hid_session = hiddevice.HidSession(usb_ids, device_path)
+        self._header_record_re = header_record_re
 
     def read(self, r_size=blocksize):
         result = []
@@ -105,63 +130,14 @@ class ContourHidDevice(driver.GlucometerDevice):
 
         self._hid_session.write(data)
 
-    USB_VENDOR_ID: int = 0x1A79  # Bayer Health Care LLC Contour
-    USB_PRODUCT_ID: int = 0x6002
-
     def parse_header_record(self, text):
-        header = _HEADER_RECORD_RE.search(text)
-
-        self.field_del = header.group("field_del")
-        self.repeat_del = header.group("repeat_del")
-        self.component_del = header.group("component_del")
-        self.escape_del = header.group("escape_del")
-
-        self.product_code = header.group("product_code")
-        self.dig_ver = header.group("dig_ver")
-        self.anlg_ver = header.group("anlg_ver")
-        self.agp_ver = header.group("agp_ver")
-
-        self.serial_num = header.group("serial_num")
-        self.sku_id = header.group("sku_id")
-        self.res_marking = header.group("res_marking")
-        self.config_bits = header.group("config_bits")
-        self.lang = header.group("lang")
-        self.interv = header.group("interv")
-        self.ref_method = header.group("ref_method")
-        self.internal = header.group("internal")
-
-        # U limit
-        self.unit = header.group("unit")
-        self.lo_bound = header.group("lo_bound")
-        self.hi_bound = header.group("hi_bound")
-
-        # X field
-        self.hypo_limit = header.group("hypo_limit")
-        self.overall_low = header.group("overall_low")
-        self.pre_food_low = header.group("pre_food_low")
-        self.post_food_low = header.group("post_food_low")
-        self.overall_high = header.group("overall_high")
-        self.pre_food_high = header.group("pre_food_high")
-        self.post_food_high = header.group("post_food_high")
-        self.hyper_limit = header.group("hyper_limit")
-
-        # Y field
-        self.upp_hyper = header.group("upp_hyper")
-        self.low_hyper = header.group("low_hyper")
-        self.upp_hypo = header.group("upp_hypo")
-        self.low_hypo = header.group("low_hypo")
-        self.upp_low_target = header.group("upp_low_target")
-        self.low_low_target = header.group("low_low_target")
-        self.upp_hi_target = header.group("upp_hi_target")
-        self.low_hi_target = header.group("low_hi_target")
-
-        # Z field
-        self.trends = header.group("trends")
-
-        self.total = header.group("total")
-        self.spec_ver = header.group("spec_ver")
-        # Datetime string in YYYYMMDDHHMM format
-        self.datetime = header.group("datetime")
+        header = self._header_record_re.search(text)
+        if not header:
+            raise FrameError("Couldn't parse header record", text)
+        for key, value in header.groupdict().items():
+            setattr(self, key, value)
+        # Harmonize datetime string to YYYYMMDDHHMMSS format
+        self.datetime = self.datetime.ljust(14, '0')
 
     def checksum(self, text):
         """
@@ -205,7 +181,7 @@ class ContourHidDevice(driver.GlucometerDevice):
 
     def connect(self):
         """Connecting the device, nothing to be done.
-        All process is hadled by hiddevice
+        All process is handled by hiddevice
         """
         pass
 
@@ -227,13 +203,9 @@ class ContourHidDevice(driver.GlucometerDevice):
                 else:
                     pass
 
-        except FrameError as e:
-            print("Frame error")
-            raise e
-
-        except Exception as e:
-            print("Uknown error occured")
-            raise e
+        except FrameError:
+            logger.error("Frame error")
+            raise
 
     def disconnect(self):
         """Disconnect the device, nothing to be done."""
@@ -255,15 +227,7 @@ class ContourHidDevice(driver.GlucometerDevice):
         return self.unit
 
     def get_datetime(self) -> datetime.datetime:
-        datetime_str = self.datetime
-        return datetime.datetime(
-            int(datetime_str[0:4]),  # year
-            int(datetime_str[4:6]),  # month
-            int(datetime_str[6:8]),  # day
-            int(datetime_str[8:10]),  # hour
-            int(datetime_str[10:12]),  # minute
-            0,
-        )
+        return datetime.datetime.strptime(self.datetime, '%Y%m%d%H%M%S')
 
     def sync(self) -> Generator[str, None, None]:
         """
@@ -272,49 +236,54 @@ class ContourHidDevice(driver.GlucometerDevice):
         More info: https://bitbucket.org/iko/glucodump/src/default/
         """
         self.state = Mode.ESTABLISH
-        try:
-            tometer = "\x04"
+        tometer = "\x04"
+        result = None
+        foo = 0
+        while True:
+            self.write(tometer)
+            if result is not None and self.state == Mode.DATA:
+                yield result
             result = None
-            foo = 0
-            while True:
-                self.write(tometer)
-                if result is not None and self.state == Mode.DATA:
-                    yield result
-                result = None
-                data_bytes = self.read()
-                data = data_bytes.decode()
+            data_bytes = self.read()
+            data = data_bytes.decode()
 
-                if self.state == Mode.ESTABLISH:
-                    if data_bytes[-1] == 15:
-                        # got a <NAK>, send <EOT>
+            if self.state == Mode.ESTABLISH:
+                if data_bytes[-1] == 15:
+                    # got a <NAK>, send <EOT>
+                    tometer = chr(foo)
+                    foo += 1
+                    foo %= 256
+                    continue
+                if data_bytes[-1] == 5:
+                    # got an <ENQ>, send <ACK>
+                    tometer = "\x06"
+                    self.currecno = None
+                    continue
+            if self.state == Mode.DATA:
+                if data_bytes[-1] == 4:
+                    # got an <EOT>, done
+                    self.state = Mode.PRECOMMAND
+                    break
+            stx = data.find("\x02")
+            if stx != -1:
+                # got <STX>, parse frame
+                try:
+                    result = self.checkframe(data[stx:])
+                    if result == "L|1||N":
+                        # got terminator record from Contour Next, send <EOT>
                         tometer = chr(foo)
                         foo += 1
                         foo %= 256
-                        continue
-                    if data_bytes[-1] == 5:
-                        # got an <ENQ>, send <ACK>
-                        tometer = "\x06"
-                        self.currecno = None
-                        continue
-                if self.state == Mode.DATA:
-                    if data_bytes[-1] == 4:
-                        # got an <EOT>, done
                         self.state = Mode.PRECOMMAND
                         break
-                stx = data.find("\x02")
-                if stx != -1:
-                    # got <STX>, parse frame
-                    try:
-                        result = self.checkframe(data[stx:])
+                    else:
                         tometer = "\x06"
                         self.state = Mode.DATA
-                    except FrameError:
-                        tometer = "\x15"  # Couldn't parse, <NAK>
-                else:
-                    # Got something we don't understand, <NAK> it
-                    tometer = "\x15"
-        except Exception as e:
-            raise e
+                except FrameError:
+                    tometer = "\x15"  # Couldn't parse, <NAK>
+            else:
+                # Got something we don't understand, <NAK> it
+                tometer = "\x15"
 
     def parse_result_record(self, text: str) -> dict[str, str]:
         result = _RESULT_RECORD_RE.search(text)

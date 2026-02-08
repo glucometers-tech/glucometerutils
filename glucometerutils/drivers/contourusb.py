@@ -32,23 +32,20 @@ def _extract_timestamp(parsed_record: dict[str, str]):
 
     This leverages the fact that all the reading records have the same base structure.
     """
-    datetime_str = parsed_record["datetime"]
-
-    return datetime.datetime(
-        int(datetime_str[0:4]),  # year
-        int(datetime_str[4:6]),  # month
-        int(datetime_str[6:8]),  # day
-        int(datetime_str[8:10]),  # hour
-        int(datetime_str[10:12]),  # minute
-        0,
-    )
+    # Pad with zeros for missing time components
+    datetime_str = parsed_record["datetime"].ljust(14, '0')
+    return datetime.datetime.strptime(datetime_str, '%Y%m%d%H%M%S')
 
 
 class Device(contourusb.ContourHidDevice):
-    """Glucometer driver for Contour devices."""
+    """Glucometer driver for Contour USB devices."""
 
     def __init__(self, device: Optional[str]) -> None:
-        super().__init__((0x1A79, 0x6002), device)
+        super().__init__(
+            (0x1A79, 0x6002),
+            device,
+            header_record_re=contourusb._HEADER_RECORD_RE_USB,
+        )
 
     def get_meter_info(self) -> common.MeterInfo:
         self._get_info_record()

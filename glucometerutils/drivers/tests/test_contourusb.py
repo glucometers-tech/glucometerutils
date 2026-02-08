@@ -16,15 +16,19 @@ from glucometerutils.support import contourusb
 class TestContourUSB(absltest.TestCase):
     header_record = b"\x04\x021H|\\^&||7w3LBL|Bayer7390^01.24\\01.04\\09.02.20^7390-2336773^7403-|A=1^C=63^G=1^I=0200^R=0^S=1^U=0^V=10600^X=070070070070180130150250^Y=360126090050099050300089^Z=1|1714||||||1|201909221304\r\x17D7\r\n\x05"
 
-    mock_dev = Mock()
+    def setUp(self):
+        super().setUp()
+        self.mock_dev = Mock()
+        self.mock_dev._header_record_re = contourusb._HEADER_RECORD_RE_USB
 
     def test_get_datetime(self):
         import datetime
 
-        self.datetime = "201908071315"  # returned by
+        # datetime is padded to 14 chars (YYYYMMDDHHMMSS) by parse_header_record
+        self.mock_dev.datetime = "20190807131500"
         self.assertEqual(
-            datetime.datetime(2019, 8, 7, 13, 15),
-            contourusb.ContourHidDevice.get_datetime(self),
+            datetime.datetime(2019, 8, 7, 13, 15, 0),
+            contourusb.ContourHidDevice.get_datetime(self.mock_dev),
         )
 
     def test_RECORD_FORMAT_match(self):
@@ -92,7 +96,8 @@ class TestContourUSB(absltest.TestCase):
         self.assertEqual(self.mock_dev.total, "1714")
         self.assertEqual(self.mock_dev.spec_ver, "1")
 
-        self.assertEqual(self.mock_dev.datetime, "201909221304")
+        # datetime is padded to 14 chars (YYYYMMDDHHMMSS)
+        self.assertEqual(self.mock_dev.datetime, "20190922130400")
 
     # TO-DO checksum and checkframe unit tests
 

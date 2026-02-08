@@ -68,6 +68,7 @@ supported.
 | GlucoRx      | NexusQ                     | `td42xx`           | [construct] [pyserial]² [hidapi]           |
 | Menarini     | GlucoMen Nexus             | `td42xx`           | [construct] [pyserial]² [hidapi]           |
 | Aktivmed     | GlucoCheck XL              | `td42xx`           | [construct] [pyserial]² [hidapi]           |
+| Ascensia     | Contour Next               | `contournext`      | [construct] [hidapi]‡                      |
 | Ascensia     | ContourUSB                 | `contourusb`       | [construct] [hidapi]‡                      |
 | Menarini     | GlucoMen areo³             | `glucomenareo`     | [pyserial] [crcmod]                        |
 

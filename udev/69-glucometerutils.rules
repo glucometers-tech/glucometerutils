@@ -28,5 +28,9 @@ ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", TAG+="uaccess"
 
 ATTRS{idVendor}=="1a61", TAG+="uaccess"
 
+# Ascensia Contour Devices
+
+ATTRS{idVendor}=="1a79", TAG+="uaccess"
+
 
 LABEL="glucometerutils_rules_end"
