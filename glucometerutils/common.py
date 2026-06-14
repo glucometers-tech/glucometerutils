@@ -21,8 +21,9 @@ class Unit(enum.Enum):
 # Constants for meal information
 class Meal(enum.Enum):
     NONE = ""
-    BEFORE = "Before Meal"
-    AFTER = "After Meal"
+    BEFORE = "before meal"
+    AFTER = "after meal"
+    FASTING = "fasting"
 
 
 # Constants for measure method
@@ -66,6 +67,7 @@ class GlucoseReading:
         validator=attr.validators.in_(MeasurementMethod),
     )
     extra_data: dict[str, Any] = attr.Factory(dict)
+    unit: Unit = attr.ib(default=Unit.MG_DL, validator=attr.validators.in_(Unit))
 
     def get_value_as(self, to_unit: Unit) -> float:
         """Returns the reading value as the given unit.
@@ -73,7 +75,7 @@ class GlucoseReading:
         Args:
           to_unit: The unit to return the value to.
         """
-        return convert_glucose_unit(self.value, Unit.MG_DL, to_unit)
+        return convert_glucose_unit(self.value, self.unit, to_unit)
 
     def as_csv(self, unit: Unit) -> str:
         """Returns the reading as a formatted comma-separated value string."""

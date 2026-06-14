@@ -69,6 +69,7 @@ supported.
 | Menarini     | GlucoMen Nexus             | `td42xx`           | [construct] [pyserial]² [hidapi]           |
 | Aktivmed     | GlucoCheck XL              | `td42xx`           | [construct] [pyserial]² [hidapi]           |
 | Ascensia     | ContourUSB                 | `contourusb`       | [construct] [hidapi]‡                      |
+| Ascensia     | Contour Care               | `contourcare`      | [construct] [hidapi]‡                      |
 | Menarini     | GlucoMen areo³             | `glucomenareo`     | [pyserial] [crcmod]                        |
 
 † Untested.

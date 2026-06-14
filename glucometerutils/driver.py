@@ -70,6 +70,14 @@ class GlucometerDevice(abc.ABC):
     def get_readings(self) -> Generator[common.AnyReading, None, None]:
         pass
 
+    @abc.abstractmethod
+    def get_patient_name(self) -> Optional[str]:
+        pass
+
+    @abc.abstractmethod
+    def set_patient_name(self, name: str) -> None:
+        pass
+
 
 @dataclasses.dataclass
 class Driver:

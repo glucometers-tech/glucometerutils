@@ -8,9 +8,12 @@
 .cache
 .mypy_cache/
 .vscode/
+.zed/
 /MANIFEST
 /dist/
 __pycache__/
 build
 .idea/
 *venv/
+*.swp
+.DS_Store
