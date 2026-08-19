@@ -7,7 +7,8 @@
 Supported features:
     - get readings, including pre-/post-meal notes;
     - get and set date and time;
-    - get serial number (partial);
+    - get serial number;
+    - get glucose unit;
     - memory reset (caution!)
 
 Expected device path: 0001:001c:00 (libusb), /dev/hidraw1 (Linux).
@@ -63,9 +64,17 @@ _SET_DATETIME = 0x33
 
 _GET_MODEL = 0x24
 
+# The serial number and glucose unit commands were ported from an
+# independent implementation of the protocol:
+# (https://github.com/kolos/glucometer)
+_GET_SERIAL_NUMBER_LOW = 0x27
+_GET_SERIAL_NUMBER_HIGH = 0x28
+
 _GET_READING_COUNT = 0x2B
 _GET_READING_DATETIME = 0x25
 _GET_READING_VALUE = 0x26
+
+_GET_RANGE = 0x2F
 
 _CLEAR_MEMORY = 0x52
 
@@ -107,6 +116,18 @@ _READING_VALUE_STRUCT = construct.Struct(
     value=construct.Int16ul,
     unknown_1=construct.Byte,
     meal=construct.Mapping(construct.Byte, _MEAL_FLAG),
+)
+
+_UNIT_FLAG = {
+    common.Unit.MG_DL: 0x00,
+    common.Unit.MMOL_L: 0x01,
+}
+
+_RANGE_STRUCT = construct.Struct(
+    low=construct.Byte,
+    high=construct.Byte,
+    unit=construct.Mapping(construct.Byte, _UNIT_FLAG),
+    unknown=construct.Byte,
 )
 
 
@@ -196,13 +217,24 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         pass
 
     def get_meter_info(self) -> common.MeterInfo:
-        return common.MeterInfo(f"TaiDoc {self._get_model()} glucometer")
+        return common.MeterInfo(
+            f"TaiDoc {self._get_model()} glucometer",
+            serial_number=self.get_serial_number(),
+            native_unit=self.get_glucose_unit(),
+        )
 
     def get_version(self) -> NoReturn:  # pylint: disable=no-self-use
         raise NotImplementedError
 
-    def get_serial_number(self) -> NoReturn:  # pylint: disable=no-self-use
-        raise NotImplementedError
+    def get_serial_number(self) -> str:
+        # The two serial number commands each return 4 raw bytes. Concatenated as
+        # LOW then HIGH and byte-reversed, they form an 8-byte BCD-like field whose
+        # hex representation matches the serial number printed on the device
+        # (including a leading 4-digit model number, e.g. "4116" for a TD-4116).
+        _, low_message = self._send_command(_GET_SERIAL_NUMBER_LOW)
+        _, high_message = self._send_command(_GET_SERIAL_NUMBER_HIGH)
+
+        return (low_message + high_message)[::-1].hex()
 
     def get_datetime(self) -> datetime.datetime:
         _, message = self._send_command(_GET_DATETIME)
@@ -254,6 +286,10 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
     def zero_log(self) -> None:
         self._send_command(_CLEAR_MEMORY)
 
-    def get_glucose_unit(self) -> NoReturn:
-        """Maybe this could be implemented by someone who knows the device"""
-        raise NotImplementedError
+    def get_glucose_unit(self) -> common.Unit:
+        _, message = self._send_command(_GET_RANGE)
+
+        try:
+            return _RANGE_STRUCT.parse(message).unit
+        except construct.ConstructError as e:
+            raise exceptions.InvalidResponse(message) from e
