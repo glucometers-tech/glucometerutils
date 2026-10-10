@@ -20,7 +20,7 @@ https://protocols.glucometers.tech/abbott/freestyle-lite.html
 import datetime
 import logging
 import re
-from typing import Generator, NoReturn, Sequence
+from typing import Generator, NoReturn, Optional, Sequence
 
 from glucometerutils import common, driver, exceptions
 from glucometerutils.support import serial
@@ -30,23 +30,24 @@ _CLOCK_INIT_RE = re.compile(
     r"(?P<time>[0-9]{2}:[0-9]{2}:[0-9]{2})$"
 )
 
-_CLOCK_READING_RE = re.compile(
-    r"^(?P<month>[A-Z][a-z]{2})  (?P<day>[0-9]{2}) (?P<year>[0-9]{4}) "
-    r"(?P<time>[0-9]{2}:[0-9]{2})$"
-)
-
 # The reading can be HI (padded to three-characters by a space) if the value was
 # over what the meter was supposed to read. Unlike the "Clock:" line, the months
 # of June and July are written in full, everything else is truncated to three
 # characters, so accept a space or 'e'/'y' at the end of the month name. Also,
 # the time does *not* include seconds.
+#
+# The type field is documented as G (glucose) or K (ketone), but some firmware
+# versions (e.g. "2.32 -P") write a two-digit numeric type such as "00" instead.
+# The trailing flags field is usually 0x00, but other values (such as 0x08) have
+# been observed; their meaning is not documented, so they are only reported.
 _READING_RE = re.compile(
     r"^(?P<reading>HI |[0-9]{3})  "
     r"(?P<month>[A-Z][a-z]{2})[ ey] "
     r"(?P<day>[0-9]{2}) "
     r"(?P<year>[0-9]{4}) "
     r"(?P<time>[0-9]{2}:[0-9]{2}) "
-    r"(?P<type>[GK]) 0x00$"
+    r"(?P<type>[GK]|[0-9]{2}) "
+    r"(?P<flags>0x[0-9A-F]{2})$"
 )
 
 _CHECKSUM_RE = re.compile(r"^(?P<checksum>0x[0-9A-F]{4})  END$")
@@ -91,25 +92,47 @@ def _parse_clock_init(datestr: str) -> datetime.datetime:
     return datetime.datetime(year, month, day, hour, minute, second)
 
 
-def _parse_clock_reading(datestr: str) -> datetime.datetime:
-    """Convert the date/time string used by the device into a datetime.
+def _parse_reading(line: str) -> Optional[common.GlucoseReading]:
+    """Convert a memory line from the device into a GlucoseReading.
 
     Args:
-      datestr: a string as returned by the device during glucose readings into a datetime.  This one does not have seconds.
-    """
-    match = _CLOCK_READING_RE.match(datestr)
-    if not match:
-        raise exceptions.InvalidResponse(datestr)
+      line: a single reading line as returned by the "mem" command.
 
-    # int() parses numbers in decimal, so we don't have to worry about '08'
+    Returns:
+      A common.GlucoseReading, or None if the line is not a glucose reading.
+
+    Raises:
+      exceptions.InvalidResponse: if the line does not match the expected
+        format.
+    """
+    match = _READING_RE.match(line)
+    if not match:
+        raise exceptions.InvalidResponse(line)
+
+    if match.group("type") == "K":
+        logging.warning("Non-glucose readings are not supported, ignoring.")
+        return None
+
+    if match.group("reading") == "HI ":
+        value = float("inf")
+    else:
+        value = float(match.group("reading"))
+
+    month = _MONTH_MATCHES.get(match.group("month"))
+    if month is None:
+        raise exceptions.InvalidResponse(line)
+
     day = int(match.group("day"))
-    month = _MONTH_MATCHES[match.group("month")]
     year = int(match.group("year"))
 
     hour, minute = (int(x) for x in match.group("time").split(":"))
-    second = 0
 
-    return datetime.datetime(year, month, day, hour, minute, second)
+    timestamp = datetime.datetime(year, month, day, hour, minute)
+
+    flags = match.group("flags")
+    comment = "" if flags == "0x00" else f"Flags: {flags}"
+
+    return common.GlucoseReading(timestamp, value, comment=comment)
 
 
 class Device(serial.SerialDevice, driver.GlucometerDevice):
@@ -148,11 +171,11 @@ class Device(serial.SerialDevice, driver.GlucometerDevice):
         numlines = int(data[4])
         last_line = 6 + numlines
 
-        self._readings = []
+        self._readings: list[common.GlucoseReading] = []
         for line in data[6:last_line]:
-            glucose = int(line[0:3])
-            timestamp = _parse_clock_reading(line[5:23])
-            self._readings.append(common.GlucoseReading(timestamp, glucose))
+            reading = _parse_reading(line)
+            if reading is not None:
+                self._readings.append(reading)
 
     def get_meter_info(self) -> common.MeterInfo:
         """Fetch and parses the device information.
